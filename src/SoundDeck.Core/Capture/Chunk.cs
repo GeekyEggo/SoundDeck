@@ -1,5 +1,6 @@
 ﻿namespace SoundDeck.Core
 {
+    using NAudio.Wave;
     using System;
 
     /// <summary>
@@ -7,6 +8,18 @@
     /// </summary>
     public class Chunk : IDisposable
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Chunk"/> class.
+        /// </summary>
+        /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
+        internal Chunk(WaveInEventArgs e)
+        {
+            this.Buffer = new byte[e.Buffer.Length];
+            this.BytesRecorded = e.BytesRecorded;
+
+            e.Buffer.CopyTo(this.Buffer, 0);
+        }
+
         /// <summary>
         /// Gets or sets the buffer.
         /// </summary>

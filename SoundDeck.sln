@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{B3E6E847-69CA-43E1-A805-517751F4C93D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Core", "src\SoundDeck.Core\SoundDeck.Core.csproj", "{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Core", "src\SoundDeck.Core\SoundDeck.Core.csproj", "{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{49D11615-E2EE-4FEE-A754-F29B583EDB92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B3E6E847-69CA-43E1-A805-517751F4C93D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3E6E847-69CA-43E1-A805-517751F4C93D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3E6E847-69CA-43E1-A805-517751F4C93D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3E6E847-69CA-43E1-A805-517751F4C93D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49D11615-E2EE-4FEE-A754-F29B583EDB92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49D11615-E2EE-4FEE-A754-F29B583EDB92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49D11615-E2EE-4FEE-A754-F29B583EDB92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49D11615-E2EE-4FEE-A754-F29B583EDB92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

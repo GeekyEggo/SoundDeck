@@ -55,7 +55,17 @@
         /// <param name="chunk">The chunk of data.</param>
         /// <returns>The task of adding the chunk.</returns>
         public Task AddAsync(Chunk chunk)
-            => _syncRoot.WaitAsync(() => this.Data.AddLast(chunk));
+        {
+            return _syncRoot.WaitAsync(() =>
+            {
+                if (this.IsDisposed)
+                {
+                    throw new ObjectDisposedException($"Unable to add {nameof(Chunk)}, the {nameof(ChunkCollection)} has been disposed.");
+                }
+
+                this.Data.AddLast(chunk);
+            });
+        }
 
         /// <summary>
         /// Gets the chunks of data from with the last <paramref name="duration"/> time span asynchronously.
@@ -104,7 +114,6 @@
                 var threshold = DateTime.UtcNow.Subtract(bufferDuration);
                 while (this.Data.Count > 0 && this.Data.First.Value.DateTime < threshold)
                 {
-                    this.Data.First.Value.Dispose();
                     this.Data.RemoveFirst();
                 }
             }
