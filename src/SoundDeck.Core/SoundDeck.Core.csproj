@@ -5,19 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NAudio\AudioAmplifier.cs" />
-    <Compile Remove="NAudio\CaptureProvider.cs" />
-    <Compile Remove="NAudio\WasapiAudioCapture.cs" />
-    <Compile Remove="NAudio\WaveFileWriter.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview5.19227.9" />
     <PackageReference Include="NAudio" Version="1.9.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NAudio\" />
   </ItemGroup>
 
 </Project>

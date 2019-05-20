@@ -86,16 +86,11 @@
         /// </summary>
         public void Dispose()
         {
-            _syncRoot.Wait();
-            try
+            _syncRoot.Wait(() =>
             {
                 this.Data.Clear();
                 this.IsDisposed = true;
-            }
-            finally
-            {
-                _syncRoot.Release();
-            }
+            });
         }
 
         /// <summary>

@@ -49,7 +49,7 @@
             try
             {
                 var device = this.DeviceEnumerator.GetDevice(deviceId);
-                return new AudioBuffer(device, TimeSpan.FromMinutes(1));
+                return new AudioBuffer(device, TimeSpan.FromMinutes(1), this.Logger);
             }
             catch
             {

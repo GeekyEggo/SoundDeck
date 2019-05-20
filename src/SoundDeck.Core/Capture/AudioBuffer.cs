@@ -4,7 +4,6 @@
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using System;
-    using System.IO;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -60,21 +59,14 @@
         /// <returns>The file path.</returns>
         public async Task<string> SaveAsync(TimeSpan duration, string outputPath)
         {
-            // get the chunks and determine the path of the file
             var chunks = await this.Chunks.GetAsync(duration);
-            var path = Path.Combine(outputPath, $"{DateTime.UtcNow:yyyy-MM-dd_HHmmss}.wav");
-
-            // write the file
-            using (var writer = new WaveFileWriter(path, this.Capture.WaveFormat))
+            using (var writer = new WavFileWriter(chunks, outputPath, this.Capture.WaveFormat))
             {
-                foreach (var chunk in chunks)
-                {
-                    await writer.WriteAsync(chunk.Buffer, 0, chunk.BytesRecorded);
-                }
-            }
+                var path = await writer.SaveAsync();
+                this.Logger?.LogInformation("Audio capture saved: {0}", path); 
 
-            this.Logger?.LogInformation("Audio capture saved: {0}", path); 
-            return path;
+                return path;
+            }
         }
 
         /// <summary>
