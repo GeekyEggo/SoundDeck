@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+﻿namespace SoundDeck.Core.Capture
 {
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;

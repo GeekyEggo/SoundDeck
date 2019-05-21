@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+﻿namespace SoundDeck.Core.Capture
 {
     using Extensions;
     using Microsoft.Extensions.Logging;
@@ -11,7 +11,7 @@
     /// <summary>
     /// Provides a collection of <see cref="Chunk"/> data, containing captured audio.
     /// </summary>
-    public sealed class ChunkCollection : IDisposable
+    public class ChunkCollection : IChunkCollection
     {
         /// <summary>
         /// The synchronize root, used to synchronize access.
@@ -54,7 +54,7 @@
         /// </summary>
         /// <param name="chunk">The chunk of data.</param>
         /// <returns>The task of adding the chunk.</returns>
-        public Task AddAsync(Chunk chunk)
+        public virtual Task AddAsync(Chunk chunk)
         {
             return _syncRoot.WaitAsync(() =>
             {
@@ -72,7 +72,7 @@
         /// </summary>
         /// <param name="duration">The duration.</param>
         /// <returns>The chunks of data.</returns>
-        public Task<Chunk[]> GetAsync(TimeSpan duration)
+        public virtual Task<Chunk[]> GetAsync(TimeSpan duration)
         {
             return _syncRoot.WaitAsync(() =>
             {
@@ -86,10 +86,23 @@
         /// </summary>
         public void Dispose()
         {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="isDisposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool isDisposing)
+        {
             _syncRoot.Wait(() =>
             {
-                this.Data.Clear();
-                this.IsDisposed = true;
+                if (!this.IsDisposed)
+                {
+                    this.Data.Clear();
+                    this.IsDisposed = true;
+                }
             });
         }
 

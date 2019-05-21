@@ -9,14 +9,25 @@
     public class Chunk : IDisposable
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Chunk" /> class.
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <param name="bytesRecorded">The bytes recorded.</param>
+        /// <param name="dateTime">The date time.</param>
+        public Chunk(byte[] buffer, int bytesRecorded, DateTime dateTime)
+        {
+            this.Buffer = buffer;
+            this.BytesRecorded = bytesRecorded;
+            this.DateTime = dateTime;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Chunk"/> class.
         /// </summary>
         /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
         internal Chunk(WaveInEventArgs e)
+            : this(new byte[e.Buffer.Length], e.BytesRecorded, DateTime.UtcNow)
         {
-            this.Buffer = new byte[e.Buffer.Length];
-            this.BytesRecorded = e.BytesRecorded;
-
             e.Buffer.CopyTo(this.Buffer, 0);
         }
 
@@ -33,7 +44,7 @@
         /// <summary>
         /// Gets the date time.
         /// </summary>
-        public DateTime DateTime { get; } = DateTime.UtcNow;
+        public DateTime DateTime { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

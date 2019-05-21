@@ -1,8 +1,10 @@
-﻿namespace SoundDeck.Core
+﻿namespace SoundDeck.Core.Capture
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
+    using NAudio.MediaFoundation;
     using NAudio.Wave;
+    using SoundDeck.Core.IO;
     using System;
     using System.Threading.Tasks;
 
@@ -28,6 +30,7 @@
             this.Capture.StartRecording();
         }
 
+
         /// <summary>
         /// Gets the audio capturer.
         /// </summary>
@@ -36,7 +39,12 @@
         /// <summary>
         /// Gets the chunks of captured audio data.
         /// </summary>
-        private ChunkCollection Chunks { get; }
+        private IChunkCollection Chunks { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is disposed.
+        /// </summary>
+        private bool IsDisposed { get; set; } = false;
 
         /// <summary>
         /// Gets the logger.
@@ -48,8 +56,14 @@
         /// </summary>
         public void Dispose()
         {
-            this.Capture.Dispose();
-            this.Chunks.Dispose();
+            if (!this.IsDisposed)
+            {
+                this.Capture?.StopRecording();
+                this.Capture?.Dispose();
+                this.Chunks?.Dispose();
+
+                this.IsDisposed = true;
+            }
         }
 
         /// <summary>
@@ -63,7 +77,7 @@
             using (var writer = new WavFileWriter(chunks, outputPath, this.Capture.WaveFormat))
             {
                 var path = await writer.SaveAsync();
-                this.Logger?.LogInformation("Audio capture saved: {0}", path); 
+                this.Logger?.LogInformation("Audio capture saved: {0}", path);
 
                 return path;
             }

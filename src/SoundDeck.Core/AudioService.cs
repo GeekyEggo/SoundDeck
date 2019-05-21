@@ -2,6 +2,7 @@
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core.Capture;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -49,7 +50,7 @@
             try
             {
                 var device = this.DeviceEnumerator.GetDevice(deviceId);
-                return new AudioBuffer(device, TimeSpan.FromMinutes(1), this.Logger);
+                return new AudioBuffer(device, TimeSpan.FromSeconds(10), this.Logger);
             }
             catch
             {
@@ -62,6 +63,6 @@
         /// </summary>
         /// <returns>The audio devices</returns>
         public IEnumerable<AudioDevice> GetDevices()
-            => this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active).Select(m => new AudioDevice(m));        
+            => this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active).Select(m => new AudioDevice(m));
     }
 }
