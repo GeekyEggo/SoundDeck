@@ -2,6 +2,8 @@
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
+    using NAudio.MediaFoundation;
+    using NAudio.Wave;
     using SoundDeck.Core.Capture;
     using System;
     using System.Collections.Generic;
@@ -33,12 +35,17 @@
         private ILogger<AudioService> Logger { get; }
 
         /// <summary>
+        /// Determines whether encoding to MP3 is possible based on the current environment.
+        /// </summary>
+        /// <returns><c>true</c> when encoding is possible; otherwise <c>false</c>.</returns>
+        public bool CanEncodeToMP3()
+            => MediaFoundationEncoder.SelectMediaType(AudioSubtypes.MFAudioFormat_MP3, Constants.DefaultWaveFormat, Constants.DesiredBitRate) != null;
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
-        {
-            this.DeviceEnumerator.Dispose();
-        }
+            => this.DeviceEnumerator.Dispose();
 
         /// <summary>
         /// Attempts to get the audio buffer for the specified device identifier.
@@ -47,15 +54,13 @@
         /// <returns>The audio buffer.</returns>
         public IAudioBuffer GetBuffer(string deviceId)
         {
-            try
-            {
-                var device = this.DeviceEnumerator.GetDevice(deviceId);
-                return new AudioBuffer(device, TimeSpan.FromSeconds(10), this.Logger);
-            }
-            catch
+            var device = this.DeviceEnumerator.GetDevice(deviceId);
+            if (device == null)
             {
                 throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
             }
+
+            return new AudioBuffer(device, TimeSpan.FromMinutes(1), this.Logger);
         }
 
         /// <summary>

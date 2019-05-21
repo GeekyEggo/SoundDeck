@@ -9,6 +9,12 @@
     public interface IAudioService : IDisposable
     {
         /// <summary>
+        /// Determines whether encoding to MP3 is possible based on the current environment.
+        /// </summary>
+        /// <returns><c>true</c> when encoding is possible; otherwise <c>false</c>.</returns>
+        bool CanEncodeToMP3();
+
+        /// <summary>
         /// Attempts to get the audio buffer for the specified device identifier.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>

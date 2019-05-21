@@ -2,10 +2,9 @@
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
-    using NAudio.MediaFoundation;
     using NAudio.Wave;
-    using SoundDeck.Core.IO;
     using System;
+    using System.IO;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -29,7 +28,6 @@
             this.Capture.DataAvailable += this.Capture_DataAvailable;
             this.Capture.StartRecording();
         }
-
 
         /// <summary>
         /// Gets the audio capturer.
@@ -74,11 +72,15 @@
         public async Task<string> SaveAsync(TimeSpan duration, string outputPath)
         {
             var chunks = await this.Chunks.GetAsync(duration);
-            using (var writer = new WavFileWriter(chunks, outputPath, this.Capture.WaveFormat))
+            using (var writer = new WavWriter(chunks, this.Capture.WaveFormat))
             {
-                var path = await writer.SaveAsync();
+                writer.NormalizeVolume = true;
+                writer.EncodeToMP3 = true;
+                var path = await writer.SaveAsync(outputPath);
+
                 this.Logger?.LogInformation("Audio capture saved: {0}", path);
 
+                var fileInfo = new FileInfo(path);
                 return path;
             }
         }

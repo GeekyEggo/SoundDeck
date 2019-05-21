@@ -35,7 +35,7 @@ namespace SoundDeck.Plugin
                     switch (key.Key)
                     {
                         case ConsoleKey.S:
-                            Task.WaitAll(capture.SaveAsync(TimeSpan.FromSeconds(5), @"c:\temp\"));
+                            Task.WaitAll(capture.SaveAsync(TimeSpan.FromSeconds(30), @"c:\temp\"));
                             break;
                     }
                 }
