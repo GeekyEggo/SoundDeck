@@ -3,11 +3,9 @@
     "version": "1.0.0",
     "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
     "scripts": {
-        "install": "npm run kill && npm run install-plugin",
+        "install": "npm run kill-esd && npm run install-plugin",
         "install-plugin": "if not exist %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin (dotnet publish .\\src\\SoundDeck.Plugin\\ -c Debug -r win10-x64 -restore --no-build --output %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\) else (xcopy /e /i /y .\\src\\SoundDeck.Plugin\\bin\\Debug\\netcoreapp2.2 %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\)",
-        "kill": "npm run kill-esd && npm run kill-plugin",
-        "kill-esd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /F || echo Stream Deck process not running",
-        "kill-plugin": "tasklist | find /i \"SoundDeck.Plugin.exe\" && taskkill /im StreamDeck.exe /F || echo Plugin process not running"
+        "kill-esd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /f /t || echo Stream Deck not running"
     },
     "repository": {
         "type": "git",

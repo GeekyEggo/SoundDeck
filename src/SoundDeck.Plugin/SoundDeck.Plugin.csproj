@@ -39,7 +39,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
-        <Exec Command="cd ..\.. &amp;&amp; npm i" />
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command="cd ..\..&#xD;&#xA;npm run kill-esd" />
+    </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="cd ..\.. &amp;&amp; npm run install-plugin" />
     </Target>
 </Project>
