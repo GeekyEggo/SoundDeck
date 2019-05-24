@@ -6,6 +6,7 @@
     using NAudio.Wave;
     using SoundDeck.Core.Capture;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -23,6 +24,11 @@
             this.Logger = logger;
             this.DeviceEnumerator = new MMDeviceEnumerator();
         }
+
+        /// <summary>
+        /// Gets the buffers.
+        /// </summary>
+        private ConcurrentDictionary<string, IAudioBuffer> Buffers { get; } = new ConcurrentDictionary<string, IAudioBuffer>();
 
         /// <summary>
         /// Gets the device enumerator.
@@ -54,13 +60,16 @@
         /// <returns>The audio buffer.</returns>
         public IAudioBuffer GetBuffer(string deviceId)
         {
-            var device = this.DeviceEnumerator.GetDevice(deviceId);
-            if (device == null)
+            return this.Buffers.GetOrAdd(deviceId, _ =>
             {
-                throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
-            }
+                var device = this.DeviceEnumerator.GetDevice(deviceId);
+                if (device == null)
+                {
+                    throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
+                }
 
-            return new AudioBuffer(device, TimeSpan.FromMinutes(1), this.Logger);
+                return new AudioBuffer(device, TimeSpan.FromSeconds(45), this.Logger);
+            });
         }
 
         /// <summary>

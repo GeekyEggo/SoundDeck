@@ -1,0 +1,36 @@
+﻿{
+    "Actions": [
+        {
+            "Icon": "Images/Action",
+            "Name": "Replay Buffer",
+            "States": [
+                {
+                    "Image": "Images/Action",
+                    "TitleAlignment": "bottom",
+                    "FontSize": "14"
+                }
+            ],
+            "SupportedInMultiActions": true,
+            "Tooltip": "Allows you to capture the last x seconds of audio, from an audio device.",
+            "UUID": "com.geekyeggo.sounddeckreplaybuffer"
+        }
+    ],
+    "Author": "Richard Herman",
+    "Category": "Sound Deck",
+    "CodePath": "SoundDeck.Plugin.exe",
+    "Description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
+    "Name": "Sound Deck",
+    "Icon": "Images/Icon",
+    "URL": "https://www.example.com",
+    "Version": "1.0",
+    "OS": [
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "SDKVersion": 2,
+    "Software": {
+        "MinimumVersion": "4.2"
+    }
+}

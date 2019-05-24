@@ -5,6 +5,7 @@
     using SoundDeck.Core.IO;
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -66,7 +67,7 @@
             return this._syncRoot.WaitAsync(async () =>
             {
                 // construct the path of the file, and write to the output
-                var path = Path.Combine(outputPath, $"{DateTime.UtcNow:yyyy-MM-dd_HHmmss}.wav");
+                var path = this.GetPath(outputPath, DateTime.UtcNow.ToString("yyyy-MM-dd_HHmmss"));
                 using (var writer = new WaveFileWriter(path, this.WaveFormat))
                 {
                     foreach (var chunk in this.Chunks)
@@ -80,6 +81,28 @@
                     ? this.WriteAudioFile(path)
                     : path;
             });
+        }
+
+        /// <summary>
+        /// Gets the unique file name for the specified <paramref name="outputPath"/> and <paramref name="name"/>, using the suffix as an indicator of how many files with the same name exist (regardless of extension).
+        /// </summary>
+        /// <param name="outputPath">The output path.</param>
+        /// <param name="name">The desired name of the file, without an extension.</param>
+        /// <param name="suffixIndex">The current suffix count.</param>
+        /// <returns>The unique file path.</returns>
+        private string GetPath(string outputPath, string name, int? suffixIndex = null)
+        {
+            // determine the suffix and extensionless file name
+            var suffix = suffixIndex == null ? string.Empty : $" ({suffixIndex})";
+            var partialFileName = $"{name}{suffix}";
+
+            // if any variant of the file exists, increment the suffix
+            if (Directory.EnumerateFiles(outputPath, $"{partialFileName}.*").Any())
+            {
+                return this.GetPath(outputPath, name, suffixIndex == null ? 2 : suffixIndex + 1);
+            }
+
+            return Path.Combine(outputPath, $"{partialFileName}.wav");
         }
 
         /// <summary>

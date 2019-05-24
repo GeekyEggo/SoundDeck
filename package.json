@@ -1,0 +1,26 @@
+{
+    "name": "sounddeck",
+    "version": "1.0.0",
+    "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
+    "scripts": {
+        "install": "npm run kill-sd && npm run dotnet-publish",
+        "dotnet-publish": "dotnet publish .\\src\\SoundDeck.Plugin\\ -c debug -r win10-x64 -restore --no-build -o %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\",
+        "kill-sd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /F || echo Process \"StreamDeck.exe\" not running"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/GeekyEggo/SoundDeck.git"
+    },
+    "keywords": [
+        "elgato-stream-deck",
+        "audio",
+        "sound-deck",
+        "capture"
+    ],
+    "author": "Richard Herman",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/GeekyEggo/SoundDeck/issues"
+    },
+    "homepage": "https://github.com/GeekyEggo/SoundDeck#readme"
+}

@@ -79,8 +79,6 @@
                 var path = await writer.SaveAsync(outputPath);
 
                 this.Logger?.LogInformation("Audio capture saved: {0}", path);
-
-                var fileInfo = new FileInfo(path);
                 return path;
             }
         }
