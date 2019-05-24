@@ -19,10 +19,12 @@
         public IAudioService AudioService { get; }
         public ReplayBufferSettings Settings { get; }
         public IAudioBuffer Buffer { get; }
-
+        
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            await this.Buffer.SaveAsync(this.Settings.ClipDuration, this.Settings.OutputPath);
+            var path = await this.Buffer.SaveAsync(this.Settings.ClipDuration, this.Settings.OutputPath);
+            
+            await this.StreamDeck.LogMessage($"Saved captured from device {this.Settings.AudioDeviceId} to {path}");
             await this.ShowOkAsync();
         }
     }
