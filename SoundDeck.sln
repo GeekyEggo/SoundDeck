@@ -9,6 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\Sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{96FB09E1-B32E-4464-AEE6-BDB261BFA868}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3701-4B5A-9441-71C488D8994A}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		package.json = package.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.PI", "src\SoundDeck.PI\SoundDeck.PI.csproj", "{C9C562B9-745D-442E-A1CA-13E8314F5CF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +35,10 @@ Global
 		{96FB09E1-B32E-4464-AEE6-BDB261BFA868}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96FB09E1-B32E-4464-AEE6-BDB261BFA868}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96FB09E1-B32E-4464-AEE6-BDB261BFA868}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

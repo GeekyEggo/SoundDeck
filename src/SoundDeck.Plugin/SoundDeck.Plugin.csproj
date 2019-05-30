@@ -18,9 +18,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\SharpDeck\src\SharpDeck\SharpDeck.csproj" />
     <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj" />
+    <ProjectReference Include="..\SoundDeck.PI\SoundDeck.PI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="PI\css\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Images\Action%402x.png">

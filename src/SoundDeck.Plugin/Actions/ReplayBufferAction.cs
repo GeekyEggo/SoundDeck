@@ -1,7 +1,7 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
     using SharpDeck;
-    using SharpDeck.Events;
+    using SharpDeck.Events.Received;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Settings;
     using System;

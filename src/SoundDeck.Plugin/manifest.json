@@ -1,17 +1,17 @@
 ﻿{
     "Actions": [
         {
-            "Icon": "Images/Action",
             "Name": "Replay Buffer",
+            "Icon": "Images/Action",
+            "PropertyInspectorPath": "PI/ReplayBufferAction.html",
             "States": [
                 {
                     "Image": "Images/Action",
-                    "TitleAlignment": "bottom",
-                    "FontSize": "14"
+                    "TitleAlignment": "bottom"
                 }
             ],
             "SupportedInMultiActions": true,
-            "Tooltip": "Allows you to capture the last x seconds of audio, from an audio device.",
+            "Tooltip": "Capture the last x seconds of audio.",
             "UUID": "com.geekyeggo.sounddeckreplaybuffer"
         }
     ],

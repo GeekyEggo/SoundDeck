@@ -3,9 +3,12 @@
     "version": "1.0.0",
     "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
     "scripts": {
-        "install": "npm run kill-esd && npm run install-plugin",
-        "install-plugin": "if not exist %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin (dotnet publish .\\src\\SoundDeck.Plugin\\ -c Debug -r win10-x64 -restore --no-build --output %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\) else (xcopy /e /i /y .\\src\\SoundDeck.Plugin\\bin\\Debug\\netcoreapp2.2 %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\)",
-        "kill-esd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /f /t || echo Stream Deck not running"
+        "install": "npm run kill-esd && npm run install-plugin && npm run install-pi",
+        "kill-esd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /f /t || echo Stream Deck not running",
+        "install-plugin": "if not exist %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin (npm run plugin-fresh) else (npm run plugin-update)",
+        "install-pi": "npx webpack --config .\\src\\SoundDeck.PI\\webpack.config.js",
+        "plugin-fresh": "dotnet publish .\\src\\SoundDeck.Plugin\\ -c Debug -r win10-x64 -restore --no-build --output %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\",
+        "plugin-update": "xcopy /e /i /y .\\src\\SoundDeck.Plugin\\bin\\Debug\\netcoreapp2.2 %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\"
     },
     "repository": {
         "type": "git",
@@ -22,5 +25,14 @@
     "bugs": {
         "url": "https://github.com/GeekyEggo/SoundDeck/issues"
     },
-    "homepage": "https://github.com/GeekyEggo/SoundDeck#readme"
+    "homepage": "https://github.com/GeekyEggo/SoundDeck#readme",
+    "devDependencies": {
+        "clean-webpack-plugin": "^3.0.0",
+        "jquery": "^3.4.1",
+        "webpack": "^4.32.2",
+        "webpack-cli": "^3.3.2"
+    },
+    "dependencies": {
+        "copy-webpack-plugin": "^5.0.3"
+    }
 }
