@@ -1,4 +1,6 @@
-﻿const EMPTY_HANDLER = (ev) => { };
+﻿const DID_RECEIVE_GLOBAL_SETTINGS = "didReceiveGlobalSettings",
+    DID_RECEIVE_SETTINGS = "didReceiveSettings",
+    EMPTY_HANDLER = (ev) => { };
 
 // the connection promise, used to determine if a connection has been established
 let resolveConnection, rejectConnection;
@@ -20,16 +22,20 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
     const ws = new WebSocket('ws://localhost:' + inPort);
     const info = JSON.parse(inInfo);
     const actionInfo = JSON.parse(inActionInfo);
+    const requests = [];
 
     /**
-     * Provides an extension method, allowing for a request to be sent, and the resolver of a promise to be pushed to an array to be resolved later.
+     * Sends a request to the web socket, and returns a promise that is awaiting a message matching the specified awaitEvent.
      * @param {string} event The event to trigger.
-     * @param {ResolveArray} resolveArr The resolve array.
+     * @param {string} awaitEvent The event to await.
      */
-    ws.get = async (event, resolveArr) => {
-        await connection;
+    ws.get = (event, awaitEvent) => {
         return new Promise((resolve, _) => {
-            resolveArr.push(resolve);
+            requests.push({
+                event: awaitEvent,
+                resolve: resolve
+            });
+
             ws.sendEvent(event);
         });
     }
@@ -72,8 +78,27 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
         }));
     };
 
-    // upon establishing a connection, register the property inspector to the Stream Deck.
-    ws.onopen = function () {
+    // listen for messages, handling any outstanding requests, and bubbling the original request with parsed data
+    ws.addEventListener("message", (ev) => {
+        var data = JSON.parse(ev.data);
+
+        // determine if there are any outstanding requests
+        var i = requests.length;
+        while (i--) {
+            if (requests[i].event == data.event) {
+                requests[i].resolve(data);
+                requests.splice(i, 1);
+            }
+        }
+
+        // bubble the message, but with the original data parsed as an object
+        ws.dispatchEvent(new MessageEvent("streamDeckMessage", {
+            data: data
+        }));
+    })
+
+    // upon establishing a connection, register the property inspector to the Stream Deck
+    ws.addEventListener("open", () => {
         ws.send(JSON.stringify({
             event: inRegisterEvent,
             uuid: inPropertyInspectorUUID
@@ -84,30 +109,20 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
             info: info,
             connection: ws
         });
-    };
+    });
 };
-
-class ResolveArray extends Array {
-    constructor() {
-        super();
-    }
-
-    resolveAll(obj) {
-        while (this.length) {
-            this.pop()(obj);
-        }
-    }
-}
 
 /**
  * Provides a wrapper for events that can be received or sent to the Elgato Stream Deck.
  */
-class StreamDeckClient {
+class StreamDeckClient extends EventTarget {
     /**
      * Initializes a new Stream Deck client.
      * @param {Promise} conn The connetion as a promise.
      */
     constructor(conn) {
+        super();
+
         /**
          * The didReceiveGlobalSettings event is received after calling the getGlobalSettings API to retrieve the global persistent data stored for the plugin.
          * @param {any} ev The event data, as sent by the Stream Deck.
@@ -135,15 +150,12 @@ class StreamDeckClient {
          * Gets information about the action the Property Inspector is associated with.
          */
         this.actionInfo;
-
-        this.__resolveGlobalSettings = new ResolveArray();
-        this.__resolveSettings = new ResolveArray();
-
+        
         conn.then((deck) => {
             this.actionInfo = deck.actionInfo;
-            this.info = deck.info;
+            this.info = deck.info;           
 
-            deck.connection.addEventListener("message", this.parseMessage.bind(this));
+            deck.connection.addEventListener("streamDeckMessage", this.parseMessage.bind(this));
         });
     }
 
@@ -161,7 +173,7 @@ class StreamDeckClient {
      */
     getGlobalSettings() {
         return this.connect()
-            .then(client => client.connection.get("getGlobalSettings", this.__resolveGlobalSettings));
+            .then(client => client.connection.get("getGlobalSettings", DID_RECEIVE_GLOBAL_SETTINGS));
     }
 
     /**
@@ -170,7 +182,7 @@ class StreamDeckClient {
      */
     getSettings() {
         return this.connect()
-            .then(client => client.connection.get("getSettings", this.__resolveSettings));
+            .then(client => client.connection.get("getSettings", DID_RECEIVE_SETTINGS));
     }
 
     /**
@@ -223,22 +235,22 @@ class StreamDeckClient {
      * @param {EventMessage} ev The event message.
      */
     parseMessage(ev) {
-        let data = JSON.parse(ev.data);
-        switch (data.event) {
-            case "didReceiveGlobalSettings":
-                this.onDidReceiveGlobalSettings(data);
-                this.__resolveGlobalSettings.resolveAll(data);
+        switch (ev.data.event) {
+            case DID_RECEIVE_GLOBAL_SETTINGS:
+                this.onDidReceiveGlobalSettings(ev.data);
                 break;
 
-            case "didReceiveSettings":
-                this.onDidReceiveSettings(data);
-                this.__resolveSettings.resolveAll(data);
+            case DID_RECEIVE_SETTINGS:
+                this.onDidReceiveSettings(ev.data);
                 break;
 
             case "sendToPropertyInspector":
-                this.onSendToPropertyInspector(data);
+                this.onSendToPropertyInspector(ev.data);
                 break;
         }
+
+        // dispatch the event
+        this.dispatchEvent(new MessageEvent(ev.data.event, { data: ev.data }));
     }
 };
 
