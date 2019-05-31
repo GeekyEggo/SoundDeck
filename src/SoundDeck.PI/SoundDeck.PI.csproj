@@ -6,13 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="js\" />
     <Folder Include="css\" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="cd ..\..&#xD;&#xA;npm run kill-esd" />
-  </Target>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="cd ..\.. &amp;&amp; npm run install-pi" />

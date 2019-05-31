@@ -6,9 +6,10 @@
         "install": "npm run kill-esd && npm run install-plugin && npm run install-pi",
         "kill-esd": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /f /t || echo Stream Deck not running",
         "install-plugin": "if not exist %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin (npm run plugin-fresh) else (npm run plugin-update)",
-        "install-pi": "npx webpack --config .\\src\\SoundDeck.PI\\webpack.config.js",
+        "install-pi": "npx webpack --config .\\src\\SoundDeck.PI\\webpack.config.js --mode development",
         "plugin-fresh": "dotnet publish .\\src\\SoundDeck.Plugin\\ -c Debug -r win10-x64 -restore --no-build --output %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\",
-        "plugin-update": "xcopy /e /i /y .\\src\\SoundDeck.Plugin\\bin\\Debug\\netcoreapp2.2 %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\"
+        "plugin-update": "xcopy /e /i /y .\\src\\SoundDeck.Plugin\\bin\\Debug\\netcoreapp2.2 %APPDATA%\\Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin\\",
+        "watch-pi": "npx webpack --config .\\src\\SoundDeck.PI\\webpack.config.js --mode development --watch"
     },
     "repository": {
         "type": "git",
