@@ -10,6 +10,9 @@ async function init() {
     console.group("Global")
     console.log(global);
     console.groupEnd();
+
+    var me = await client.get("SayHello");
+    console.log(me);
 }
 
 init();

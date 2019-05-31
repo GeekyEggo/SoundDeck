@@ -1,6 +1,9 @@
-﻿const DID_RECEIVE_GLOBAL_SETTINGS = "didReceiveGlobalSettings",
-    DID_RECEIVE_SETTINGS = "didReceiveSettings",
-    EMPTY_HANDLER = (ev) => { };
+﻿const EMPTY_HANDLER = (ev) => { };
+const EVENTS = {
+    DID_RECEIVE_GLOBAL_SETTINGS: "didReceiveGlobalSettings",
+    DID_RECEIVE_SETTINGS: "didReceiveSettings",
+    SEND_TO_PLUGIN: "sendToPlugin"
+};
 
 // the connection promise, used to determine if a connection has been established
 let resolveConnection, rejectConnection;
@@ -27,16 +30,17 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
     /**
      * Sends a request to the web socket, and returns a promise that is awaiting a message matching the specified awaitEvent.
      * @param {string} event The event to trigger.
-     * @param {string} awaitEvent The event to await.
+     * @param {string|Function} isMatch The event to await, or a predicate to wait for.
+     * @param {any} payload The optional payload
      */
-    ws.get = (event, awaitEvent) => {
+    ws.get = (event, waitFor, payload) => {
         return new Promise((resolve, _) => {
             requests.push({
-                event: awaitEvent,
+                isMatch: typeof (waitFor) === 'string' || waitFor instanceof String ? (data) => data.event == waitFor : waitFor,
                 resolve: resolve
             });
 
-            ws.sendEvent(event);
+            ws.sendActionPayload(event, payload);
         });
     }
 
@@ -85,7 +89,7 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
         // determine if there are any outstanding requests
         var i = requests.length;
         while (i--) {
-            if (requests[i].event == data.event) {
+            if (requests[i].isMatch(data)) {
                 requests[i].resolve(data);
                 requests.splice(i, 1);
             }
@@ -111,6 +115,15 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
         });
     });
 };
+
+/**
+ * Generates a "unique" identifier.
+ * @returns {string} The unique identifier.
+ */
+const getUUID = () => {
+    let chr4 = () => Math.random().toString(16).slice(-4);
+    return chr4() + chr4() + '-' + chr4() + '-' + chr4() + '-' + chr4() + '-' + chr4() + chr4() + chr4();
+}
 
 /**
  * Provides a wrapper for events that can be received or sent to the Elgato Stream Deck.
@@ -168,12 +181,27 @@ class StreamDeckClient extends EventTarget {
     }
 
     /**
+     * Sends a `get` request to the plugin, utilising SharpDeck libraries `PropertyInspectorMethod` attribute.
+     * @param {string} event The name of the event or method, i.e. URI endpoint.
+     * @param {any} payload The optional payload.
+     */
+    get(event, payload) {
+        let request = {
+            event: event,
+            requestId: getUUID()
+        };
+
+        return this.connect()
+            .then(client => client.connection.get(EVENTS.SEND_TO_PLUGIN, (data) => data.payload && data.payload.event == request.event && data.payload.requestId == request.requestId, { ...payload, ...request }));
+    }
+
+    /**
      * Triggers the `getGlobalSettings` event; upon receiving the settings, `onDidReceiveGlobalSettings` is raised.
      * @returns {Promise} The global settings as part of a promise.
      */
     getGlobalSettings() {
         return this.connect()
-            .then(client => client.connection.get("getGlobalSettings", DID_RECEIVE_GLOBAL_SETTINGS));
+            .then(client => client.connection.get("getGlobalSettings", EVENTS.DID_RECEIVE_GLOBAL_SETTINGS));
     }
 
     /**
@@ -182,7 +210,7 @@ class StreamDeckClient extends EventTarget {
      */
     getSettings() {
         return this.connect()
-            .then(client => client.connection.get("getSettings", DID_RECEIVE_SETTINGS));
+            .then(client => client.connection.get("getSettings", EVENTS.DID_RECEIVE_SETTINGS));
     }
 
     /**
@@ -227,7 +255,7 @@ class StreamDeckClient extends EventTarget {
      */
     sendToPlugin(payload) {
         this.connect()
-            .then(client => client.connection.sendActionPayload("sendToPlugin", payload));
+            .then(client => client.connection.sendActionPayload(EVENTS.SEND_TO_PLUGIN, payload));
     }
 
     /**
@@ -236,11 +264,11 @@ class StreamDeckClient extends EventTarget {
      */
     parseMessage(ev) {
         switch (ev.data.event) {
-            case DID_RECEIVE_GLOBAL_SETTINGS:
+            case EVENTS.DID_RECEIVE_GLOBAL_SETTINGS:
                 this.onDidReceiveGlobalSettings(ev.data);
                 break;
 
-            case DID_RECEIVE_SETTINGS:
+            case EVENTS.DID_RECEIVE_SETTINGS:
                 this.onDidReceiveSettings(ev.data);
                 break;
 
