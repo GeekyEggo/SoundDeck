@@ -22,7 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
-    <Folder Include="PI\css\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Images\Action%402x.png">

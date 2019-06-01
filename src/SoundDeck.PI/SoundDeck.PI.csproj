@@ -5,10 +5,6 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="css\" />
-  </ItemGroup>
-
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
