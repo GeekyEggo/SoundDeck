@@ -1,6 +1,6 @@
 ﻿import client from './streamDeckClient';
 
-async function init() {
+(async function() {
     var settings = await client.getSettings();
     console.group("Settings")
     console.log(settings);
@@ -13,6 +13,4 @@ async function init() {
 
     var me = await client.get("SayHello");
     console.log(me);
-}
-
-init();
+})();

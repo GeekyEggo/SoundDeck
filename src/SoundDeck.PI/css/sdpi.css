@@ -31,7 +31,7 @@ html, body {
   --sdpi-background: #3D3D3D;
   --sdpi-color: #d8d8d8;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 9pt;
+  font-size: 8pt;
 	background-color: var(--sdpi-bgcolor);
 	color: #9a9a9a;
 }
@@ -90,6 +90,7 @@ hr, hr2 {
   margin-right:16px;
 }
 
+/*
 .sdpi-item-value,
 option,
 input,
@@ -99,8 +100,7 @@ button {
   font-weight: var(--sdpi-fontweight);
   letter-spacing: var(--sdpi-letterspacing);
 }
-
-
+*/
 
 .win .sdpi-item-value,
 .win option,
@@ -345,9 +345,8 @@ table > caption {
 .sdpi-item-label {
   text-align: right;
   flex: none;
-  width: 94px;
+  width: 92px;
   padding-right: 4px;
-  font-weight: 600;
   -webkit-user-select: none;
 }
 
@@ -357,7 +356,8 @@ table > caption {
 }
 
 .sdpi-item-label:after {
-  content: ": ";
+  content: ":";
+  margin-left: 1px;
 }
 
 .sdpi-item-label.empty:after {
@@ -511,7 +511,7 @@ td:last-child {
 .sdpi-item-value.select,
 .sdpi-item-value > select {
   margin-right: 13px;
-  margin-left: 4px;
+  margin-left: 6px;
 }
 
 .sdpi-item-child,
@@ -1220,7 +1220,7 @@ input:required:valid {
 */
 
 .sdpi-item-group.file {
-  width: 232px;
+  width: 233px;
   display: flex;
   align-items: center;
 }
@@ -1234,7 +1234,7 @@ input:required:valid {
   max-width: 144px;
   max-height: 32px;
   margin-top: 0px;
-  margin-left: 5px;
+  margin-left: 6px;
   display: inline-block;
   overflow: hidden;
   padding: 6px 4px;

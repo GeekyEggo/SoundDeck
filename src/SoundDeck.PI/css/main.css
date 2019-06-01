@@ -1,0 +1,16 @@
+﻿.sdpi-folder-info {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+    width: 187px;
+    max-height: 32px;
+    margin-top: 0px;
+    margin-left: 7px;
+    display: inline-block;
+    overflow: hidden;
+    padding: 6px 4px;
+    background-color: var(--sdpi-background);
+}
+.sdpi-file-label {
+    letter-spacing: 2px;
+}
