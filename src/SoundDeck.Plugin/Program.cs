@@ -16,13 +16,13 @@
 #if DEBUG
             Debugger.Launch();
 #endif
-                        
+
             var provider = GetServiceProvider();
             using (var client = new StreamDeckClient(args))
             {
                 client.RegisterAction("com.geekyeggo.sounddeckreplaybuffer", () => provider.GetInstance<ReplayBufferAction>());
                 client.Start();
-            }            
+            }
 
             /*                                 
             var logger = provider.GetRequiredService<ILoggerFactory>().CreateLogger("Main");
