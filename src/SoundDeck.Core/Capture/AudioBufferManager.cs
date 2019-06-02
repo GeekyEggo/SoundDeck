@@ -72,11 +72,6 @@
                 observers.AudioBuffer.Dispose();
                 this.AudioBuffers.TryRemove(observers.AudioBuffer.DeviceId, out var _);
             }
-            else
-            {
-                // otherwise update the buffer duration
-                observers.RefreshBufferDuration();
-            }
         }
 
         /// <summary>

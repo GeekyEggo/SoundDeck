@@ -72,6 +72,7 @@
                 {
                     item.PropertyChanged -= this.Listener_PropertyChanged;
                     this.Listeners.Remove(id);
+                    this.RefreshBufferDuration();
 
                     return true;
                 }
