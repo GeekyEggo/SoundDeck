@@ -9,6 +9,11 @@
     public interface IChunkCollection : IDisposable
     {
         /// <summary>
+        /// Gets or sets the duration of the buffer.
+        /// </summary>
+        TimeSpan BufferDuration { get; set; }
+
+        /// <summary>
         /// Adds the chunk of data asynchronously.
         /// </summary>
         /// <param name="chunk">The chunk of data.</param>

@@ -6,7 +6,6 @@
     using NAudio.Wave;
     using SoundDeck.Core.Capture;
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -21,24 +20,19 @@
         /// <param name="logger">The logger.</param>
         public AudioService(ILogger<AudioService> logger)
         {
-            this.Logger = logger;
             this.DeviceEnumerator = new MMDeviceEnumerator();
+            this.AudioBufferManager = new AudioBufferManager(logger);
         }
 
         /// <summary>
-        /// Gets the buffers.
+        /// Gets the audio buffer manager.
         /// </summary>
-        private ConcurrentDictionary<string, IAudioBuffer> Buffers { get; } = new ConcurrentDictionary<string, IAudioBuffer>();
+        private AudioBufferManager AudioBufferManager { get; }
 
         /// <summary>
         /// Gets the device enumerator.
         /// </summary>
         private MMDeviceEnumerator DeviceEnumerator { get; }
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        private ILogger<AudioService> Logger { get; }
 
         /// <summary>
         /// Determines whether encoding to MP3 is possible based on the current environment.
@@ -54,29 +48,26 @@
             => this.DeviceEnumerator.Dispose();
 
         /// <summary>
-        /// Attempts to get the audio buffer for the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio buffer.</returns>
-        public IAudioBuffer GetBuffer(string deviceId)
-        {
-            return this.Buffers.GetOrAdd(deviceId, _ =>
-            {
-                var device = this.DeviceEnumerator.GetDevice(deviceId);
-                if (device == null)
-                {
-                    throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
-                }
-
-                return new AudioBuffer(device, TimeSpan.FromSeconds(45), this.Logger);
-            });
-        }
-
-        /// <summary>
         /// Gets the active audio devices.
         /// </summary>
         /// <returns>The audio devices</returns>
         public IEnumerable<AudioDevice> GetDevices()
             => this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active).Select(m => new AudioDevice(m));
+
+        /// <summary>
+        /// Registers a new audio buffer.
+        /// </summary>
+        /// <param name="deviceId">The audio device identifier.</param>
+        /// <param name="clipDuration">The clip duration for the buffer.</param>
+        /// <returns>The registration.</returns>
+        public AudioBufferRegistration RegisterBufferListener(string deviceId, TimeSpan clipDuration)
+            => this.AudioBufferManager.Register(deviceId, clipDuration);
+
+        /// <summary>
+        /// Unregisters the audio buffer.
+        /// </summary>
+        /// <param name="registration">The registration.</param>
+        public void UnregisterBufferListener(AudioBufferRegistration registration)
+            => this.AudioBufferManager.Unregister(registration);
     }
 }

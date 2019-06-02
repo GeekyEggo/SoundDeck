@@ -25,14 +25,21 @@
         /// <param name="logger">The logger.</param>
         public ChunkCollection(TimeSpan bufferDuration, ILogger logger = null)
         {
+            this.BufferDuration = bufferDuration;
             this.Logger = logger;
-            Task.Run(() => this.FlushAsync(bufferDuration));
+
+            Task.Run(() => this.FlushAsync());
         }
 
         /// <summary>
         /// Gets or sets the flush delay.
         /// </summary>
         public TimeSpan FlushDelay { get; set; } = TimeSpan.FromSeconds(5);
+
+        /// <summary>
+        /// Gets or sets the duration of the buffer.
+        /// </summary>
+        public TimeSpan BufferDuration { get; set; }
 
         /// <summary>
         /// Gets the data.
@@ -109,17 +116,17 @@
         /// <summary>
         /// Flushes the <see cref="Data"/> asynchronously, ensuring minimal memory footprint.
         /// </summary>
-        /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <returns>The task of flushing the chunks of data.</returns>
-        private async Task FlushAsync(TimeSpan bufferDuration)
+        private async Task FlushAsync()
         {
-            await Task.Delay(bufferDuration);
+            await Task.Delay(this.BufferDuration);
             while (!this.IsDisposed)
             {
                 await Task.Delay(this.FlushDelay);
                 this.Logger.LogTrace("Flushing Chunk Collection");
 
-                var threshold = DateTime.UtcNow.Subtract(bufferDuration);
+                // add an additional buffer of 5 seconds
+                var threshold = DateTime.UtcNow.Subtract(this.BufferDuration).Subtract(TimeSpan.FromSeconds(5));
                 while (this.Data.Count > 0 && this.Data.First.Value.DateTime < threshold)
                 {
                     this.Data.RemoveFirst();

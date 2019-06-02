@@ -7,7 +7,7 @@ const piPath = path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/c
 module.exports = {
     devtool: "source-map",
     entry: {
-        replayBufferAction: path.resolve(__dirname, "js/replayBufferAction.js")
+        captureAudioBuffer: path.resolve(__dirname, "js/captureAudioBuffer.js")
     },
     module: {
         rules: [{

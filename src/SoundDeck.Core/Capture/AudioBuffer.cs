@@ -4,13 +4,12 @@
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using System;
-    using System.IO;
     using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an audio buffer designed to capture and save audio data.
     /// </summary>
-    public sealed class AudioBuffer : IAudioBuffer
+    public sealed class AudioBuffer : IConfigurableAudioBuffer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioBuffer" /> class.
@@ -20,6 +19,7 @@
         /// <param name="logger">The logger.</param>
         public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger logger = null)
         {
+            this.DeviceId = device.ID;
             this.Chunks = new ChunkCollection(bufferDuration, logger);
             this.Logger = logger;
 
@@ -28,6 +28,20 @@
             this.Capture.DataAvailable += this.Capture_DataAvailable;
             this.Capture.StartRecording();
         }
+
+        /// <summary>
+        /// Gets or sets the duration of the buffer.
+        /// </summary>
+        public TimeSpan BufferDuration
+        {
+            get { return this.Chunks.BufferDuration; }
+            set { this.Chunks.BufferDuration = value; }
+        }
+
+        /// <summary>
+        /// Gets the audio device identifier.
+        /// </summary>
+        public string DeviceId { get; }
 
         /// <summary>
         /// Gets the audio capturer.

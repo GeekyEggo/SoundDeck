@@ -1,5 +1,6 @@
 ﻿namespace SoundDeck.Core
 {
+    using SoundDeck.Core.Capture;
     using System;
     using System.Collections.Generic;
 
@@ -15,16 +16,23 @@
         bool CanEncodeToMP3();
 
         /// <summary>
-        /// Attempts to get the audio buffer for the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio buffer.</returns>
-        IAudioBuffer GetBuffer(string deviceId);
-
-        /// <summary>
         /// Gets the active audio devices.
         /// </summary>
         /// <returns>The audio devices</returns>
         IEnumerable<AudioDevice> GetDevices();
+
+        /// <summary>
+        /// Registers a new audio buffer listener.
+        /// </summary>
+        /// <param name="deviceId">The audio device identifier.</param>
+        /// <param name="clipDuration">The clip duration for the buffer.</param>
+        /// <returns>The registration.</returns>
+        AudioBufferRegistration RegisterBufferListener(string deviceId, TimeSpan clipDuration);
+
+        /// <summary>
+        /// Unregisters the audio buffer listener.
+        /// </summary>
+        /// <param name="registration">The registration.</param>
+        void UnregisterBufferListener(AudioBufferRegistration registration);
     }
 }

@@ -3,14 +3,21 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using SharpDeck;
+    using SharpDeck.Events.Received;
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Plugin.Actions;
     using System;
     using System.Diagnostics;
+    using System.Linq;
 
     public class Program
     {
+        public class SomeSettings
+        {
+            public AudioDevice[] Devices { get; set; }
+        }
+
         public static void Main(string[] args)
         {
 #if DEBUG
@@ -20,7 +27,17 @@
             var provider = GetServiceProvider();
             using (var client = new StreamDeckClient(args))
             {
-                client.RegisterAction("com.geekyeggo.sounddeckreplaybuffer", () => provider.GetInstance<ReplayBufferAction>());
+                client.RegisterAction("com.geekyEggo.soundDeckCaptureAudioBuffer", () => provider.GetInstance<CaptureAudioBuffer>());
+                client.Registered += (s, o) =>
+                {
+                    var settings = new SomeSettings
+                    {
+                        Devices = provider.GetRequiredService<IAudioService>().GetDevices().ToArray()
+                    };
+
+                    client.SetGlobalSettingsAsync(settings);
+                };
+
                 client.Start();
             }
 
@@ -51,6 +68,10 @@
                 logger.LogInformation("Done");
             }
             */
+        }
+
+        private static void Client_ApplicationDidLaunch(object sender, StreamDeckEventArgs<ApplicationPayload> e)
+        {
         }
 
         private static IServiceProvider GetServiceProvider()

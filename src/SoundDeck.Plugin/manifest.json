@@ -1,9 +1,9 @@
 ﻿{
     "Actions": [
         {
-            "Name": "Replay Buffer",
+            "Name": "Audio Replay",
             "Icon": "Images/Action",
-            "PropertyInspectorPath": "PI/ReplayBufferAction.html",
+            "PropertyInspectorPath": "PI/captureAudioBuffer.html",
             "States": [
                 {
                     "Image": "Images/Action",
@@ -12,7 +12,7 @@
             ],
             "SupportedInMultiActions": true,
             "Tooltip": "Capture the last x seconds of audio.",
-            "UUID": "com.geekyeggo.sounddeckreplaybuffer"
+            "UUID": "com.geekyEggo.soundDeckCaptureAudioBuffer"
         }
     ],
     "Author": "Richard Herman",

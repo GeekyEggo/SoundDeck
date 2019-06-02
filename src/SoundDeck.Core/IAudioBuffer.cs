@@ -6,8 +6,13 @@
     /// <summary>
     /// Provides an audio buffer, used to save captured audio data.
     /// </summary>
-    public interface IAudioBuffer : IDisposable
+    public interface IAudioBuffer
     {
+        /// <summary>
+        /// Gets the audio device identifier.
+        /// </summary>
+        string DeviceId { get; }
+
         /// <summary>
         /// Saves the buffered audio data for the duration, to the specified output path.
         /// </summary>

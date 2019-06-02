@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en-gb">
+    <meta charset="utf-8">
+    <title>Replay Buffer Action</title>
+
+    <link rel="stylesheet" href="./css/sdpi.css">
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <details class="message" id="loading">
+            <summary>Loading...</summary>
+        </details>
+        <div class="hidden" id="settings">
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Device</div>
+                <select class="sdpi-item-value select" id="devices" required disabled="disabled"></select>
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Duration</div>
+                <select class="sdpi-item-value select" id="duration" required disabled="disabled">
+                    <option value="5">5 seconds</option>
+                    <option value="10">10 seconds</option>
+                    <option value="15">15 seconds</option>
+                    <option value="30">30 seconds</option>
+                    <option value="45">45 seconds</option>
+                    <option value="60">1 minute</option>
+                    <option value="120">2 minutes</option>
+                </select>
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Output Path</div>
+                <div class="sdpi-item-group file">
+                    <input class="sdpi-item-value" id="outputPath" type="file" webkitdirectory directory multiple />
+                    <label class="sdpi-folder-info">No folder</label>
+                    <label class="sdpi-file-label" for="outputPath">...</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./captureAudioBuffer.js"></script>
+</body>
+</html>
