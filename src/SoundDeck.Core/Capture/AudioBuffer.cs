@@ -9,7 +9,7 @@
     /// <summary>
     /// Provides an audio buffer designed to capture and save audio data.
     /// </summary>
-    public sealed class AudioBuffer : IConfigurableAudioBuffer
+    public sealed class AudioBuffer : IAudioBuffer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioBuffer" /> class.

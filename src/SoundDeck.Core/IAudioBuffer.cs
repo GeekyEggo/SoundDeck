@@ -6,8 +6,13 @@
     /// <summary>
     /// Provides an audio buffer, used to save captured audio data.
     /// </summary>
-    public interface IAudioBuffer
+    public interface IAudioBuffer : IDisposable
     {
+        /// <summary>
+        /// Gets or sets the duration of the buffer.
+        /// </summary>
+        TimeSpan BufferDuration { get; set; }
+
         /// <summary>
         /// Gets the audio device identifier.
         /// </summary>
