@@ -163,10 +163,10 @@ class StreamDeckClient extends EventTarget {
          * Gets information about the action the Property Inspector is associated with.
          */
         this.actionInfo;
-        
+
         conn.then((deck) => {
             this.actionInfo = deck.actionInfo;
-            this.info = deck.info;           
+            this.info = deck.info;
 
             deck.connection.addEventListener("streamDeckMessage", this.parseMessage.bind(this));
         });
@@ -248,7 +248,7 @@ class StreamDeckClient extends EventTarget {
         this.connect()
             .then(client => client.connection.sendPayload("setSettings", settings));
     }
-    
+
     /**
      * Sends payload information to the plugin.
      * @param {any} payload The payload information to send.

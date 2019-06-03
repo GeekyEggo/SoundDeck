@@ -5,17 +5,25 @@ import utils from './utils';
 const DEFAULT_SETTINGS = {
     audioDeviceId: null,
     clipDuration: null,
-    outputPath: "C:\\Temp\\"
+    outputPath: null
 };
 
 let settings = {};
 
-async function bind() {
-    const getAudioDevicesResponse = await client.get("GetAudioDevices");
-    const devicesElem = document.getElementById("devices");
+async function bindAsync() {
+    await bindAudioDevicesAsync();
+    bindDuration();
+    bindOutputPath();
+}
+
+/**
+ * Binds the audio devices drop down asynchronously by loading the devices from the plugin API
+ */
+async function bindAudioDevicesAsync() {
+    const input = document.getElementById("devices");
 
     let grps = {};
-    getAudioDevicesResponse.payload.devices.forEach(device => {
+    (await client.get("GetAudioDevices")).payload.devices.forEach(device => {
         const label = soundDeck.enums.FLOW[device.flow];
         if (grps[label] === undefined) {
             grps[label] = [];
@@ -24,34 +32,42 @@ async function bind() {
         grps[label].push(device);
     });
 
-    utils.dataBindGroups(devicesElem, grps, (item, option) => {
+    utils.dataBindGroups(input, grps, (item, option) => {
         option.innerText = item.friendlyName;
         option.value = item.id;
     });
 
-    observe(devicesElem, "audioDeviceId");
+    utils.observe(input, settings, "audioDeviceId");
 }
 
+/**
+ * Binds the duration drop down, and monitors for changes.
+ * */
 function bindDuration() {
-    const elem = document.getElementById("duration");
-
-    observe(elem, "clipDuration");
-    for (var i = 0; i < elem.options.length; i++) {
-        elem.options[i].removeAttribute("disabled");
-    }
+    const input = document.getElementById("duration");
+    utils.observe(input, settings, "clipDuration");
 }
 
-function observe(elem, key) {
-    elem.removeAttribute("disabled");
-    elem.value = settings[key];
+/**
+ * Binds the output path control, and button to open a folder picker.
+ * */
+function bindOutputPath() {
+    const input = document.getElementById("outputPath"),
+        outputPathLbl = document.getElementById("outputPathLbl"),
+        outputPathBtn = document.getElementById("outputPathBtn");
 
-    elem.addEventListener("change", (ev) => {
-        const val = ev.target.options[ev.target.selectedIndex].value;
-        if (val !== "" && settings[key] !== val) {
-            settings[key] = val;
-            client.setSettings(settings);
+    const setLabel = (val) => {
+        outputPathLbl.innerText = val || "No folder";
+    };
+    setLabel(settings.outputPath);
+    utils.observe(input, settings, "outputPath", setLabel);
+
+    outputPathBtn.addEventListener("click", async _ => {
+        var response = await client.get("GetOutputPath");
+        if (response.payload.success) {
+            utils.change(input, response.payload.path);
         }
-    });
+    })
 }
 
 console.time();
@@ -60,8 +76,7 @@ console.time();
     console.log(client);
     settings = { ...DEFAULT_SETTINGS, ...client.actionInfo.payload.settings }
 
-    bindDuration();
-    await bind();
+    await bindAsync();
     console.timeEnd();
 
     document.getElementById("settings").classList.remove("hidden");

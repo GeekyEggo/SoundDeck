@@ -9,6 +9,7 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Forms;
 
     public class CaptureAudioBuffer : StreamDeckAction<CaptureAudioBufferSettings>
     {
@@ -16,6 +17,7 @@
             : base()
         {
             this.AudioService = audioService;
+            this.Devices = audioService.GetDevices().ToArray();
             this.Initialized += this.ReplayBufferAction_Initialized;
         }
 
@@ -29,14 +31,31 @@
 
         public IAudioService AudioService { get; }
         private IAudioBuffer AudioBuffer { get; set; }
+        private AudioDevice[] Devices { get; }
 
         [PropertyInspectorMethod]
         public Task<AudioDevicesPayload> GetAudioDevices()
+            => Task.FromResult(new AudioDevicesPayload(this.Devices));
+
+        [PropertyInspectorMethod]
+        public Task<FolderPickerPayload> GetOutputPath()
         {
-            return Task.FromResult(new AudioDevicesPayload
+            using (var dialog = new FolderBrowserDialog())
             {
-                Devices = this.AudioService.GetDevices().ToArray()
-            });
+                dialog.Description = "Output Path";
+                dialog.SelectedPath = this.Settings?.OutputPath;
+                dialog.UseDescriptionForTitle = true;
+
+                var result = dialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    return Task.FromResult(new FolderPickerPayload(dialog.SelectedPath, true));
+                }
+                else
+                {
+                    return Task.FromResult(new FolderPickerPayload(this.Settings?.OutputPath, false));
+                }
+            }
         }
 
         protected override Task OnPropertyInspectorDidAppear(ActionEventArgs args)
