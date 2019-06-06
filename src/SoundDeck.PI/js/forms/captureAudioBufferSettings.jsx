@@ -7,7 +7,6 @@ import FolderPicker from "../components/common/folderPicker"
 class CaptureAudioBufferSettings extends React.Component {
     constructor(props) {
         super(props);
-        console.time();
 
         this.outputPathOnClick = this.outputPathOnClick.bind(this);
         this.onSettingChange = this.onSettingChange.bind(this);
