@@ -7,11 +7,13 @@ import FolderPicker from "../components/common/folderPicker"
 class CaptureAudioBufferSettings extends React.Component {
     constructor(props) {
         super(props);
+        console.time();
 
         this.outputPathOnClick = this.outputPathOnClick.bind(this);
         this.onSettingChange = this.onSettingChange.bind(this);
 
         this.state = {
+            disabled: true,
             settings: {
                 audioDeviceId: undefined,
                 clipDuration: undefined,
@@ -20,8 +22,9 @@ class CaptureAudioBufferSettings extends React.Component {
         }
 
         client.connect()
-            .then(_ => this.setState((state, _) => {
-                return { ...state, ...{ settings: client.actionInfo.payload.settings } }
+            .then(_ => this.setState({
+                disabled: false,
+                settings: client.actionInfo.payload.settings
             }));
     }
 
