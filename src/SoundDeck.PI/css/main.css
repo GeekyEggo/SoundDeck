@@ -10,7 +10,17 @@
     overflow: hidden;
     padding: 6px 4px;
     background-color: var(--sdpi-background);
+    color: var(--sdpi-color);
 }
 .sdpi-file-label {
     letter-spacing: 2px;
+}
+.disabler {
+    background-color: var(--sdpi-bgcolor);
+    height: 100%;
+    left: 0;
+    opacity: .5;
+    position: absolute;
+    top: 0;
+    width: 100%;
 }

@@ -1,9 +1,9 @@
-﻿const EMPTY_HANDLER = (ev) => { };
-const EVENTS = {
-    DID_RECEIVE_GLOBAL_SETTINGS: "didReceiveGlobalSettings",
-    DID_RECEIVE_SETTINGS: "didReceiveSettings",
-    SEND_TO_PLUGIN: "sendToPlugin"
-};
+﻿const EMPTY_HANDLER = (ev) => { },
+    EVENTS = {
+        DID_RECEIVE_GLOBAL_SETTINGS: "didReceiveGlobalSettings",
+        DID_RECEIVE_SETTINGS: "didReceiveSettings",
+        SEND_TO_PLUGIN: "sendToPlugin"
+    };
 
 // the connection promise, used to determine if a connection has been established
 let resolveConnection, rejectConnection;
@@ -22,10 +22,10 @@ const connection = new Promise((resolve, reject) => {
  */
 window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
     // initialize the socket
-    const ws = new WebSocket('ws://localhost:' + inPort);
-    const info = JSON.parse(inInfo);
-    const actionInfo = JSON.parse(inActionInfo);
-    const requests = [];
+    const ws = new WebSocket('ws://localhost:' + inPort),
+        info = JSON.parse(inInfo),
+        actionInfo = JSON.parse(inActionInfo),
+        requests = [];
 
     /**
      * Sends a request to the web socket, and returns a promise that is awaiting a message matching the specified awaitEvent.
@@ -80,14 +80,14 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
             "context": inPropertyInspectorUUID,
             "payload": payload
         }));
-    };
+    }
 
     // listen for messages, handling any outstanding requests, and bubbling the original request with parsed data
     ws.addEventListener("message", (ev) => {
-        var data = JSON.parse(ev.data);
+        let data = JSON.parse(ev.data);
 
         // determine if there are any outstanding requests
-        var i = requests.length;
+        let i = requests.length;
         while (i--) {
             if (requests[i].isMatch(data)) {
                 requests[i].resolve(data);
@@ -114,7 +114,7 @@ window.connectElgatoStreamDeckSocket = function (inPort, inPropertyInspectorUUID
             connection: ws
         });
     });
-};
+}
 
 /**
  * Generates a "unique" identifier.
@@ -280,6 +280,6 @@ class StreamDeckClient extends EventTarget {
         // dispatch the event
         this.dispatchEvent(new MessageEvent(ev.data.event, { data: ev.data }));
     }
-};
+}
 
 export default new StreamDeckClient(connection);

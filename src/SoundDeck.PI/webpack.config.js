@@ -7,12 +7,19 @@ const piPath = path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/c
 module.exports = {
     devtool: "source-map",
     entry: {
-        captureAudioBuffer: path.resolve(__dirname, "js/captureAudioBuffer.js")
+        sdpi: path.resolve(__dirname, "js/sdpi.jsx")
     },
     module: {
         rules: [{
             test: /\.css$/,
             use: [{ loader: "style-loader" }, { loader: "css-loader" }]
+        },
+        {
+            test: /\.jsx$/,
+            exclude: /node_modules/,
+            use: {
+                loader: "babel-loader"
+            }
         }]
     },
     output: {
@@ -20,14 +27,19 @@ module.exports = {
         path: piPath
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        new CleanWebpackPlugin({
+            cleanAfterEveryBuildPatterns: ["!*.html", "!css/**/*.*", "!imgs/**/*.*"],
+        }),
         new CopyPlugin([
             {
                 from: __dirname,
                 to: piPath,
                 context: __dirname,
-                ignore: ["*.csproj", "*.js", "bin/**/*.*", "obj/**/*.*"]
+                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
             },
-        ]),
-    ]
+        ])
+    ],
+    resolve: {
+        extensions: [".js", ".jsx"]
+    }
 };

@@ -8,37 +8,7 @@
     <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
-    <div class="sdpi-wrapper">
-        <details class="message" id="loading">
-            <summary>Loading...</summary>
-        </details>
-        <div class="hidden" id="settings">
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">Device</div>
-                <select class="sdpi-item-value select" id="devices" required></select>
-            </div>
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">Duration</div>
-                <select class="sdpi-item-value select" id="duration" required>
-                    <option value="5">5 seconds</option>
-                    <option value="10">10 seconds</option>
-                    <option value="15">15 seconds</option>
-                    <option value="30">30 seconds</option>
-                    <option value="45">45 seconds</option>
-                    <option value="60">1 minute</option>
-                    <option value="120">2 minutes</option>
-                </select>
-            </div>
-            <div class="sdpi-item">
-                <div class="sdpi-item-label">Output Path</div>
-                <div class="sdpi-item-group file">
-                    <input type="hidden" id="outputPath" />
-                    <label class="sdpi-folder-info" id="outputPathLbl">No folder</label>
-                    <label class="sdpi-file-label" id="outputPathBtn">...</label>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="./captureAudioBuffer.js"></script>
+    <div id="root" data-settings="captureAudioBufferSettings" />
+    <script src="./sdpi.js"></script>
 </body>
 </html>

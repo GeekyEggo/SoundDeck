@@ -38,7 +38,7 @@
             => Task.FromResult(new AudioDevicesPayload(this.Devices));
 
         [PropertyInspectorMethod]
-        public Task<FolderPickerPayload> GetOutputPath()
+        public async Task<FolderPickerPayload> GetOutputPath()
         {
             using (var dialog = new FolderBrowserDialog())
             {
@@ -49,17 +49,21 @@
                 var result = dialog.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    return Task.FromResult(new FolderPickerPayload(dialog.SelectedPath, true));
+                    this.Settings.OutputPath = dialog.SelectedPath;
+                    await this.SetSettingsAsync(this.Settings);
+
+                    return new FolderPickerPayload(this.Settings.OutputPath, true);
                 }
-                else
-                {
-                    return Task.FromResult(new FolderPickerPayload(this.Settings?.OutputPath, false));
-                }
+
+                return new FolderPickerPayload(this.Settings?.OutputPath, false);
             }
         }
 
         protected override Task OnPropertyInspectorDidAppear(ActionEventArgs args)
             => base.OnPropertyInspectorDidAppear(args);
+
+        protected override Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+            => base.OnWillAppear(args);
 
         protected async override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, CaptureAudioBufferSettings settings)
         {

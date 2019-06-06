@@ -11,6 +11,7 @@
         /// Initializes a new instance of the <see cref="FolderPickerPayload"/> class.
         /// </summary>
         /// <param name="path">The path.</param>
+        /// <param name="success">Determines whether a folder was successfully picked.</param>
         public FolderPickerPayload(string path = "", bool success = true)
         {
             this.Path = path;
