@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import ReactDOM from "react-dom";
-import client from "./streamDeckClient";
+import client from "./common/streamDeckClient";
 import CaptureAudioBufferSettings from "./forms/captureAudioBufferSettings";
 
 function render() {

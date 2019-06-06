@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import Select from "./select";
+import Select from "./common/select";
 
 class DurationSelect extends React.Component {
     constructor(props) {

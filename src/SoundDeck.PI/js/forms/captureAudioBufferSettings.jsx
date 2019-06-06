@@ -1,8 +1,8 @@
 ﻿import React from "react";
 import AudioDevices from "../components/audioDeviceSelect";
-import client from "../streamDeckClient";
+import client from "../common/streamDeckClient";
 import Duration from "../components/durationSelect";
-import FolderPicker from "../components/folderPicker"
+import FolderPicker from "../components/common/folderPicker"
 
 class CaptureAudioBufferSettings extends React.Component {
     constructor(props) {

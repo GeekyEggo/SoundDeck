@@ -6,7 +6,6 @@ class FolderPicker extends React.Component {
     }
 
     render() {
-        console.log(this.props.value);
         return (
             <div className="sdpi-item">
                 <div className="sdpi-item-label">{this.props.label}</div>

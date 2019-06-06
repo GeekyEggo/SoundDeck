@@ -1,7 +1,11 @@
 ﻿import React from "react";
-import Select from "./select";
-import soundDeck from "../soundDeck";
-import streamDeckClient from "../streamDeckClient";
+import Select from "./common/select";
+import streamDeckClient from "../common/streamDeckClient";
+
+const FLOW = {
+    "0": "Playback",
+    "1": "Recording"
+};
 
 class AudioDeviceSelect extends React.Component {
     constructor(props) {
@@ -15,7 +19,7 @@ class AudioDeviceSelect extends React.Component {
     async componentDidMount() {
         let options = [];
         const getGroup = (device) => {
-            let grp = options.find(grp => grp.label == soundDeck.enums.FLOW[device.flow]) || this.transformDeviceToOptionGroup(device);
+            let grp = options.find(grp => grp.label == FLOW[device.flow]) || this.transformDeviceToOptionGroup(device);
             if (grp.children.length == 0) {
                 options.push(grp);
             }
@@ -41,7 +45,7 @@ class AudioDeviceSelect extends React.Component {
 
     transformDeviceToOptionGroup(device) {
         return {
-            label: soundDeck.enums.FLOW[device.flow],
+            label: FLOW[device.flow],
             children: []
         };
     }
