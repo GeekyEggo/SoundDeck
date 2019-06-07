@@ -12,15 +12,19 @@
     background-color: var(--sdpi-background);
     color: var(--sdpi-color);
 }
-.sdpi-file-label {
-    letter-spacing: 2px;
+.sdpi-folder-button {
+    cursor: pointer;
+    min-height: 21px !important;
+    height: 21px !important;
+    letter-spacing: 1px;
+    line-height: 20px;
+    padding: 0px 4px;
+    margin: auto;
+    margin-right: 0px;
 }
-.disabler {
-    background-color: var(--sdpi-bgcolor);
-    height: 100%;
-    left: 0;
-    opacity: .5;
-    position: absolute;
-    top: 0;
-    width: 100%;
+.sdpi-folder-button:disabled {
+    cursor: default;
+}
+.sdpi-folder-button:hover:enabled {
+    background-color: #464646;
 }

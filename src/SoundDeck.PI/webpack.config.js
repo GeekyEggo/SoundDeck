@@ -7,7 +7,7 @@ const piPath = path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/c
 module.exports = {
     devtool: "source-map",
     entry: {
-        sdpi: path.resolve(__dirname, "js/sdpi.jsx")
+        index: path.resolve(__dirname, "js/index.jsx")
     },
     module: {
         rules: [{

@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import Select from "./common/select";
+import Select from "../common/components/select";
 import streamDeckClient from "../common/streamDeckClient";
 
 const FLOW = {
@@ -51,12 +51,7 @@ class AudioDeviceSelect extends React.Component {
     }
 
     render() {
-        return <Select
-            id={this.props.id}
-            label="Device"
-            onChange={this.props.onChange}
-            options={this.state.options}
-            value={this.props.value} />
+        return <Select label="Device" {...this.props} {...this.state} />
     }
 }
 

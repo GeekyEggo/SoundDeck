@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import Select from "./common/select";
+import Select from "../common/components/select";
 
 class DurationSelect extends React.Component {
     constructor(props) {
@@ -16,19 +16,15 @@ class DurationSelect extends React.Component {
     }
 
     render() {
-        return <Select
-            id={this.props.id}
-            label="Duration"
-            onChange={this.props.onChange}
-            options={this.state.options}
-            value={this.props.value} />
+        return <Select label="Duration" {...this.props} {...this.state} />
     }
 }
 
 DurationSelect.defaultProps = {
     id: undefined,
     onChange: undefined,
-    value: undefined
+    value: undefined,
+    valuePath: undefined
 };
 
 export default DurationSelect;
