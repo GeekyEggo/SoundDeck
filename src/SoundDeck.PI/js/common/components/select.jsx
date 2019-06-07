@@ -1,10 +1,17 @@
 ﻿import React from "react";
 import { connect } from "../actionSettingsStore";
+import streamDeckClient from "../streamDeckClient";
 
 class Select extends React.Component {
     constructor(props) {
         super(props);
+
         this.mapOptions = this.mapOptions.bind(this);
+        this.state = props.options instanceof Array ? { options: [...props.options] } : { options: undefined };
+
+        if (props.dataSourceUri) {
+            streamDeckClient.get(props.dataSourceUri).then(r => this.setState({ options: r.payload.options }));
+        }
     }
 
     mapOptions(item) {
@@ -14,11 +21,13 @@ class Select extends React.Component {
     }
 
     render() {
+        let options = this.state.options || this.props.options || [];
+
         return (
             <div className="sdpi-item">
                 <label className="sdpi-item-label" htmlFor={this.props.id}>{this.props.label}</label>
                 <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.value} onChange={this.props.onChange}>
-                    {this.props.options.map(this.mapOptions)}
+                    {options.map(this.mapOptions)}
                 </select>
             </div>
         );
@@ -29,7 +38,7 @@ Select.defaultProps = {
     id: "",
     label: " ",
     onChange: undefined,
-    options: [],
+    options: undefined,
     value: undefined,
     valuePath: undefined
 };

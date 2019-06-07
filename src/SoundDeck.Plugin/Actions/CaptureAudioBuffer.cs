@@ -3,6 +3,7 @@
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
+    using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.Payloads;
     using SoundDeck.Plugin.Models.Settings;
@@ -34,8 +35,16 @@
         private AudioDevice[] Devices { get; }
 
         [PropertyInspectorMethod]
-        public Task<AudioDevicesPayload> GetAudioDevices()
-            => Task.FromResult(new AudioDevicesPayload(this.Devices));
+        public Task<OptionsPayload> GetAudioDevices()
+        {
+            var options = this.Devices.GroupBy(d => d.Flow).Select(g =>
+            {
+                var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
+                return new Option(g.Key.ToString(), children);
+            }).ToList();
+
+            return Task.FromResult(new OptionsPayload(options));
+        }
 
         [PropertyInspectorMethod]
         public async Task<FolderPickerPayload> GetOutputPath()
