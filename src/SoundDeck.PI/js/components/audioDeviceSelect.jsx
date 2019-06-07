@@ -56,14 +56,14 @@ class AudioDeviceSelect extends React.Component {
             label="Device"
             onChange={this.props.onChange}
             options={this.state.options}
-            selected={this.props.selected} />
+            value={this.props.value} />
     }
 }
 
 AudioDeviceSelect.defaultProps = {
     id: undefined,
     onChange: undefined,
-    selected: undefined
+    value: undefined
 };
 
 export default AudioDeviceSelect;

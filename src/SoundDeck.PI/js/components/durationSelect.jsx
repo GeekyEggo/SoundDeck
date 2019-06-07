@@ -21,14 +21,14 @@ class DurationSelect extends React.Component {
             label="Duration"
             onChange={this.props.onChange}
             options={this.state.options}
-            selected={this.props.selected} />
+            value={this.props.value} />
     }
 }
 
 DurationSelect.defaultProps = {
     id: undefined,
     onChange: undefined,
-    selected: undefined
+    value: undefined
 };
 
 export default DurationSelect;

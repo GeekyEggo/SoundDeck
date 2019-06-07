@@ -5,7 +5,7 @@ class Select extends React.Component {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
-        this.state = { selected: props.selected };
+        this.state = { value: props.value };
     }
 
     getOptions() {
@@ -21,7 +21,7 @@ class Select extends React.Component {
     }
 
     handleChange(ev) {
-        this.setState({ selected: ev.target.value });
+        this.setState({ value: ev.target.value });
         this.props.onChange && this.props.onChange(ev);
     }
 
@@ -29,7 +29,7 @@ class Select extends React.Component {
         return (
             <div className="sdpi-item">
                 <label className="sdpi-item-label" htmlFor={this.props.id}>{this.props.label}</label>
-                <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.selected || this.state.selected} onChange={this.handleChange}>
+                <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.value || this.state.value} onChange={this.handleChange}>
                     {this.getOptions()}
                 </select>
             </div>
@@ -42,7 +42,7 @@ Select.defaultProps = {
     label: " ",
     onChange: undefined,
     options: [],
-    selected: undefined
+    value: undefined
 };
 
 export default Select;

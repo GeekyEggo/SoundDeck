@@ -57,8 +57,8 @@ class CaptureAudioBufferSettings extends React.Component {
     render() {
         return (
             <div className="sdpi-wrapper">
-                <AudioDevices id="audioDeviceId" selected={this.state.settings.audioDeviceId} onChange={this.onSettingChange} />
-                <Duration id="clipDuration" selected={this.state.settings.clipDuration} onChange={this.onSettingChange} />
+                <AudioDevices id="audioDeviceId" value={this.state.settings.audioDeviceId} onChange={this.onSettingChange} />
+                <Duration id="clipDuration" value={this.state.settings.clipDuration} onChange={this.onSettingChange} />
                 <FolderPicker label="Output Path" onClick={this.outputPathOnClick} value={this.state.settings.outputPath} />
                 {this.state.disabled &&
                     <div className="disabler"></div>
