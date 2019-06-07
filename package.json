@@ -33,6 +33,7 @@
         "babel-loader": "^8.0.6",
         "clean-webpack-plugin": "^3.0.0",
         "copy-webpack-plugin": "^5.0.3",
+        "object-path": "^0.11.4",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
         "react-redux": "^7.0.3",

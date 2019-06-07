@@ -6,9 +6,7 @@ class PropertyInspectorWrapper extends React.Component {
     render() {
         return (
             <Provider store={store} context={Context}>
-                <div className="sdpi-wrapper">
-                    {this.props.children}
-                </div>
+                <div className="sdpi-wrapper">{this.props.children}</div>
             </Provider>
         );
     }
