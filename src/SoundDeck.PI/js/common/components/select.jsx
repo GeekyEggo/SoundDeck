@@ -1,6 +1,5 @@
 ﻿import React from "react";
-import { connect } from "react-redux"
-import { Context, mapStateToProps, mapDispatchToProps } from "../actionSettingsStore";
+import { connect } from "../actionSettingsStore";
 
 class Select extends React.Component {
     constructor(props) {
@@ -35,4 +34,4 @@ Select.defaultProps = {
     valuePath: undefined
 };
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { context: Context })(Select);
+export default connect(Select);
