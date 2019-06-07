@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import CaptureAudioBufferSettings from "../forms/captureAudioBufferSettings";
+import CaptureAudioBufferSettings from "./captureAudioBufferSettings";
 
 class App extends React.Component {
     render() {

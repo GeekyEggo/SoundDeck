@@ -1,23 +1,17 @@
 ﻿import React from "react";
 import { connect } from "react-redux"
-import { mapStateToProps, mapDispatchToProps } from "../actionSettingsStore";
+import { Context, mapStateToProps, mapDispatchToProps } from "../actionSettingsStore";
 
 class Select extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.mapOptions = this.mapOptions.bind(this);
     }
 
-    getOptions() {
-        return this.props.options.map(item => {
-            return item.children && item.children instanceof Array
-                ? <optgroup key={item.label} label={item.label}>{item.children.map(this.getOption)}</optgroup>
-                : this.getOption(item);
-        });
-    }
-
-    getOption(item) {
-        return <option key={item.value} value={item.value}>{item.label}</option>
+    mapOptions(item) {
+        return item.children && item.children instanceof Array
+            ? <optgroup key={item.label} label={item.label}>{item.children.map(this.mapOptions)}</optgroup>
+            : <option key={item.value} value={item.value}>{item.label}</option>
     }
 
     render() {
@@ -25,7 +19,7 @@ class Select extends React.Component {
             <div className="sdpi-item">
                 <label className="sdpi-item-label" htmlFor={this.props.id}>{this.props.label}</label>
                 <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.value} onChange={this.props.onChange}>
-                    {this.getOptions()}
+                    {this.props.options.map(this.mapOptions)}
                 </select>
             </div>
         );
@@ -41,4 +35,4 @@ Select.defaultProps = {
     valuePath: undefined
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Select);
+export default connect(mapStateToProps, mapDispatchToProps, null, { context: Context })(Select);

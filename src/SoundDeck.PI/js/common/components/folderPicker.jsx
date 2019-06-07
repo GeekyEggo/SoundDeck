@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import client from "../streamDeckClient";
 import { connect } from "react-redux"
-import { mapStateToProps, mapDispatchToProps } from "../actionSettingsStore";
+import { Context, mapStateToProps, mapDispatchToProps } from "../actionSettingsStore";
 
 class FolderPicker extends React.Component {
     constructor(props) {
@@ -11,7 +11,7 @@ class FolderPicker extends React.Component {
         this.state = { disabled: false }
     }
 
-    async handleClick(ev) {
+    async handleClick() {
         this.setState({ disabled: true });
 
         var response = await client.get(this.props.pluginUri);
@@ -42,4 +42,4 @@ FolderPicker.defaultProps = {
     value: undefined
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FolderPicker);
+export default connect(mapStateToProps, mapDispatchToProps, null, { context: Context })(FolderPicker);

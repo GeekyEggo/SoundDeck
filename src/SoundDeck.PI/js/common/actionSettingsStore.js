@@ -1,18 +1,19 @@
-﻿import client from "./streamDeckClient";
+﻿import React from "react";
+import { createStore, applyMiddleware } from "redux"
+import client from "./streamDeckClient";
 
-const defaultState = {
-    settings: {}
-};
+const DEFAULT_STATE = { settings: {} };
+const ACTIONS = {
+        SET_ACTION_SETTINGS: "setActionSettings",
+        SET_ACTION_SETTING: "setActionSetting"
+    };
 
-export const SET_ACTION_SETTINGS = "setActionSettings";
-export const SET_ACTION_SETTING = "setActionSetting";
-
-export const settingsReducer = (state, action) => {
+const reducer = (state, action) => {
     if (state == undefined) {
-        return defaultState;
+        return DEFAULT_STATE;
     }
 
-    if (action.type !== SET_ACTION_SETTING && action.type !== SET_ACTION_SETTINGS) {
+    if (!Object.keys(ACTIONS).find(key => ACTIONS[key] === action.type)) {
         return state;
     }
 
@@ -24,39 +25,36 @@ export const settingsReducer = (state, action) => {
     });
 }
 
+const saveSettings = store => next => action => {
+    next(action);
+
+    if (action.type === ACTIONS.SET_ACTION_SETTING) {
+        client.setSettings(store.getState().settings);
+    }
+}
+
 export const mapDispatchToProps = (dispatch, ownProps) => {
     return {
-        onChange: (ev) => dispatch(setSetting({ [ownProps.valuePath]: ev.target.value }))
+        onChange: (ev) => dispatch({
+            type: ACTIONS.SET_ACTION_SETTING,
+            value: { [ownProps.valuePath]: ev.target.value }
+        })
     }
 }
 
 export const mapStateToProps = (state, ownProps) => {
-    return Object.assign({}, ownProps, { value: state.settings[ownProps.valuePath] });
+    let obj = Object.assign({}, ownProps, { value: state.settings[ownProps.valuePath] });
+    console.log(obj);
+    return obj;
 }
 
-const setSetting = (value) => {
-    return {
-        type: SET_ACTION_SETTING,
-        value: value,
-    }
-}
+export const Context = React.createContext();
 
-const setSettings = (settings) => {
-    return {
-        type: SET_ACTION_SETTINGS,
-        value: settings
-    }
-}
+const store = createStore(reducer, applyMiddleware(saveSettings));
+client.connect()
+    .then(conn => store.dispatch({
+        type: ACTIONS.SET_ACTION_SETTINGS,
+        value: conn.actionInfo.payload.settings
+    }));
 
-export async function connectElgatoStreamDeck(store) {
-    let connection = await client.connect();
-    store.dispatch(setSettings(connection.actionInfo.payload.settings));
-}
-
-export const saveSettings = store => next => action => {
-    next(action);
-
-    if (action.type === SET_ACTION_SETTING) {
-        client.setSettings(store.getState().settings);
-    }
-}
+export default store;
