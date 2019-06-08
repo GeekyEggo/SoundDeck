@@ -26,7 +26,7 @@ class FolderPicker extends React.Component {
             <div className="sdpi-item">
                 <div className="sdpi-item-label">{this.props.label}</div>
                 <div className="sdpi-item-group file">
-                    <label className="sdpi-folder-info">{this.props.value || "No folder"}</label>
+                    <label className="sdpi-folder-info">{this.props.value || "\u00a0"}</label>
                     <button className="sdpi-folder-button" disabled={this.state.disabled} onClick={this.handleClick}>...</button>
                 </div>
             </div>

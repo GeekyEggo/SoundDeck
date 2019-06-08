@@ -20,8 +20,8 @@ class CaptureAudioBufferSettings extends React.Component {
         return (
             <PropertyInspectorWrapper>
                 <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
-                <FolderPicker label="Output Path" pluginUri="GetOutputPath" valuePath="outputPath" />
                 <Select label="Duration" options={this.durationOptions} valuePath="clipDuration" />
+                <FolderPicker label="Output Path" pluginUri="GetOutputPath" valuePath="outputPath" />
             </PropertyInspectorWrapper>
         );
     }

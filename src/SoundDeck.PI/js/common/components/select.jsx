@@ -26,7 +26,8 @@ class Select extends React.Component {
         return (
             <div className="sdpi-item">
                 <label className="sdpi-item-label" htmlFor={this.props.id}>{this.props.label}</label>
-                <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.value} onChange={this.props.onChange}>
+                <select className="sdpi-item-value select" name={this.props.id} id={this.props.id} value={this.props.value || this.props.defaultValue} onChange={this.props.onChange}>
+                    <option hidden disabled value="" />
                     {options.map(this.mapOptions)}
                 </select>
             </div>
@@ -35,6 +36,7 @@ class Select extends React.Component {
 }
 
 Select.defaultProps = {
+    defaultValue: "",
     id: "",
     label: " ",
     onChange: undefined,
