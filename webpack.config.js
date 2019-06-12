@@ -1,13 +1,13 @@
-﻿const path = require("path");
+const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin")
 
-const piPath = path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI")
+const source = path.resolve(__dirname, "src/SoundDeck.PI");
+const dest = path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI");
 
-module.exports = {
-    devtool: "source-map",
+let config = {
     entry: {
-        index: path.resolve(__dirname, "js/index.jsx")
+        index: path.resolve(source, "js/index.jsx")
     },
     module: {
         rules: [{
@@ -24,7 +24,7 @@ module.exports = {
     },
     output: {
         filename: "[name].js",
-        path: piPath
+        path: dest
     },
     plugins: [
         new CleanWebpackPlugin({
@@ -32,9 +32,9 @@ module.exports = {
         }),
         new CopyPlugin([
             {
-                from: __dirname,
-                to: piPath,
-                context: __dirname,
+                from: source,
+                to: dest,
+                context: source,
                 ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
             },
         ])
@@ -42,4 +42,12 @@ module.exports = {
     resolve: {
         extensions: [".js", ".jsx"]
     }
+};
+
+module.exports = (env, argv) => {
+    if (argv.mode === "development") {
+        config.devtool = "source-map";
+    }
+
+    return config;
 };

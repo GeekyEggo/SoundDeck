@@ -7,15 +7,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Core", "src\Sound
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3701-4B5A-9441-71C488D8994A}"
 	ProjectSection(SolutionItems) = preProject
+		.babelrc = .babelrc
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		LICENSE = LICENSE
 		package.json = package.json
+		webpack.config.js = webpack.config.js
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.PI", "src\SoundDeck.PI\SoundDeck.PI.csproj", "{C9C562B9-745D-442E-A1CA-13E8314F5CF5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{C149BEBE-95F0-4A4D-9281-9B94D973D861}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{9F60F66B-B443-40C9-A8F2-8941D23EDE11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{9F60F66B-B443-40C9-A8F2-8941D23EDE11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

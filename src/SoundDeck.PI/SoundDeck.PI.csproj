@@ -1,14 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <OutputType>Library</OutputType>
-  </PropertyGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" />
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd ..\.. &amp;&amp; npm run install-pi" />
-  </Target>
-
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent" />
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="cd ..\.. &amp;&amp; npm run install:pi" />
+    </Target>
 </Project>
