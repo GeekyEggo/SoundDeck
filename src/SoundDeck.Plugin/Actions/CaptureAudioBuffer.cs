@@ -1,9 +1,10 @@
-﻿namespace SoundDeck.Plugin.Actions
+namespace SoundDeck.Plugin.Actions
 {
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
+    using SharpDeck.Registration;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.Payloads;
     using SoundDeck.Plugin.Models.Settings;
@@ -12,6 +13,8 @@
     using System.Threading.Tasks;
     using System.Windows.Forms;
 
+    [StreamDeckAction("Audio Replay", "com.geekyEggo.soundDeckCaptureAudioBuffer", "Images/Action", PropertyInspectorPath = "PI/captureAudioBuffer.html", Tooltip = "Capture the last x seconds of audio.")]
+    [StreamDeckActionState("Images/Action")]
     public class CaptureAudioBuffer : StreamDeckAction<CaptureAudioBufferSettings>
     {
         public CaptureAudioBuffer(IAudioService audioService)

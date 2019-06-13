@@ -1,4 +1,15 @@
-﻿namespace SoundDeck.Plugin
+using SharpDeck.Registration;
+[assembly: StreamDeckPlugin(
+    Name = "Sound Deck",
+    Category = "Sound Deck",
+    Description = "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
+    Icon = "Images/Icon",
+    CodePath = "SoundDeck.Plugin.exe",
+    Version = "1.0.0",
+    Author = "GeekyEggo",
+    WindowsMinimumVersion = "10")]
+
+namespace SoundDeck.Plugin
 {
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -23,6 +34,12 @@
         /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
+            if (ManifestWriter.TryWrite(e.Args, out int result))
+            {
+                Application.Current.Shutdown();
+                return;
+            }
+
 #if DEBUG
             Debugger.Launch();
 #endif

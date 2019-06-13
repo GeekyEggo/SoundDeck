@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
@@ -29,14 +29,15 @@
         <None Update="Images\Icon.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="manifest.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$(Configuration) == 'Debug'">
         <Exec Command="cd ..\.. &amp;&amp; npm stop" />
     </Target>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Debug'">
+        <Exec Command="$(TargetDir)$(TargetName).exe -m" />
         <Exec Command="cd ..\.. &amp;&amp; npm run debug:plugin" />
+    </Target>
+    <Target Name="CreateManifest" AfterTargets="Publish">
+        <Exec Command="$(PublishDir)$(TargetName).exe -m" />
     </Target>
 </Project>
