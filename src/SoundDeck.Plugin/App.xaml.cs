@@ -34,16 +34,16 @@ namespace SoundDeck.Plugin
         /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
-#if DEBUG
-            Debugger.Launch();
-#endif
-
             if (ManifestWriter.TryWrite(e.Args, out int result))
             {
                 Application.Current.Shutdown();
             }
             else
             {
+#if DEBUG
+                Debugger.Launch();
+#endif
+
                 var provider = GetServiceProvider();
                 using (var client = new StreamDeckClient(e.Args))
                 {
