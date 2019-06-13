@@ -2,9 +2,9 @@ namespace SoundDeck.Plugin.Actions
 {
     using SharpDeck;
     using SharpDeck.Events.Received;
+    using SharpDeck.Manifest;
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
-    using SharpDeck.Registration;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.Payloads;
     using SoundDeck.Plugin.Models.Settings;

@@ -1,4 +1,4 @@
-using SharpDeck.Registration;
+using SharpDeck.Manifest;
 [assembly: StreamDeckPlugin(
     Name = "Sound Deck",
     Category = "Sound Deck",
@@ -34,21 +34,22 @@ namespace SoundDeck.Plugin
         /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (ManifestWriter.TryWrite(e.Args, out int result))
-            {
-                Application.Current.Shutdown();
-                return;
-            }
-
 #if DEBUG
             Debugger.Launch();
 #endif
 
-            var provider = GetServiceProvider();
-            using (var client = new StreamDeckClient(e.Args))
+            if (ManifestWriter.TryWrite(e.Args, out int result))
             {
-                client.RegisterAction("com.geekyEggo.soundDeckCaptureAudioBuffer", () => provider.GetInstance<CaptureAudioBuffer>());
-                await client.StartAsync(CancellationToken.None);
+                Application.Current.Shutdown();
+            }
+            else
+            {
+                var provider = GetServiceProvider();
+                using (var client = new StreamDeckClient(e.Args))
+                {
+                    client.RegisterAction("com.geekyEggo.soundDeckCaptureAudioBuffer", () => provider.GetInstance<CaptureAudioBuffer>());
+                    await client.StartAsync(CancellationToken.None);
+                }
             }
         }
 
