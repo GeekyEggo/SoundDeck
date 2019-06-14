@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture.Sharing
+namespace SoundDeck.Core.Capture.Sharing
 {
     using System;
     using System.Threading.Tasks;
@@ -68,12 +68,11 @@
         }
 
         /// <summary>
-        /// Saves the buffered audio data for the duration, to the specified output path.
+        /// Saves an audio file of the current buffer.
         /// </summary>
-        /// <param name="duration">The duration.</param>
-        /// <param name="outputPath">The output path.</param>
+        /// <param name="settings">The settings containing information about how, and where to save the capture.</param>
         /// <returns>The file path.</returns>
-        public Task<string> SaveAsync(TimeSpan duration, string outputPath)
-            => this.AudioBuffer.SaveAsync(duration, outputPath);
+        public Task<string> SaveAsync(ISaveBufferSettings settings)
+            => this.AudioBuffer.SaveAsync(settings);
     }
 }

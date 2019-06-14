@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture
+namespace SoundDeck.Core.Capture
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
@@ -79,18 +79,18 @@
         }
 
         /// <summary>
-        /// Saves an audio file of the current buffer, for the specified duration.
+        /// Saves an audio file of the current buffer.
         /// </summary>
-        /// <param name="duration">The duration.</param>
+        /// <param name="settings">The settings containing information about how, and where to save the capture.</param>
         /// <returns>The file path.</returns>
-        public async Task<string> SaveAsync(TimeSpan duration, string outputPath)
+        public async Task<string> SaveAsync(ISaveBufferSettings settings)
         {
-            var chunks = await this.Chunks.GetAsync(duration);
+            var chunks = await this.Chunks.GetAsync(settings.Duration);
             using (var writer = new WavWriter(chunks, this.Capture.WaveFormat))
             {
-                writer.NormalizeVolume = true;
-                writer.EncodeToMP3 = true;
-                var path = await writer.SaveAsync(outputPath);
+                writer.NormalizeVolume = settings.NormalizeVolume;
+                writer.EncodeToMP3 = settings.EncodeToMP3;
+                var path = await writer.SaveAsync(settings.OutputPath);
 
                 this.Logger?.LogInformation("Audio capture saved: {0}", path);
                 return path;

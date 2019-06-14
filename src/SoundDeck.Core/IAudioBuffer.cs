@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+namespace SoundDeck.Core
 {
     using System;
     using System.Threading.Tasks;
@@ -19,11 +19,10 @@
         string DeviceId { get; }
 
         /// <summary>
-        /// Saves the buffered audio data for the duration, to the specified output path.
+        /// Saves an audio file of the current buffer.
         /// </summary>
-        /// <param name="duration">The duration.</param>
-        /// <param name="outputPath">The output path.</param>
+        /// <param name="settings">The settings containing information about how, and where to save the capture.</param>
         /// <returns>The file path.</returns>
-        Task<string> SaveAsync(TimeSpan duration, string outputPath);
+        Task<string> SaveAsync(ISaveBufferSettings settings);
     }
 }

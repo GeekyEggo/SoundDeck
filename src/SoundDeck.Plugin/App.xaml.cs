@@ -47,7 +47,7 @@ namespace SoundDeck.Plugin
                 var provider = GetServiceProvider();
                 using (var client = new StreamDeckClient(e.Args))
                 {
-                    client.RegisterAction("com.geekyEggo.soundDeckCaptureAudioBuffer", () => provider.GetInstance<CaptureAudioBuffer>());
+                    client.RegisterAction(CaptureAudioBuffer.UUID, () => provider.GetInstance<CaptureAudioBuffer>());
                     await client.StartAsync(CancellationToken.None);
                 }
             }

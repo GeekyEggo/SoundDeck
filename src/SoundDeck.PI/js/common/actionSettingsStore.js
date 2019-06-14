@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { createStore, applyMiddleware } from "redux"
 import { connect as reduxConnect } from "react-redux"
 import objectPath from "object-path";

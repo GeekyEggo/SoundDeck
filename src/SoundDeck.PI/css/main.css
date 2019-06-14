@@ -1,4 +1,4 @@
-﻿.sdpi-folder-info {
+.sdpi-folder-info {
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
@@ -27,4 +27,7 @@
 }
 .sdpi-folder-button:hover:enabled {
     background-color: #464646;
+}
+input[type="checkbox"] + label span {
+    margin: 5px 4px 0 2px !important;
 }
