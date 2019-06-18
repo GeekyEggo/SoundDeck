@@ -1,8 +1,5 @@
 import React from "react";
-import FolderPicker from "../common/components/folderPicker"
-import PropertyInspectorWrapper from "../common/components/propertyInspectorWrapper";
-import Select from "../common/components/select";
-import CheckBox from "../common/components/checkbox";
+import { Checkbox, FolderPicker, PropertyInspectorWrapper, Select } from "../react-sounddeck";
 
 class CaptureAudioBufferSettings extends React.Component {
     constructor (props) {
@@ -23,8 +20,8 @@ class CaptureAudioBufferSettings extends React.Component {
                 <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
                 <Select label="Duration" options={this.durationOptions} valuePath="duration" />
                 <FolderPicker label="Output Path" pluginUri="GetOutputPath" valuePath="outputPath" />
-                <CheckBox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={true} id="encodeToMP3" />
-                <CheckBox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={false} id="normalizeVolume" />
+                <Checkbox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={true} id="encodeToMP3" />
+                <Checkbox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={false} id="normalizeVolume" />
             </PropertyInspectorWrapper>
         );
     }

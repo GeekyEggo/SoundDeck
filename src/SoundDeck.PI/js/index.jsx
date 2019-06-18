@@ -1,10 +1,10 @@
-﻿import React from "react"
+import React from "react"
 import ReactDOM from "react-dom";
 import App from "./components/app"
-import client from "./common/streamDeckClient";
+import { streamDeckClient } from "./react-sounddeck";
 
 const render = () =>
     ReactDOM.render(<App />, document.getElementById("root")
 );
 
-client.connect().then(render);
+streamDeckClient.connect().then(render);
