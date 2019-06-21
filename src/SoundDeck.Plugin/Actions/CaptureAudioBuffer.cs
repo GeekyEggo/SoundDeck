@@ -29,13 +29,16 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="CaptureAudioBuffer"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
-        public CaptureAudioBuffer(IAudioService audioService)
+        public CaptureAudioBuffer(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
             : base()
         {
             this.AudioService = audioService;
-            this.Devices = audioService.GetDevices().ToArray();
 
-            this.Initialized += this.ReplayBufferAction_Initialized;
+            var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+            if (!string.IsNullOrWhiteSpace(settings?.AudioDeviceId))
+            {
+                this.AudioBuffer = this.AudioService.GetAudioBuffer(settings.AudioDeviceId, settings.Duration);
+            }
         }
 
         /// <summary>
@@ -49,18 +52,13 @@ namespace SoundDeck.Plugin.Actions
         private IAudioBuffer AudioBuffer { get; set; }
 
         /// <summary>
-        /// Gets the devices.
-        /// </summary>
-        private AudioDevice[] Devices { get; }
-
-        /// <summary>
         /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public Task<OptionsPayload> GetAudioDevices()
         {
-            var options = this.Devices.GroupBy(d => d.Flow).Select(g =>
+            var options = this.AudioService.Devices.GroupBy(d => d.Flow).Select(g =>
             {
                 var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
                 return new Option(g.Key.ToString(), children);
@@ -76,36 +74,44 @@ namespace SoundDeck.Plugin.Actions
         [PropertyInspectorMethod]
         public async Task<FolderPickerPayload> GetOutputPath()
         {
+            var settings = await this.GetSettingsAsync();
             using (var dialog = new FolderBrowserDialog())
             {
                 dialog.Description = "Output Path";
-                dialog.SelectedPath = this.Settings?.OutputPath;
+                dialog.SelectedPath = settings.OutputPath;
                 dialog.UseDescriptionForTitle = true;
 
                 var result = dialog.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    this.Settings.OutputPath = dialog.SelectedPath;
-                    await this.SetSettingsAsync(this.Settings);
+                    settings.OutputPath = dialog.SelectedPath;
+                    await this.SetSettingsAsync(settings);
 
-                    return new FolderPickerPayload(this.Settings.OutputPath, true);
+                    return new FolderPickerPayload(settings.OutputPath, true);
                 }
 
-                return new FolderPickerPayload(this.Settings?.OutputPath, false);
+                return new FolderPickerPayload(settings?.OutputPath, false);
             }
         }
 
         /// <summary>
-        /// Called when the action receives the strongly-typed settings.
+        /// Raises the <see cref="E:SharpDeck.StreamDeckActionEventReceiver.DidReceiveSettings" /> event.
         /// </summary>
-        /// <param name="args">The <see cref="ActionEventArgs{ActionPayload}" /> instance containing the event data.</param>
-        /// <param name="settings">The settings.</param>
-        protected async override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, CaptureAudioBufferSettings settings)
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <returns>The task of updating updating the audio buffer based on the new settings.</returns>
+        protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
-            await base.OnDidReceiveSettings(args, settings);
-            if (this.Settings.AudioDeviceId != settings.AudioDeviceId)
+            await base.OnDidReceiveSettings(args);
+            var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+
+            if (this.AudioBuffer != null && this.AudioBuffer.DeviceId != settings.AudioDeviceId)
             {
                 this.AudioBuffer.Dispose();
+                this.AudioBuffer = null;
+            }
+
+            if (this.AudioBuffer == null && !string.IsNullOrWhiteSpace(settings.AudioDeviceId))
+            {
                 this.AudioBuffer = this.AudioService.GetAudioBuffer(settings.AudioDeviceId, settings.Duration);
             }
 
@@ -113,31 +119,30 @@ namespace SoundDeck.Plugin.Actions
             {
                 this.AudioBuffer.BufferDuration = settings.Duration;
             }
-
-            this.Settings = settings;
-        }
-
-        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
-        {
-            if (this.AudioBuffer != null)
-            {
-                var path = await this.AudioBuffer.SaveAsync(this.Settings);
-
-                await this.StreamDeck.LogMessageAsync($"Saved captured from device {this.Settings.AudioDeviceId} to {path}");
-                await this.ShowOkAsync();
-            }
         }
 
         /// <summary>
-        /// Handles the <see cref="StreamDeckAction.Initialized"/> event of the this instance.
+        /// Occurs when the user presses a key.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void ReplayBufferAction_Initialized(object sender, EventArgs e)
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <returns>The task of saving the buffer to a file.</returns>
+        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            if (!string.IsNullOrWhiteSpace(this.Settings?.AudioDeviceId))
+            try
             {
-                this.AudioBuffer = this.AudioService.GetAudioBuffer(this.Settings.AudioDeviceId, this.Settings.Duration);
+                var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+                if (this.AudioBuffer != null)
+                {
+                    var path = await this.AudioBuffer.SaveAsync(settings);
+
+                    await this.StreamDeck.LogMessageAsync($"Saved captured from device {settings.AudioDeviceId} to {path}");
+                    await this.ShowOkAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                await this.StreamDeck.LogMessageAsync(ex.Message);
+                await this.ShowAlertAsync();
             }
         }
     }

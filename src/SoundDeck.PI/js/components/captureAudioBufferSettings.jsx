@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, FolderPicker, PropertyInspectorWrapper, Select } from "../react-sounddeck";
+import { Checkbox, FolderPicker, PropertyInspectorWrapper, Select } from "../react-sharpdeck";
 
 class CaptureAudioBufferSettings extends React.Component {
     constructor (props) {

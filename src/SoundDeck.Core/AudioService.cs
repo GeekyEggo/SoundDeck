@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+namespace SoundDeck.Core
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
@@ -20,20 +20,20 @@
         /// <param name="logger">The logger.</param>
         public AudioService(ILogger<AudioService> logger)
         {
-            this.DeviceEnumerator = new MMDeviceEnumerator();
+            this.Devices = new AudioDeviceCollection();
             this.SharedAudioBufferManager = new SharedAudioBufferManager(logger);
         }
+
+        /// <summary>
+        /// Gets the audio devices.
+        /// </summary>
+        public IAudioDeviceCollection Devices { get; }
 
         /// <summary>
         /// Gets the audio buffer manager.
         /// </summary>
         private SharedAudioBufferManager SharedAudioBufferManager { get; }
 
-        /// <summary>
-        /// Gets the device enumerator.
-        /// </summary>
-        private MMDeviceEnumerator DeviceEnumerator { get; }
-        
         /// <summary>
         /// Determines whether encoding to MP3 is possible based on the current environment.
         /// </summary>
@@ -45,7 +45,7 @@
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
-            => this.DeviceEnumerator.Dispose();
+            => this.Devices.Dispose();
 
         /// <summary>
         /// Gets an audio buffer for the specified device identifier.
@@ -55,12 +55,5 @@
         /// <returns>The audio buffer.</returns>
         public IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration)
             => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceId, clipDuration);
-
-        /// <summary>
-        /// Gets the active audio devices.
-        /// </summary>
-        /// <returns>The audio devices</returns>
-        public IEnumerable<AudioDevice> GetDevices()
-            => this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active).Select(m => new AudioDevice(m));
     }
 }

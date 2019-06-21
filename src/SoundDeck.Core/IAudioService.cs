@@ -1,14 +1,17 @@
-﻿namespace SoundDeck.Core
+namespace SoundDeck.Core
 {
-    using SoundDeck.Core.Capture;
     using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
     /// </summary>
     public interface IAudioService : IDisposable
     {
+        /// <summary>
+        /// Gets the audio devices.
+        /// </summary>
+        IAudioDeviceCollection Devices { get; }
+
         /// <summary>
         /// Determines whether encoding to MP3 is possible based on the current environment.
         /// </summary>
@@ -22,11 +25,5 @@
         /// <param name="clipDuration">Duration of the clip.</param>
         /// <returns>The audio buffer.</returns>
         IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration);
-
-        /// <summary>
-        /// Gets the active audio devices.
-        /// </summary>
-        /// <returns>The audio devices</returns>
-        IEnumerable<AudioDevice> GetDevices();
     }
 }

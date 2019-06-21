@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+namespace SoundDeck.Core
 {
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Enums;
@@ -33,5 +33,13 @@
         /// Gets the flow of the audio.
         /// </summary>
         public AudioFlow Flow { get; }
+
+        /// <summary>
+        /// Performs an implicit conversion from <see cref="MMDevice"/> to <see cref="AudioDevice"/>.
+        /// </summary>
+        /// <param name="device">The device.</param>
+        /// <returns>The result of the conversion.</returns>
+        public static implicit operator AudioDevice(MMDevice device)
+            => new AudioDevice(device);
     }
 }

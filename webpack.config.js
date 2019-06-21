@@ -35,7 +35,7 @@ let config = {
                 from: source,
                 to: dest,
                 context: source,
-                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
+                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*", "js/react-sharpdeck/**/*"]
             },
         ])
     ],
