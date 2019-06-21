@@ -1,3 +1,6 @@
 [submodule "src/SoundDeck.PI/js/React-SharpDeck"]
 	path = src/SoundDeck.PI/js/React-SharpDeck
 	url = git@github.com:GeekyEggo/React-SharpDeck.git
+[submodule "lib/React-SharpDeck"]
+	path = lib/React-SharpDeck
+	url = git@github.com:GeekyEggo/React-SharpDeck.git
