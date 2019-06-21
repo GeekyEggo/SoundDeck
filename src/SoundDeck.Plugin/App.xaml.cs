@@ -5,6 +5,7 @@ using SharpDeck.Manifest;
     Description = "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
     Icon = "Images/Icon",
     CodePath = "SoundDeck.Plugin.exe",
+    PropertyInspectorPath = "PI/index.html",
     Version = "1.0.0",
     Author = "GeekyEggo",
     WindowsMinimumVersion = "10")]

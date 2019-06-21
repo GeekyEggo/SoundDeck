@@ -16,14 +16,14 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides capturing of an audio buffer, similar to an instat replay.
     /// </summary>
-    [StreamDeckAction("Audio Replay", UUID, "Images/Action", PropertyInspectorPath = "PI/captureAudioBuffer.html", Tooltip = "Capture the last x seconds of audio.")]
+    [StreamDeckAction("Audio Replay", UUID, "Images/Action", Tooltip = "Capture the last x seconds of audio.")]
     [StreamDeckActionState("Images/Action")]
     public class CaptureAudioBuffer : StreamDeckAction<CaptureAudioBufferSettings>
     {
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyEggo.soundDeckCaptureAudioBuffer";
+        public const string UUID = "com.geekyEggo.soundDeck.captureAudioBuffer";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CaptureAudioBuffer"/> class.
