@@ -35,7 +35,6 @@ namespace SoundDeck.Plugin
         /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
-
             if (ManifestWriter.TryWrite(e.Args, out int result))
             {
                 Application.Current.Shutdown();
@@ -43,12 +42,15 @@ namespace SoundDeck.Plugin
             else
             {
 #if DEBUG
-            Debugger.Launch();
+                Debugger.Launch();
 #endif
                 var provider = GetServiceProvider();
+
                 using (var client = new StreamDeckClient(e.Args))
                 {
                     client.RegisterAction(CaptureAudioBuffer.UUID, args => provider.GetInstance<CaptureAudioBuffer>(args));
+                    client.RegisterAction(PlayAudioClip.UUID, args => provider.GetInstance<PlayAudioClip>(args));
+
                     await client.StartAsync(CancellationToken.None);
                 }
             }

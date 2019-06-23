@@ -17,7 +17,6 @@ namespace SoundDeck.Core
         /// </summary>
         bool EncodeToMP3 { get; }
 
-
         /// <summary>
         /// Gets the output path, directory, where the file should be saved to.
         /// </summary>

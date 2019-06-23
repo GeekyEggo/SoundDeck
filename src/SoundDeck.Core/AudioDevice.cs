@@ -14,15 +14,21 @@ namespace SoundDeck.Core
         /// <param name="device">The device.</param>
         internal AudioDevice(MMDevice device)
         {
+            this.Enabled = device.State == DeviceState.Active;
             this.Flow = device.DataFlow == DataFlow.Capture ? AudioFlow.Recording : AudioFlow.Playback;
             this.FriendlyName = device.FriendlyName;
             this.Id = device.ID;
         }
 
         /// <summary>
-        /// Gets the identifier.
+        /// Gets a value indicating whether this <see cref="AudioDevice"/> is enabled.
         /// </summary>
-        public string Id { get; }
+        public bool Enabled { get; }
+
+        /// <summary>
+        /// Gets the flow of the audio.
+        /// </summary>
+        public AudioFlow Flow { get; }
 
         /// <summary>
         /// Gets or sets the friendly name of the device.
@@ -30,9 +36,9 @@ namespace SoundDeck.Core
         public string FriendlyName { get; }
 
         /// <summary>
-        /// Gets the flow of the audio.
+        /// Gets the identifier.
         /// </summary>
-        public AudioFlow Flow { get; }
+        public string Id { get; }
 
         /// <summary>
         /// Performs an implicit conversion from <see cref="MMDevice"/> to <see cref="AudioDevice"/>.

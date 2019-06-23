@@ -44,7 +44,7 @@
         "react-sharpdeck": "file:lib/react-sharpdeck",
         "redux": "^4.0.1",
         "webpack": "^4.32.2",
-        "webpack-cli": "^3.3.2"
+        "webpack-cli": "^3.3.4"
     },
     "dependencies": {
         "object-path": "^0.11.4"

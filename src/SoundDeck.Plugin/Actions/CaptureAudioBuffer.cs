@@ -58,11 +58,14 @@ namespace SoundDeck.Plugin.Actions
         [PropertyInspectorMethod]
         public Task<OptionsPayload> GetAudioDevices()
         {
-            var options = this.AudioService.Devices.GroupBy(d => d.Flow).Select(g =>
-            {
-                var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
-                return new Option(g.Key.ToString(), children);
-            }).ToList();
+            var options = this.AudioService.Devices
+                .Where(d => d.Enabled)
+                .GroupBy(d => d.Flow)
+                .Select(g =>
+                {
+                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
+                    return new Option(g.Key.ToString(), children);
+                });
 
             return Task.FromResult(new OptionsPayload(options));
         }
@@ -89,24 +92,24 @@ namespace SoundDeck.Plugin.Actions
 
                     return new FolderPickerPayload(settings.OutputPath, true);
                 }
-
-                return new FolderPickerPayload(settings?.OutputPath, false);
             }
+
+            return new FolderPickerPayload(settings?.OutputPath, false);
         }
 
         /// <summary>
         /// Raises the <see cref="E:SharpDeck.StreamDeckActionEventReceiver.DidReceiveSettings" /> event.
         /// </summary>
         /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
-        /// <returns>The task of updating updating the audio buffer based on the new settings.</returns>
+        /// <returns>The task of updating the state of the object based on the settings.</returns>
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
             var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
 
-            if (this.AudioBuffer != null && this.AudioBuffer.DeviceId != settings.AudioDeviceId)
+            if (this.AudioBuffer?.DeviceId != settings.AudioDeviceId)
             {
-                this.AudioBuffer.Dispose();
+                this.AudioBuffer?.Dispose();
                 this.AudioBuffer = null;
             }
 

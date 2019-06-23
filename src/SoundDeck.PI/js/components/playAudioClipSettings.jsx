@@ -1,9 +1,12 @@
 import React from "react";
+import { Checkbox, FolderPicker, PropertyInspectorWrapper, Select } from "react-sharpdeck";
 
 class PlayAudioClipSettings extends React.Component {
     render() {
         return (
-            <div>Hello World</div>
+            <PropertyInspectorWrapper>
+                <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
+            </PropertyInspectorWrapper>
         );
     }
 }

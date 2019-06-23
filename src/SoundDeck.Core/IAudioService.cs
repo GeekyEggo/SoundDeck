@@ -25,5 +25,12 @@ namespace SoundDeck.Core
         /// <param name="clipDuration">Duration of the clip.</param>
         /// <returns>The audio buffer.</returns>
         IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration);
+
+        /// <summary>
+        /// Gets an audio player for the specified device identifier.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <returns>The audio player.</returns>
+        IAudioPlayer GetAudioPlayer(string deviceId);
     }
 }
