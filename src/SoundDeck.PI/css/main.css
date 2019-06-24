@@ -31,3 +31,31 @@
 input[type="checkbox"] + label span {
     margin: 5px 4px 0 2px !important;
 }
+.max100 {
+    flex-basis: 100%;
+    flex-grow: 0;
+}
+.opacity-zero {
+    opacity: 0;
+}
+.text-center {
+    text-align: center;
+}
+label.input__margin {
+    margin: 0 0 0 7px !important;
+}
+ol.sdpi-item-value {
+    text-align: left !important;
+}
+ol.files-list {
+    max-height: inherit;
+    overflow: inherit;
+    padding: 0 !important;
+    text-align: left;
+}
+ol.files-list li {
+    padding: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

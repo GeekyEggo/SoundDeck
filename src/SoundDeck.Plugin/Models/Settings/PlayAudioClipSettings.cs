@@ -11,8 +11,8 @@ namespace SoundDeck.Plugin.Models.Settings
         public string AudioDeviceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the audio file to play.
+        /// Gets or sets the audio files to play.
         /// </summary>
-        public string File { get; set; }
+        public string[] Files { get; set; }
     }
 }

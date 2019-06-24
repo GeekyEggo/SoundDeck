@@ -114,10 +114,10 @@ namespace SoundDeck.Plugin.Actions
                     this.AudioPlayer.Stop();
 
                     var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
-                    if (!string.IsNullOrWhiteSpace(settings.File))
-                    {
-                        await this.AudioPlayer.PlayAsync(settings.File, CancellationToken.None);
-                    }
+                    //if (!string.IsNullOrWhiteSpace(settings.File))
+                    //{
+                    //    await this.AudioPlayer.PlayAsync(settings.File, CancellationToken.None);
+                    //}
                 }
             }
             finally
