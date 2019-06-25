@@ -91,6 +91,9 @@ li.sortable span {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+li.sortable span:first-child.sortable_value {
+    padding-left: 8px;
+}
 .flex-right {
     margin-left: auto;
 }

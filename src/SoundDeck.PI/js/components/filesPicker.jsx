@@ -4,21 +4,23 @@ import arrayMove from "array-move";
 import { connect } from "react-sharpdeck";
 
 // a component wrapper of a sortable container, in the form of an ordered list
-const SortableList = sortableContainer(({ className, items, onDelete }) => {
+const SortableList = sortableContainer(({ className, enableSort, items, onDelete }) => {
     return (
         <ol className={className}>
             {items.map((value, index) => (
-                <SortableItem key={`item-${index}`} index={index} value={value} onDelete={onDelete} title="Move" />
+                <SortableItem key={`item-${index}`} index={index} value={value} onDelete={onDelete} enableSort={enableSort} />
             ))}
         </ol>
     );
 });
 
 // a component wrapper of a sortable element, in the form of a list item
-const SortableItem = sortableElement(({ onDelete, index, value }) => {
+const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) => {
     return (
         <li className="sortable">
-            <DragHandle />
+            {enableSort &&
+                <DragHandle />
+            }
             <span className="sortable_value">{value}</span>
             <span className="delete-handle sortable_icon flex-right" title="Remove" onClick={() => onDelete(index)}></span>
         </li>
@@ -105,11 +107,12 @@ class FilesPicker extends React.Component {
                 <div type="list" className="sdpi-item list">
                     <div className="sdpi-item-label opacity-zero">&nbsp;</div>
                     <SortableList className="sdpi-item-value files-list"
+                        enableSort={this.props.enableSort}
                         items={this.state.value.map(path => path.replace(/^.*[\\\/]/, ''))}
-                        useDragHandle={true}
                         lockAxis="y"
                         onDelete={this.handleDelete}
-                        onSortEnd={this.handleSortEnd} />
+                        onSortEnd={this.handleSortEnd}
+                        useDragHandle={true} />
                 </div>
             </div>
         );
