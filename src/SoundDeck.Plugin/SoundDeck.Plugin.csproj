@@ -14,14 +14,23 @@
         <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Images\" />
-    </ItemGroup>
-    <ItemGroup>
         <None Update="Images\Action%402x.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Images\Action.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\CaptureAudioBuffer@2.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\CaptureAudioBuffer\Action.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\CaptureAudioBuffer\Key%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\CaptureAudioBuffer\Key.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Images\Icon%402x.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>

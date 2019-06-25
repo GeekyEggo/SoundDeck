@@ -16,8 +16,8 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides capturing of an audio buffer, similar to an instat replay.
     /// </summary>
-    [StreamDeckAction("Audio Replay", UUID, "Images/Action", Tooltip = "Capture the last x seconds of audio.")]
-    [StreamDeckActionState("Images/Action")]
+    [StreamDeckAction("Audio Replay", UUID, "Images/CaptureAudioBuffer/Action", Tooltip = "Capture the last seconds of audio.")]
+    [StreamDeckActionState("Images/CaptureAudioBuffer/Key")]
     public class CaptureAudioBuffer : StreamDeckAction<CaptureAudioBufferSettings>
     {
         /// <summary>
