@@ -62,6 +62,7 @@ li.sortable {
     display: flex;
     flex-direction: row;
     list-style-type: none;
+    margin-bottom: 1px;
 }
 li.sortable:hover {
     background-color: var(--sdpi-background);
