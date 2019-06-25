@@ -18,9 +18,7 @@ const SortableList = sortableContainer(({ className, enableSort, items, onDelete
 const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) => {
     return (
         <li className="sortable">
-            {enableSort &&
-                <DragHandle />
-            }
+            {enableSort && <DragHandle /> }
             <span className="sortable_value">{value}</span>
             <span className="delete-handle sortable_icon flex-right" title="Remove" onClick={() => onDelete(index)}></span>
         </li>
