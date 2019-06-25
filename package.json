@@ -35,6 +35,7 @@
     "devDependencies": {
         "@babel/core": "^7.4.5",
         "@babel/preset-react": "^7.0.0",
+        "array-move": "^2.1.0",
         "babel-loader": "^8.0.6",
         "clean-webpack-plugin": "^3.0.0",
         "copy-webpack-plugin": "^5.0.3",
@@ -42,6 +43,7 @@
         "react-dom": "^16.8.6",
         "react-redux": "^7.0.3",
         "react-sharpdeck": "file:lib/react-sharpdeck",
+        "react-sortable-hoc": "^1.9.1",
         "redux": "^4.0.1",
         "webpack": "^4.32.2",
         "webpack-cli": "^3.3.4"

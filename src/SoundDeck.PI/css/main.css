@@ -47,15 +47,49 @@ label.input__margin {
 ol.sdpi-item-value {
     text-align: left !important;
 }
+
 ol.files-list {
+    color: var(--sdpi-color);
+    border-color: #303030;
+    cursor: inherit;
+    margin-top: 0;
     max-height: inherit;
     overflow: inherit;
     padding: 0 !important;
-    text-align: left;
 }
-ol.files-list li {
-    padding: 5px;
+li.sortable {
+    background-color: var(--sdpi-background);
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+}
+li.sortable:hover {
+    background-color: var(--sdpi-background);
+}
+li.sortable span {
+    padding: 8px 2px;
+}
+.sortable_icon {
+    background: no-repeat center;
+    flex-basis: 20px;
+    flex-shrink: 0;
+}
+.drag-handle {
+    cursor: move;
+    background-image: url(../imgs/drag.svg);
+}
+.delete-handle {
+    cursor: pointer;
+    background-image: url(../imgs/cross.svg);
+}
+.delete-handle:hover {
+    background-image: url(../imgs/cross-active.svg);
+}
+.sortable_value {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.flex-right {
+    margin-left: auto;
 }

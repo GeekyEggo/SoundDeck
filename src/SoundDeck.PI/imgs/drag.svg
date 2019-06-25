@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4" height="8" version="1.1">
+    <path fill="transparent"
+          stroke="#8E8E92"
+          d="M 0 1.5 H 1 M 3 1.5 H 4
+             M 0 4.5 H 1 M 3 4.5 H 4
+             M 0 7.5 H 1 M 3 7.5 H 4" />
+</svg>
