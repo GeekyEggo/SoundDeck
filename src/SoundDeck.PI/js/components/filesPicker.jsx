@@ -47,14 +47,14 @@ class FilesPicker extends React.Component {
 
     /**
      * Handles a generic change that should be made to the state, in the form of a delegate.
-     * @param {Function} getUpdatedState The function to apply to the current state, that returns the new state.
+     * @param {Function} getValue Gets the updated value based on the current states value, returning the new value to be applied to the state.
      */
-    handleChange(getUpdatedState) {
-        this.setState(s => {
-            s.value = getUpdatedState(s);
-            this.props.onChange({ target: { value: s.value } });
+    handleChange(getValue) {
+        this.setState(state => {
+            state.value = getValue(state.value);
+            this.props.onChange({ target: { value: state.value } });
 
-            return s;
+            return state;
         })
     }
 
@@ -63,13 +63,19 @@ class FilesPicker extends React.Component {
      * @param {any} ev The event arguments.
      */
     handleFileChange(ev) {
-        // ensure the file isnt already in the array
-        const path = decodeURIComponent(ev.target.files[0].name);
-        if (this.state.value.indexOf(path) > -1) {
-            return;
-        }
+        const files = Array.from(ev.target.files);
 
-        this.handleChange((state) => [...state.value, path]);
+        this.handleChange(value => {
+            return files.reduce((seed, { name }) => {
+                const path = decodeURIComponent(name);
+
+                if (seed.indexOf(path) < 0) {
+                    seed.push(path);
+                }
+
+                return seed;
+            }, [...value]);
+        });
     }
 
     /**
@@ -77,9 +83,9 @@ class FilesPicker extends React.Component {
      * @param {Number} index The index of the path being deleted.
      */
     handleDelete(index) {
-        this.handleChange((state) => {
-            state.value.splice(index, 1)
-            return state.value;
+        this.handleChange(value => {
+            value.splice(index, 1)
+            return value;
         });
     }
 
@@ -90,17 +96,19 @@ class FilesPicker extends React.Component {
      * @param {Number} obj.newIndex The new index.
      */
     handleSortEnd({ oldIndex, newIndex }) {
-        this.handleChange((state) => arrayMove(state.value, oldIndex, newIndex));
+        this.handleChange(value => arrayMove(value, oldIndex, newIndex));
     }
 
     render() {
+        const id = this.props.id || this.props.valuePath;
+
         return (
             <div>
                 <div className="sdpi-item">
                     <div className="sdpi-item-label">{this.props.label}</div>
                     <div className="sdpi-item-group file">
-                        <input className="sdpi-item-value" type="file" id="elgfilepicker" accept={this.props.accept} onChange={this.handleFileChange} />
-                        <label className="sdpi-file-label max100 input__margin text-center" htmlFor="elgfilepicker">{this.props.buttonLabel}</label>
+                        <input className="sdpi-item-value" type="file" value={""} multiple id={id} accept={this.props.accept} onChange={this.handleFileChange} />
+                        <label className="sdpi-file-label max100 input__margin text-center" htmlFor={id}>{this.props.buttonLabel}</label>
                     </div>
                 </div>
 
