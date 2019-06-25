@@ -1,4 +1,4 @@
-namespace SoundDeck.Core
+namespace SoundDeck.Core.Playback
 {
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
@@ -34,6 +34,11 @@ namespace SoundDeck.Core
         /// Gets the audio device identifier.
         /// </summary>
         public string DeviceId { get; private set; }
+
+        /// <summary>
+        /// Gets the state.
+        /// </summary>
+        public PlaybackStateType State { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is disposed.
@@ -108,7 +113,9 @@ namespace SoundDeck.Core
             using (var stream = new AudioFileReader(file))
             {
                 player.Init(stream);
+
                 player.Play();
+                this.State = PlaybackStateType.Playing;
 
                 while (player.PlaybackState != PlaybackState.Stopped
                     && !this.InternalCancellationTokenSource.IsCancellationRequested
@@ -117,7 +124,8 @@ namespace SoundDeck.Core
                     Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
                 }
 
-                this.InternalCancellationTokenSource = null;
+                player.Stop();
+                this.State = PlaybackStateType.Stopped;
             }
         }
     }

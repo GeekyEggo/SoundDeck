@@ -4,6 +4,7 @@ namespace SoundDeck.Core
     using NAudio.MediaFoundation;
     using NAudio.Wave;
     using SoundDeck.Core.Capture.Sharing;
+    using SoundDeck.Core.Playback;
     using System;
 
     /// <summary>

@@ -1,4 +1,4 @@
-namespace SoundDeck.Core
+namespace SoundDeck.Core.Playback
 {
     using System;
     using System.Threading;
@@ -9,6 +9,11 @@ namespace SoundDeck.Core
     /// </summary>
     public interface IAudioPlayer : IDisposable
     {
+        /// <summary>
+        /// Gets the state.
+        /// </summary>
+        PlaybackStateType State { get; }
+
         /// <summary>
         /// Gets the device identifier the audio will be played on.
         /// </summary>

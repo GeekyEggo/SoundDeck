@@ -7,6 +7,7 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
     using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
     using System.Linq;
     using System.Threading;
@@ -39,10 +40,9 @@ namespace SoundDeck.Plugin.Actions
             var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
 
             this.AudioService = audioService;
-            if (settings?.AudioDeviceId != null)
-            {
-                this.AudioPlayer = this.AudioService.GetAudioPlayer(settings.AudioDeviceId);
-            }
+            this.Playback = new AudioPlaybackCollection(
+                settings?.AudioDeviceId != null ? this.AudioService.GetAudioPlayer(settings.AudioDeviceId) : null,
+                settings);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace SoundDeck.Plugin.Actions
         private IAudioService AudioService { get; }
 
         /// <summary>
-        /// Gets or sets the audio player.
+        /// Gets the playback collection.
         /// </summary>
-        private IAudioPlayer AudioPlayer { get; set; }
+        private AudioPlaybackCollection Playback { get; }
 
         /// <summary>
         /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
@@ -81,16 +81,18 @@ namespace SoundDeck.Plugin.Actions
                 await this._syncRoot.WaitAsync();
 
                 var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
-                if (this.AudioPlayer?.DeviceId != settings.AudioDeviceId)
+                if (this.Playback.Player?.DeviceId != settings.AudioDeviceId)
                 {
-                    this.AudioPlayer?.Dispose();
-                    this.AudioPlayer = null;
+                    this.Playback.Player?.Dispose();
+                    this.Playback.Player = null;
                 }
 
-                if (this.AudioPlayer == null && !string.IsNullOrWhiteSpace(settings.AudioDeviceId))
+                if (this.Playback.Player == null && !string.IsNullOrWhiteSpace(settings.AudioDeviceId))
                 {
-                    this.AudioPlayer = this.AudioService.GetAudioPlayer(settings.AudioDeviceId);
+                    this.Playback.Player = this.AudioService.GetAudioPlayer(settings.AudioDeviceId);
                 }
+
+                await this.Playback.SetOptionsAsync(settings);
             }
             finally
             {
@@ -105,25 +107,7 @@ namespace SoundDeck.Plugin.Actions
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
             await base.OnKeyDown(args);
-
-            try
-            {
-                await this._syncRoot.WaitAsync();
-                if (this.AudioPlayer != null)
-                {
-                    this.AudioPlayer.Stop();
-
-                    var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
-                    //if (!string.IsNullOrWhiteSpace(settings.File))
-                    //{
-                    //    await this.AudioPlayer.PlayAsync(settings.File, CancellationToken.None);
-                    //}
-                }
-            }
-            finally
-            {
-                this._syncRoot.Release();
-            }
+            await this.Playback.NextAsync();
         }
     }
 }
