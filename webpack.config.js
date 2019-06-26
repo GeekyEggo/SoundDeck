@@ -16,38 +16,56 @@ let config = {
         },
         {
             test: /\.jsx$/,
-			include: [
-				/react-sharpdeck/,
-				source
-			],
+            include: [
+                /react-sharpdeck/,
+                source
+            ],
             exclude: /node_modules/,
             use: {
                 loader: "babel-loader",
-				options: {
-					presets: ["@babel/preset-react"]
-				}
+                options: {
+                    presets: ["@babel/preset-react"]
+                }
             }
         }]
     },
     output: {
-        filename: "[name].js",
+        chunkFilename: "./js/[name].bundle.js",
+        filename: "./js/[name].js",
         path: dest
     },
     plugins: [
         new CleanWebpackPlugin({
             cleanAfterEveryBuildPatterns: ["!*.html", "!css/**/*.*", "!imgs/**/*.*"],
         }),
-        new CopyPlugin([
-            {
-                from: source,
-                to: dest,
-                context: source,
-                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*", "js/react-sharpdeck/**/*"]
-            },
-        ])
+        new CopyPlugin([{
+            from: source,
+            to: dest,
+            context: source,
+            ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*", "js/react-sharpdeck/**/*"]
+        }])
     ],
     resolve: {
         extensions: [".js", ".jsx"]
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                reactSharpdeck: {
+                    test: /react-sharpdeck/,
+                    chunks: 'all',
+                    name: "react-sharpdeck",
+                    enforce: true
+                },
+                vendor: {
+                    test: /node_modules/,
+                    chunks: "all",
+                    name: "vendor",
+                    enforce: true,
+                    priority: -1
+                }
+            }
+        }
     }
 };
 
