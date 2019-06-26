@@ -12,7 +12,14 @@ let config = {
     module: {
         rules: [{
             test: /\.css$/,
-            use: [{ loader: "style-loader" }, { loader: "css-loader" }]
+            use: [
+                { loader: 'style-loader/url' },
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: "./css/[name].css"
+                    }
+                }],
         },
         {
             test: /\.jsx$/,
