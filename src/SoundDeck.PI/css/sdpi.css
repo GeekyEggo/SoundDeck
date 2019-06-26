@@ -6,8 +6,9 @@
     --sdpi-buttonbordercolor: #969696;
     --sdpi-borderradius: 0px;
     --sdpi-width: 224px;
-    --sdpi-fontweight: 600;
+    --sdpi-fontweight: normal;
     --sdpi-letterspacing: -0.25pt;
+    --sdpi-fontsize: 8pt;
 }
 
 html {
@@ -31,7 +32,7 @@ html, body {
     --sdpi-background: #3D3D3D;
     --sdpi-color: #d8d8d8;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 8pt;
+    font-size: var(--sdpi-fontsize);
     background-color: var(--sdpi-bgcolor);
     color: #9a9a9a;
 }
@@ -90,17 +91,15 @@ hr, hr2 {
     margin-right: 16px;
 }
 
-/*
 .sdpi-item-value,
 option,
 input,
 select,
 button {
-  font-size: 10pt;
-  font-weight: var(--sdpi-fontweight);
-  letter-spacing: var(--sdpi-letterspacing);
+    font-size: var(--sdpi-fontsize);
+    font-weight: var(--sdpi-fontweight);
+    letter-spacing: var(--sdpi-letterspacing);
 }
-*/
 
 .win .sdpi-item-value,
 .win option,
@@ -345,6 +344,7 @@ table > caption {
     flex: none;
     width: 92px;
     padding-right: 4px;
+    font-weight: var(--sdpi-fontweight);
     -webkit-user-select: none;
 }
 
@@ -564,8 +564,8 @@ summary {
     }
 
 details * {
-    /*font-size: 12px;*/
-    font-weight: normal;
+    font-size: var(--sdpi-fontsize);
+    font-weight: var(--sdpi-fontweight);
 }
 
 details.message {
@@ -573,8 +573,8 @@ details.message {
 }
 
     details.message summary {
-        /*font-size: 10pt;
-  font-weight: 600;*/
+        font-size: var(--sdpi-fontsize);
+        font-weight: var(--sdpi-fontweight);
         min-height: 18px;
     }
 
