@@ -1,4 +1,4 @@
-namespace SoundDeck.Core
+namespace SoundDeck.Core.Capture
 {
     using System;
     using System.Threading.Tasks;
@@ -6,17 +6,12 @@ namespace SoundDeck.Core
     /// <summary>
     /// Provides an audio buffer, used to save captured audio data.
     /// </summary>
-    public interface IAudioBuffer : IDisposable
+    public interface IAudioBuffer : ICaptureDevice
     {
         /// <summary>
         /// Gets or sets the duration of the buffer.
         /// </summary>
         TimeSpan BufferDuration { get; set; }
-
-        /// <summary>
-        /// Gets the audio device identifier.
-        /// </summary>
-        string DeviceId { get; }
 
         /// <summary>
         /// Saves an audio file of the current buffer.

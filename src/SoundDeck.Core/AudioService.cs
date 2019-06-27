@@ -3,6 +3,7 @@ namespace SoundDeck.Core
     using Microsoft.Extensions.Logging;
     using NAudio.MediaFoundation;
     using NAudio.Wave;
+    using SoundDeck.Core.Capture;
     using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
     using System;

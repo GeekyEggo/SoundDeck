@@ -1,5 +1,6 @@
 namespace SoundDeck.Core
 {
+    using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
     using System;
 

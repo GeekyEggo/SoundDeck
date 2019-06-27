@@ -1,4 +1,4 @@
-namespace SoundDeck.Core
+namespace SoundDeck.Core.Capture
 {
     using System;
 
@@ -18,13 +18,13 @@ namespace SoundDeck.Core
         bool EncodeToMP3 { get; }
 
         /// <summary>
-        /// Gets the output path, directory, where the file should be saved to.
-        /// </summary>
-        string OutputPath { get; }
-
-        /// <summary>
         /// Gets a value indicating whether to normalize the volume of the buffer.
         /// </summary>
         bool NormalizeVolume { get; }
+
+        /// <summary>
+        /// Gets the output path, directory, where the file should be saved to.
+        /// </summary>
+        string OutputPath { get; }
     }
 }
