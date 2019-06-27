@@ -10,7 +10,6 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -28,7 +27,7 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// The synchronization root.
         /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private readonly object _syncRoot = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayAudioClip"/> class.
@@ -63,7 +62,7 @@ namespace SoundDeck.Plugin.Actions
         public Task<OptionsPayload> GetAudioDevices()
         {
             var options = this.AudioService.Devices
-                .Where(d => d.Enabled && d.Flow == AudioFlow.Playback)
+                .Where(d => d.Enabled && d.Flow == AudioFlowType.Playback)
                 .Select(d => new Option(d.FriendlyName, d.Id));
 
             return Task.FromResult(new OptionsPayload(options));
@@ -74,12 +73,10 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
         /// <returns>The task of updating the state of the object based on the settings.</returns>
-        protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
+        protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
-            try
+            lock (this._syncRoot)
             {
-                await this._syncRoot.WaitAsync();
-
                 var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
                 if (this.Playback.Player?.DeviceId != settings.AudioDeviceId)
                 {
@@ -92,12 +89,10 @@ namespace SoundDeck.Plugin.Actions
                     this.Playback.Player = this.AudioService.GetAudioPlayer(settings.AudioDeviceId);
                 }
 
-                await this.Playback.SetOptionsAsync(settings);
+                this.Playback.SetOptions(settings);
             }
-            finally
-            {
-                this._syncRoot.Release();
-            }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -50,7 +50,7 @@
         {
             if (this.NormalizeVolume)
             {
-                this.Reader.NormalizeVolume();
+                this.Reader.ApplyPeakNormalization();
             }
 
             // attempt to encode if desired

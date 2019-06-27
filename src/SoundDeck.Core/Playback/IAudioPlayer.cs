@@ -24,8 +24,9 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="token">The cancellation token.</param>
+        /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
         /// <returns>The task of the audio file being played.</returns>
-        Task PlayAsync(string file, CancellationToken token);
+        Task PlayAsync(string file, CancellationToken token, float? maxGain = null);
 
         /// <summary>
         /// Stops any audio being played on this player.

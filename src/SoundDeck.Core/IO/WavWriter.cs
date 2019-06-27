@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture
+namespace SoundDeck.Core.Capture
 {
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;
@@ -17,7 +17,7 @@
         /// <summary>
         /// The synchronize root, used to synchronize processes.
         /// </summary>
-        private SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WavWriter"/> class.
@@ -55,17 +55,29 @@
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
-            => this._syncRoot.Wait(() => this.Chunks = null);
+        {
+            try
+            {
+                this._syncRoot.Wait();
+                this.Chunks = null;
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
+        }
 
         /// <summary>
         /// Saves the chunks asynchronously, returning the name of the file path.
         /// </summary>
         /// <param name="outputPath">The output directory path.</param>
         /// <returns>The file path.</returns>
-        public Task<string> SaveAsync(string outputPath)
+        public async Task<string> SaveAsync(string outputPath)
         {
-            return this._syncRoot.WaitAsync(async () =>
+            try
             {
+                await this._syncRoot.WaitAsync();
+
                 // construct the path of the file, and write to the output
                 var path = this.GetPath(outputPath, DateTime.UtcNow.ToString("yyyy-MM-dd_HHmmss"));
                 using (var writer = new WaveFileWriter(path, this.WaveFormat))
@@ -80,7 +92,11 @@
                 return this.NormalizeVolume || this.EncodeToMP3
                     ? this.WriteAudioFile(path)
                     : path;
-            });
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
         }
 
         /// <summary>

@@ -25,9 +25,10 @@ namespace SoundDeck.Core.Playback
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
-        internal AudioPlayer(string deviceId)
+        internal AudioPlayer(string deviceId, INormalizationProvider normalizationProvider)
         {
             this.DeviceId = deviceId;
+            this.NormalizationProvider = normalizationProvider;
         }
 
         /// <summary>
@@ -39,6 +40,11 @@ namespace SoundDeck.Core.Playback
         /// Gets the state.
         /// </summary>
         public PlaybackStateType State { get; private set; }
+
+        /// <summary>
+        /// Gets the normalization provider.
+        /// </summary>
+        private INormalizationProvider NormalizationProvider { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is disposed.
@@ -65,8 +71,9 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="token">The cancellation token.</param>
+        /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
         /// <returns>The task of the audio file being played.</returns>
-        public Task PlayAsync(string file, CancellationToken token)
+        public Task PlayAsync(string file, CancellationToken token, float? maxGain = null)
         {
             if (this.IsDisposed)
             {
@@ -78,7 +85,7 @@ namespace SoundDeck.Core.Playback
                 lock (this._syncRoot)
                 {
                     this.InternalCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-                    this.InternalPlay(file);
+                    this.InternalPlay(file, maxGain);
                     this.InternalCancellationTokenSource = null;
                 }
             });
@@ -107,13 +114,18 @@ namespace SoundDeck.Core.Playback
         /// Plays the audio file.
         /// </summary>
         /// <param name="file">The file.</param>
-        private void InternalPlay(string file)
+        /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
+        private void InternalPlay(string file, float? maxGain = null)
         {
             using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, 0))
             using (var stream = new AudioFileReader(file))
             {
-                player.Init(stream);
+                if (maxGain != null)
+                {
+                    this.NormalizationProvider.ApplyLoudnessNormalization(stream, maxGain.Value);
+                }
 
+                player.Init(stream);
                 player.Play();
                 this.State = PlaybackStateType.Playing;
 

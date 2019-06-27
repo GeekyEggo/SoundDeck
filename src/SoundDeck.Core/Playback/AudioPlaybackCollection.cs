@@ -56,6 +56,11 @@ namespace SoundDeck.Core.Playback
         public PlaybackOrderType Order { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum gain, i.e. the max volume.
+        /// </summary>
+        public float MaxGain { get; set; } = 0.25f;
+
+        /// <summary>
         /// Gets or sets the current index.
         /// </summary>
         private int CurrentIndex { get; set; } = 0;
@@ -70,11 +75,11 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <param name="options">The options.</param>
         /// <returns>The task of updating the options.</returns>
-        public async Task SetOptionsAsync(IAudioPlaybackOptions options)
+        public void SetOptions(IAudioPlaybackOptions options)
         {
             try
             {
-                await this._syncRoot.WaitAsync();
+                this._syncRoot.Wait();
 
                 // set the files
                 if (this.TrySetFiles(options.Files))
@@ -114,7 +119,7 @@ namespace SoundDeck.Core.Playback
 
             if (!completeAfterCancel)
             {
-                await this.PlayNextAudio();
+                await this.PlayNextAudioAsync();
             }
         }
 
@@ -122,18 +127,17 @@ namespace SoundDeck.Core.Playback
         /// Plays the next audio clip.
         /// </summary>
         /// <returns>The player, playing the audio.</returns>
-        private async Task PlayNextAudio()
+        private async Task PlayNextAudioAsync()
         {
             try
             {
                 await this._syncRoot.WaitAsync();
-
                 if (this.CurrentIndex >= this.Items.Length)
                 {
                     this.CurrentIndex = 0;
                 }
 
-                await this.Player.PlayAsync(this.Items[this.CurrentIndex], CancellationToken.None);
+                await this.Player.PlayAsync(this.Items[this.CurrentIndex], CancellationToken.None, this.MaxGain);
                 this.CurrentIndex++;
             }
             finally

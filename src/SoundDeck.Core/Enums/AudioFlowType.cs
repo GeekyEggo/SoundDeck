@@ -1,9 +1,9 @@
-﻿namespace SoundDeck.Core.Enums
+namespace SoundDeck.Core.Enums
 {
     /// <summary>
     /// An enumeration that defines the flow of audio.
     /// </summary>
-    public enum AudioFlow
+    public enum AudioFlowType
     {
         /// <summary>
         /// A playback device, e.g. speakers.

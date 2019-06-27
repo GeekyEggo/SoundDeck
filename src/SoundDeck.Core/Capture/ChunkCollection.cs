@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture
+namespace SoundDeck.Core.Capture
 {
     using Extensions;
     using Microsoft.Extensions.Logging;
@@ -61,17 +61,22 @@
         /// </summary>
         /// <param name="chunk">The chunk of data.</param>
         /// <returns>The task of adding the chunk.</returns>
-        public virtual Task AddAsync(Chunk chunk)
+        public virtual async Task AddAsync(Chunk chunk)
         {
-            return _syncRoot.WaitAsync(() =>
+            try
             {
+                await _syncRoot.WaitAsync();
                 if (this.IsDisposed)
                 {
                     throw new ObjectDisposedException($"Unable to add {nameof(Chunk)}, the {nameof(ChunkCollection)} has been disposed.");
                 }
 
                 this.Data.AddLast(chunk);
-            });
+            }
+            finally
+            {
+                _syncRoot.Release();
+            };
         }
 
         /// <summary>
@@ -79,13 +84,19 @@
         /// </summary>
         /// <param name="duration">The duration.</param>
         /// <returns>The chunks of data.</returns>
-        public virtual Task<Chunk[]> GetAsync(TimeSpan duration)
+        public virtual async Task<Chunk[]> GetAsync(TimeSpan duration)
         {
-            return _syncRoot.WaitAsync(() =>
+            try
             {
+                await _syncRoot.WaitAsync();
+
                 var threshold = DateTime.UtcNow.Subtract(duration);
                 return this.Data.Where(c => c.DateTime >= threshold).ToArray();
-            });
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
 
         /// <summary>
@@ -103,14 +114,19 @@
         /// <param name="isDisposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool isDisposing)
         {
-            _syncRoot.Wait(() =>
+            try
             {
+                _syncRoot.Wait();
                 if (!this.IsDisposed)
                 {
                     this.Data.Clear();
                     this.IsDisposed = true;
                 }
-            });
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
 
         /// <summary>
