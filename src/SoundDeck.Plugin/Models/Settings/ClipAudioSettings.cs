@@ -6,9 +6,9 @@ namespace SoundDeck.Plugin.Models.Settings
     using System;
 
     /// <summary>
-    /// Provides settings for <see cref="Actions.CaptureAudioBuffer"/>.
+    /// Provides settings for <see cref="Actions.ClipAudio"/>.
     /// </summary>
-    public class CaptureAudioBufferSettings : ISaveBufferSettings
+    public class ClipAudioSettings : ISaveBufferSettings
     {
         /// <summary>
         /// Gets or sets the audio device identifier to capture.

@@ -1,15 +1,15 @@
 import React from "react";
-import CaptureAudioBufferSettings from "./captureAudioBufferSettings";
-import PlayAudioClipSettings from "./playAudioClipSettings";
+import ClipAudioSettings from "./clipAudioSettings";
+import PlayAudioSettings from "./playAudioSettings";
 
 class App extends React.Component {
     render() {
         switch (this.props.uuid) {
-            case "com.geekyEggo.soundDeck.captureAudioBuffer":
-                return <CaptureAudioBufferSettings />;
+            case "com.geekyEggo.soundDeck.clipAudio":
+                return <ClipAudioSettings />;
 
-            case "com.geekyEggo.soundDeck.playAudioClip":
-                return <PlayAudioClipSettings />;
+            case "com.geekyEggo.soundDeck.playAudio":
+                return <PlayAudioSettings />;
 
             default:
                 return <div />

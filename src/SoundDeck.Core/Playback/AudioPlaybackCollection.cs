@@ -28,7 +28,7 @@ namespace SoundDeck.Core.Playback
         public AudioPlaybackCollection(IAudioPlayer player, IAudioPlaybackOptions options)
         {
             this.Action = options.Action;
-            this.Files = options.Files;
+            this.Files = options.Files ?? new string[0];
             this.Order = options.Order;
             this.Player = player;
 
@@ -58,7 +58,7 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets or sets the maximum gain, i.e. the max volume.
         /// </summary>
-        public float MaxGain { get; set; } = 0.25f;
+        public float MaxGain { get; set; } = 0.35f;
 
         /// <summary>
         /// Gets or sets the current index.
@@ -162,18 +162,19 @@ namespace SoundDeck.Core.Playback
         }
 
         /// <summary>
-        /// Tries to set <see cref="Files"/>, based on the equality of <paramref name="newValue"/>.
+        /// Tries to set <see cref="Files"/>, based on the equality of <paramref name="newFiles"/>.
         /// </summary>
-        /// <param name="newValue">The new value.</param>
+        /// <param name="newFiles">The new files.</param>
         /// <returns><c>true</c> when the files were updated; otherwise <c>false</c>.</returns>
-        private bool TrySetFiles(string[] newValue)
+        private bool TrySetFiles(string[] newFiles)
         {
-            if (this.Files.SequenceEqual(newValue))
+            newFiles = newFiles ?? new string[0];
+            if (this.Files.SequenceEqual(newFiles))
             {
                 return false;
             }
 
-            this.Files = newValue;
+            this.Files = newFiles;
             this.RefreshOrder();
 
             return true;

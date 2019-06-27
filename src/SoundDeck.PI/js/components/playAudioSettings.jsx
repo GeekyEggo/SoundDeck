@@ -2,7 +2,7 @@ import React from "react";
 import { PropertyInspectorWrapper, Select, store } from "react-sharpdeck";
 import FilesPicker from "./filesPicker";
 
-class PlayAudioClipSettings extends React.Component {
+class PlayAudioSettings extends React.Component {
     constructor(props) {
         super(props);
 
@@ -30,12 +30,12 @@ class PlayAudioClipSettings extends React.Component {
         return (
             <PropertyInspectorWrapper>
                 <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
-                <Select label="Action" options={this.actionTypes} valuePath="action" onChange={this.onActionTypeChange} />
-                <Select label="Order" options={this.orderTypes} valuePath="order" />
+                <Select label="Action" options={this.actionTypes} valuePath="action" defaultValue="0" onChange={this.onActionTypeChange} />
+                <Select label="Order" options={this.orderTypes} valuePath="order" defaultValue="0" />
                 <FilesPicker label="Files" valuePath="files" accept="audio/mpeg,audio/wav" buttonLabel="Add file..." enableSort={this.state.enableSort} />
             </PropertyInspectorWrapper>
         );
     }
 }
 
-export default PlayAudioClipSettings;
+export default PlayAudioSettings;

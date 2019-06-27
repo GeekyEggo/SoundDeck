@@ -48,8 +48,8 @@ namespace SoundDeck.Plugin
 
                 using (var client = new StreamDeckClient(e.Args))
                 {
-                    client.RegisterAction(CaptureAudioBuffer.UUID, args => provider.GetInstance<CaptureAudioBuffer>(args));
-                    client.RegisterAction(PlayAudioClip.UUID, args => provider.GetInstance<PlayAudioClip>(args));
+                    client.RegisterAction(ClipAudio.UUID, args => provider.GetInstance<ClipAudio>(args));
+                    client.RegisterAction(PlayAudio.UUID, args => provider.GetInstance<PlayAudio>(args));
 
                     await client.StartAsync(CancellationToken.None);
                 }

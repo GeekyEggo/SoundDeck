@@ -15,14 +15,14 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
     /// </summary>
-    [StreamDeckAction("Play Audio", UUID, "Images/Action", Tooltip = "Play an audio clip.")]
-    [StreamDeckActionState("Images/Action")]
-    public class PlayAudioClip  : StreamDeckAction<PlayAudioClipSettings>
+    [StreamDeckAction("Play Audio", UUID, "Images/PlayAudio/Action", Tooltip = "Play an audio clip, or three... or more, in the order your heart desires.")]
+    [StreamDeckActionState("Images/PlayAudio/Key")]
+    public class PlayAudio  : StreamDeckAction<PlayAudioSettings>
     {
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyEggo.soundDeck.playAudioClip";
+        public const string UUID = "com.geekyEggo.soundDeck.playAudio";
 
         /// <summary>
         /// The synchronization root.
@@ -30,13 +30,13 @@ namespace SoundDeck.Plugin.Actions
         private readonly object _syncRoot = new object();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayAudioClip"/> class.
+        /// Initializes a new instance of the <see cref="PlayAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public PlayAudioClip(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
+        public PlayAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
         {
-            var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
+            var settings = args.Payload.GetSettings<PlayAudioSettings>();
 
             this.AudioService = audioService;
             this.Playback = new AudioPlaybackCollection(
@@ -77,7 +77,7 @@ namespace SoundDeck.Plugin.Actions
         {
             lock (this._syncRoot)
             {
-                var settings = args.Payload.GetSettings<PlayAudioClipSettings>();
+                var settings = args.Payload.GetSettings<PlayAudioSettings>();
                 if (this.Playback.Player?.DeviceId != settings.AudioDeviceId)
                 {
                     this.Playback.Player?.Dispose();

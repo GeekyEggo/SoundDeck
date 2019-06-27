@@ -23,13 +23,13 @@
         <None Update="Images\CaptureAudioBuffer@2.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Images\CaptureAudioBuffer\Action.png">
+        <None Update="Images\ClipAudio\Action.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Images\CaptureAudioBuffer\Key%402.png">
+        <None Update="Images\ClipAudio\Key@2.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Images\CaptureAudioBuffer\Key.png">
+        <None Update="Images\ClipAudio\Key.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Images\Icon%402x.png">
@@ -37,6 +37,18 @@
         </None>
         <None Update="Images\Icon.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\PlayAudio\Action%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\PlayAudio\Action.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\PlayAudio\Key%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\PlayAudio\Key.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$(Configuration) == 'Debug'">

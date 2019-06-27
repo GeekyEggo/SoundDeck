@@ -16,25 +16,25 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides capturing of an audio buffer, similar to an instat replay.
     /// </summary>
-    [StreamDeckAction("Audio Replay", UUID, "Images/CaptureAudioBuffer/Action", Tooltip = "Capture the last seconds of audio.")]
-    [StreamDeckActionState("Images/CaptureAudioBuffer/Key")]
-    public class CaptureAudioBuffer : StreamDeckAction<CaptureAudioBufferSettings>
+    [StreamDeckAction("Clip Audio", UUID, "Images/ClipAudio/Action", Tooltip = "Clip those last precious seconds of audio; you'll never miss a funny moment again.")]
+    [StreamDeckActionState("Images/ClipAudio/Key")]
+    public class ClipAudio : StreamDeckAction<ClipAudioSettings>
     {
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyEggo.soundDeck.captureAudioBuffer";
+        public const string UUID = "com.geekyEggo.soundDeck.clipAudio";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CaptureAudioBuffer"/> class.
+        /// Initializes a new instance of the <see cref="ClipAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
-        public CaptureAudioBuffer(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
+        public ClipAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
             : base()
         {
             this.AudioService = audioService;
 
-            var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+            var settings = args.Payload.GetSettings<ClipAudioSettings>();
             if (!string.IsNullOrWhiteSpace(settings?.AudioDeviceId))
             {
                 this.AudioBuffer = this.AudioService.GetAudioBuffer(settings.AudioDeviceId, settings.Duration);
@@ -105,7 +105,7 @@ namespace SoundDeck.Plugin.Actions
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
-            var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+            var settings = args.Payload.GetSettings<ClipAudioSettings>();
 
             if (this.AudioBuffer?.DeviceId != settings.AudioDeviceId)
             {
@@ -133,7 +133,7 @@ namespace SoundDeck.Plugin.Actions
         {
             try
             {
-                var settings = args.Payload.GetSettings<CaptureAudioBufferSettings>();
+                var settings = args.Payload.GetSettings<ClipAudioSettings>();
                 if (this.AudioBuffer != null)
                 {
                     var path = await this.AudioBuffer.SaveAsync(settings);
