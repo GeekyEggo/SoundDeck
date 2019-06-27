@@ -1,6 +1,7 @@
 namespace SoundDeck.Core
 {
     using Microsoft.Extensions.Logging;
+    using NAudio.CoreAudioApi;
     using NAudio.MediaFoundation;
     using NAudio.Wave;
     using SoundDeck.Core.Capture;
@@ -69,5 +70,13 @@ namespace SoundDeck.Core
         /// <returns>The audio player.</returns>
         public IAudioPlayer GetAudioPlayer(string deviceId)
             => new AudioPlayer(deviceId, this.NormalizationProvider);
+
+        /// <summary>
+        /// Gets an audio recorder, capable of capturing the audio from the specified device identifier.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <returns>The audio recorder.</returns>
+        public IAudioRecorder GetAudioRecorder(string deviceId)
+            => new AudioRecorder(new MMDeviceEnumerator().GetDevice(deviceId));
     }
 }

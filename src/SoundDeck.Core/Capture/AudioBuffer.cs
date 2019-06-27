@@ -86,7 +86,7 @@ namespace SoundDeck.Core.Capture
         public async Task<string> SaveAsync(ISaveBufferSettings settings)
         {
             var chunks = await this.Chunks.GetAsync(settings.Duration);
-            using (var writer = new WavWriter(chunks, this.Capture.WaveFormat))
+            using (var writer = new ChunkFileWriter(chunks, this.Capture.WaveFormat))
             {
                 writer.NormalizeVolume = settings.NormalizeVolume;
                 writer.EncodeToMP3 = settings.EncodeToMP3;

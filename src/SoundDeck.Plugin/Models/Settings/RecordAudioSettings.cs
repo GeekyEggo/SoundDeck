@@ -3,7 +3,7 @@ namespace SoundDeck.Plugin.Models.Settings
     /// <summary>
     /// Provides settings for recording audio.
     /// </summary>
-    public class CaptureAudioSettings: ICaptureAudioSettings
+    public class RecordAudioSettings : ICaptureAudioSettings
     {
         /// <summary>
         /// Gets or sets the audio device identifier to capture.

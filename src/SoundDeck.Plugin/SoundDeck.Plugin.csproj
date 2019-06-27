@@ -50,6 +50,24 @@
         <None Update="Images\PlayAudio\Key.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Images\RecordAudio\Action%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\RecordAudio\Action.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\RecordAudio\Key0%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\RecordAudio\Key0.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\RecordAudio\Key1%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\RecordAudio\Key1.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$(Configuration) == 'Debug'">
         <Exec Command="cd ..\.. &amp;&amp; npm stop" />

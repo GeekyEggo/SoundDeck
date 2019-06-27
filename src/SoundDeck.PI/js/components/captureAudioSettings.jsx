@@ -1,7 +1,7 @@
 import React from "react";
 import { Checkbox, FolderPicker, PropertyInspectorWrapper, Select } from "react-sharpdeck";
 
-class ClipAudioSettings extends React.Component {
+class CaptureAudioSettings extends React.Component {
     constructor (props) {
         super(props);
 
@@ -18,7 +18,9 @@ class ClipAudioSettings extends React.Component {
         return (
             <PropertyInspectorWrapper>
                 <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
-                <Select label="Duration" options={this.durationOptions} valuePath="duration" />
+                {this.props.showDuration &&
+                    <Select label="Duration" options={this.durationOptions} valuePath="duration" />
+                }
                 <FolderPicker label="Output Path" pluginUri="GetOutputPath" valuePath="outputPath" />
                 <Checkbox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={true} id="encodeToMP3" />
                 <Checkbox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={false} id="normalizeVolume" />
@@ -27,4 +29,8 @@ class ClipAudioSettings extends React.Component {
     }
 }
 
-export default ClipAudioSettings
+CaptureAudioSettings.defaultProps = {
+    showDuration: false
+};
+
+export default CaptureAudioSettings

@@ -8,7 +8,7 @@ namespace SoundDeck.Plugin.Models.Settings
     /// <summary>
     /// Provides settings for <see cref="Actions.ClipAudio"/>.
     /// </summary>
-    public class ClipAudioSettings : CaptureAudioSettings, ISaveBufferSettings
+    public class ClipAudioSettings : RecordAudioSettings, ISaveBufferSettings
     {
         /// <summary>
         /// Gets or sets the duration of the clip.

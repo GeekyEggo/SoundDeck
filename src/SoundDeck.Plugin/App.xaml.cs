@@ -50,6 +50,7 @@ namespace SoundDeck.Plugin
                 {
                     client.RegisterAction(ClipAudio.UUID, args => provider.GetInstance<ClipAudio>(args));
                     client.RegisterAction(PlayAudio.UUID, args => provider.GetInstance<PlayAudio>(args));
+                    client.RegisterAction(RecordAudio.UUID, args => provider.GetInstance<RecordAudio>(args));
 
                     await client.StartAsync(CancellationToken.None);
                 }

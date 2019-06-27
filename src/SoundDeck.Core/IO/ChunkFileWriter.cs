@@ -1,7 +1,6 @@
 namespace SoundDeck.Core.Capture
 {
     using NAudio.Wave;
-    using SoundDeck.Core.Extensions;
     using SoundDeck.Core.IO;
     using System;
     using System.IO;
@@ -12,7 +11,7 @@ namespace SoundDeck.Core.Capture
     /// <summary>
     /// Provides a wave audio file writer, used for writing <see cref="Chunk" />, and normalizing audio levels.
     /// </summary>
-    public sealed class WavWriter : IDisposable
+    public sealed class ChunkFileWriter : IDisposable
     {
         /// <summary>
         /// The synchronize root, used to synchronize processes.
@@ -20,12 +19,12 @@ namespace SoundDeck.Core.Capture
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WavWriter"/> class.
+        /// Initializes a new instance of the <see cref="ChunkFileWriter"/> class.
         /// </summary>
         /// <param name="chunks">The chunks.</param>
         /// <param name="outputPath">The output path.</param>
         /// <param name="waveFormat">The wave format.</param>
-        public WavWriter(Chunk[] chunks, WaveFormat waveFormat)
+        public ChunkFileWriter(Chunk[] chunks, WaveFormat waveFormat)
         {
             this.Chunks = chunks;
             this.WaveFormat = waveFormat;
@@ -85,6 +84,7 @@ namespace SoundDeck.Core.Capture
                     foreach (var chunk in this.Chunks)
                     {
                         await writer.WriteAsync(chunk.Buffer, 0, chunk.BytesRecorded);
+                        await writer.FlushAsync();
                     }
                 }
 

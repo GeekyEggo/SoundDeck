@@ -34,5 +34,12 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio player.</returns>
         IAudioPlayer GetAudioPlayer(string deviceId);
+
+        /// <summary>
+        /// Gets an audio recorder, capable of capturing the audio from the specified device identifier.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <returns>The audio recorder.</returns>
+        IAudioRecorder GetAudioRecorder(string deviceId);
     }
 }

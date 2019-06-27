@@ -25,6 +25,7 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="ClipAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
+        /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
         public ClipAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
             : base(audioService)
         {
