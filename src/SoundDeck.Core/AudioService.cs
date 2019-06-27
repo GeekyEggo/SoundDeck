@@ -32,7 +32,7 @@ namespace SoundDeck.Core
         /// <summary>
         /// Gets or sets the normalization provider.
         /// </summary>
-        internal INormalizationProvider NormalizationProvider { get; set; }
+        public INormalizationProvider NormalizationProvider { get; set; }
 
         /// <summary>
         /// Gets the audio buffer manager.

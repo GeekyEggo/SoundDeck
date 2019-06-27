@@ -1,8 +1,8 @@
-﻿namespace SoundDeck.Core.IO
+namespace SoundDeck.Core.IO
 {
     using NAudio.MediaFoundation;
     using NAudio.Wave;
-    using SoundDeck.Core.Extensions;
+    using SoundDeck.Core.Playback;
     using System;
     using System.IO;
 
@@ -31,6 +31,11 @@
         public bool NormalizeVolume { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets the normalization provider.
+        /// </summary>
+        public INormalizationProvider NormalizationProvider { get; set; } = new NormalizationProvider();
+
+        /// <summary>
         /// Gets the reader; the main data source of the writer.
         /// </summary>
         private AudioFileReader Reader { get; }
@@ -50,7 +55,7 @@
         {
             if (this.NormalizeVolume)
             {
-                this.Reader.ApplyPeakNormalization();
+                this.NormalizationProvider.ApplyPeakNormalization(this.Reader);
             }
 
             // attempt to encode if desired

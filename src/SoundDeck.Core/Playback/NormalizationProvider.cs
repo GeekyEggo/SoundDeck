@@ -1,20 +1,34 @@
-namespace SoundDeck.Core.Extensions
+namespace SoundDeck.Core.Playback
 {
     using NAudio.Wave;
     using System;
 
     /// <summary>
-    /// Provides extension methods for <see cref="AudioFileReader"/>.
+    /// Provides normalization of a <see cref="AudioFileReader"/>.
     /// </summary>
-    public static class AudioFileReaderExtensions
+    public class NormalizationProvider : INormalizationProvider
     {
+        /// <summary>
+        /// Applies the loudness normalization, based on the percent multiplier.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="maxGain">The maximum gain.</param>
+        public void ApplyLoudnessNormalization(AudioFileReader reader, float maxGain)
+        {
+            var peak = this.GetPeak(reader);
+            if (peak >= maxGain)
+            {
+                reader.Volume = (1.0f / peak) * maxGain;
+            }
+        }
+
         /// <summary>
         /// Normalizes the volume of the audio file reader, based on the peak.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        public static void ApplyPeakNormalization(this AudioFileReader reader)
+        public void ApplyPeakNormalization(AudioFileReader reader)
         {
-            var peak = reader.GetPeak();
+            var peak = this.GetPeak(reader);
             reader.Volume = 1.0f / peak;
         }
 
@@ -23,7 +37,7 @@ namespace SoundDeck.Core.Extensions
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The peak byte as an absolute value.</returns>
-        public static float GetPeak(this AudioFileReader reader)
+        public virtual float GetPeak(AudioFileReader reader)
         {
             float peak = 0;
 

@@ -1,14 +1,13 @@
 namespace SoundDeck.Core.Playback
 {
     using NAudio.Wave;
-    using SoundDeck.Core.Extensions;
     using System.Collections.Concurrent;
     using System.IO;
 
     /// <summary>
     /// Provides a static helper class for getting the normalization levels of an audio file based on its full path.
     /// </summary>
-    public class CachedNormalizationProvider : INormalizationProvider
+    public class CachedNormalizationProvider : NormalizationProvider, INormalizationProvider
     {
         /// <summary>
         /// Gets the items in the cache.
@@ -16,25 +15,11 @@ namespace SoundDeck.Core.Playback
         private ConcurrentDictionary<string, CacheEntry> Items { get; } = new ConcurrentDictionary<string, CacheEntry>();
 
         /// <summary>
-        /// Applies the loudness normalization, based on the percent multiplier.
-        /// </summary>
-        /// <param name="reader">The reader.</param>
-        /// <param name="maxGain">The maximum gain.</param>
-        public void ApplyLoudnessNormalization(AudioFileReader reader, float maxGain)
-        {
-            var peak = this.GetPeak(reader);
-            if (peak >= maxGain)
-            {
-                reader.Volume = (1.0f / peak) * maxGain;
-            }
-        }
-
-        /// <summary>
         /// Gets the peak of the audio file.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The peak as an absolute value of the byte.</returns>
-        public float GetPeak(AudioFileReader reader)
+        public override float GetPeak(AudioFileReader reader)
         {
             var key = this.GetKey(reader);
             var entry = this.Items.GetOrAdd(key, _ => this.GetNewEntry(key, reader));
@@ -66,7 +51,7 @@ namespace SoundDeck.Core.Playback
         /// <returns>The cache entry.</returns>
         private CacheEntry GetNewEntry(string key, AudioFileReader reader)
         {
-            var peak = reader.GetPeak();
+            var peak = base.GetPeak(reader);
             var watcher = new FileSystemWatcher
             {
                 Path = Path.GetDirectoryName(key),
