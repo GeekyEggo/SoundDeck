@@ -9,6 +9,7 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Enums;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -36,12 +37,11 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
         public PlayAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
         {
-            var settings = args.Payload.GetSettings<PlayAudioSettings>();
-
             this.AudioService = audioService;
-            this.Playback = new AudioPlaybackCollection(
-                settings?.AudioDeviceId != null ? this.AudioService.GetAudioPlayer(settings.AudioDeviceId) : null,
-                settings);
+
+            var settings = args.Payload.GetSettings<PlayAudioSettings>();
+            this.Playback = new AudioPlaybackCollection(settings);
+            this.SetPlayer(settings.AudioDeviceId);
         }
 
         /// <summary>
@@ -78,17 +78,8 @@ namespace SoundDeck.Plugin.Actions
             lock (this._syncRoot)
             {
                 var settings = args.Payload.GetSettings<PlayAudioSettings>();
-                if (this.Playback.Player?.DeviceId != settings.AudioDeviceId)
-                {
-                    this.Playback.Player?.Dispose();
-                    this.Playback.Player = null;
-                }
 
-                if (this.Playback.Player == null && !string.IsNullOrWhiteSpace(settings.AudioDeviceId))
-                {
-                    this.Playback.Player = this.AudioService.GetAudioPlayer(settings.AudioDeviceId);
-                }
-
+                this.SetPlayer(settings.AudioDeviceId);
                 this.Playback.SetOptions(settings);
             }
 
@@ -103,6 +94,56 @@ namespace SoundDeck.Plugin.Actions
         {
             await base.OnKeyDown(args);
             await this.Playback.NextAsync();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IAudioPlayer.TimeChanged"/> event of <see cref="AudioPlaybackCollection.Player"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PlaybackTimeEventArgs" /> instance containing the event data.</param>
+        private async void Player_TimeChanged(object sender, PlaybackTimeEventArgs e)
+        {
+            static string getTime(PlaybackTimeEventArgs time)
+            {
+                if (time.Current == TimeSpan.Zero)
+                {
+                    return null;
+                }
+
+                var remaining = time.Total.Subtract(time.Current);
+                return remaining.TotalSeconds > 0.5f ? remaining.ToString("mm':'ss") : null;
+            }
+
+            await this.SetTitleAsync(getTime(e));
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IAudioPlayer"/> of <see cref="Playback"/>.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        private void SetPlayer(string deviceId)
+        {
+            // dispose of the current player, if the device identifiers differ
+            if (this.Playback.Player?.DeviceId != deviceId)
+            {
+                if (this.Playback.Player != null)
+                {
+                    this.Playback.Player.TimeChanged -= this.Player_TimeChanged;
+                }
+
+                this.Playback.Player?.Dispose();
+                this.Playback.Player = null;
+            }
+
+            // attempt to re-set the audio player
+            if (this.Playback.Player == null && !string.IsNullOrWhiteSpace(deviceId))
+            {
+                this.Playback.Player = this.AudioService.GetAudioPlayer(deviceId);
+                if (this.Playback.Player != null)
+                {
+                    this.Playback.Player.TimeChanged += this.Player_TimeChanged;
+                }
+            }
         }
     }
 }

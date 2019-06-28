@@ -22,6 +22,11 @@ namespace SoundDeck.Core.Playback
         private readonly object _syncRoot = new object();
 
         /// <summary>
+        /// Private member field for <see cref="Time"/>.
+        /// </summary>
+        private PlaybackTimeEventArgs _time = PlaybackTimeEventArgs.Zero;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
@@ -32,6 +37,11 @@ namespace SoundDeck.Core.Playback
         }
 
         /// <summary>
+        /// Occurs when the time of the current audio being played, changed.
+        /// </summary>
+        public event EventHandler<PlaybackTimeEventArgs> TimeChanged;
+
+        /// <summary>
         /// Gets the audio device identifier.
         /// </summary>
         public string DeviceId { get; private set; }
@@ -40,6 +50,29 @@ namespace SoundDeck.Core.Playback
         /// Gets the state.
         /// </summary>
         public PlaybackStateType State { get; private set; }
+
+        /// <summary>
+        /// Gets the current and total time of the audio being played.
+        /// </summary>
+        public PlaybackTimeEventArgs Time
+        {
+            get
+            {
+                return this._time;
+            }
+
+            private set
+            {
+                lock (this._syncRoot)
+                {
+                    if (!value.Equals(this._time))
+                    {
+                        this._time = value;
+                        this.TimeChanged?.Invoke(this, value);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the normalization provider.
@@ -118,15 +151,19 @@ namespace SoundDeck.Core.Playback
         private void InternalPlay(string file, float? maxGain = null)
         {
             using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, 0))
-            using (var stream = new AudioFileReader(file))
+            using (var reader = new AudioFileReader(file))
             {
                 if (maxGain != null)
                 {
-                    this.NormalizationProvider.ApplyLoudnessNormalization(stream, maxGain.Value);
+                    this.NormalizationProvider.ApplyLoudnessNormalization(reader, maxGain.Value);
                 }
 
-                player.Init(stream);
+                player.Init(reader);
+                player.PlaybackStopped += (_, __) => this.Time = PlaybackTimeEventArgs.Zero;
+
                 player.Play();
+
+                this.Time = PlaybackTimeEventArgs.FromReader(reader);
                 this.State = PlaybackStateType.Playing;
 
                 while (player.PlaybackState != PlaybackState.Stopped
@@ -134,6 +171,7 @@ namespace SoundDeck.Core.Playback
                     && !this.IsDisposed)
                 {
                     Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
+                    this.Time = PlaybackTimeEventArgs.FromReader(reader);
                 }
 
                 player.Stop();

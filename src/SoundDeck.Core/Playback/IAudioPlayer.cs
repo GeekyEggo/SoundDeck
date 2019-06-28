@@ -10,14 +10,24 @@ namespace SoundDeck.Core.Playback
     public interface IAudioPlayer : IDisposable
     {
         /// <summary>
-        /// Gets the state.
+        /// Occurs when the time of the current audio being played, changed.
         /// </summary>
-        PlaybackStateType State { get; }
+        event EventHandler<PlaybackTimeEventArgs> TimeChanged;
 
         /// <summary>
         /// Gets the device identifier the audio will be played on.
         /// </summary>
         string DeviceId { get; }
+
+        /// <summary>
+        /// Gets the state.
+        /// </summary>
+        PlaybackStateType State { get; }
+
+        /// <summary>
+        /// Gets the current and total time of the audio being played.
+        /// </summary>
+        PlaybackTimeEventArgs Time { get; }
 
         /// <summary>
         /// Plays the audio file asynchronously.

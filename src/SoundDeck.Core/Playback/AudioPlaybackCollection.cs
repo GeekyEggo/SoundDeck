@@ -23,14 +23,12 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlaybackCollection"/> class.
         /// </summary>
-        /// <param name="player">The player.</param>
         /// <param name="options">The options.</param>
-        public AudioPlaybackCollection(IAudioPlayer player, IAudioPlaybackOptions options)
+        public AudioPlaybackCollection(IAudioPlaybackOptions options)
         {
             this.Action = options.Action;
             this.Files = options.Files ?? new string[0];
             this.Order = options.Order;
-            this.Player = player;
 
             this.RefreshOrder();
         }
