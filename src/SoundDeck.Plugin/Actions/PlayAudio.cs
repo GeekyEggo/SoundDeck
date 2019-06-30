@@ -26,11 +26,6 @@ namespace SoundDeck.Plugin.Actions
         public const string UUID = "com.geekyEggo.soundDeck.playAudio";
 
         /// <summary>
-        /// The synchronization root.
-        /// </summary>
-        private readonly object _syncRoot = new object();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PlayAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
@@ -75,15 +70,10 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of updating the state of the object based on the settings.</returns>
         protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
-            lock (this._syncRoot)
-            {
-                var settings = args.Payload.GetSettings<PlayAudioSettings>();
+            var settings = args.Payload.GetSettings<PlayAudioSettings>();
 
-                this.SetPlayer(settings.AudioDeviceId);
-                this.Playback.SetOptions(settings);
-            }
-
-            return Task.CompletedTask;
+            this.SetPlayer(settings.AudioDeviceId);
+            return this.Playback.SetOptionsAsync(settings);
         }
 
         /// <summary>

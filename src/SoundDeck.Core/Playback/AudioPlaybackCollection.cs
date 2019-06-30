@@ -73,11 +73,11 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <param name="options">The options.</param>
         /// <returns>The task of updating the options.</returns>
-        public void SetOptions(IAudioPlaybackOptions options)
+        public async Task SetOptionsAsync(IAudioPlaybackOptions options)
         {
             try
             {
-                this._syncRoot.Wait();
+                await this._syncRoot.WaitAsync();
 
                 // set the files
                 if (this.TrySetFiles(options.Files))
