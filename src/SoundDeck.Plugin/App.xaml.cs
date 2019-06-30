@@ -15,6 +15,7 @@ namespace SoundDeck.Plugin
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using SharpDeck;
+    using SharpDeck.Exceptions;
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Plugin.Actions;
@@ -45,7 +46,7 @@ namespace SoundDeck.Plugin
 #if DEBUG
                 Debugger.Launch();
 #endif
-                var provider = GetServiceProvider();
+                var provider = this.GetServiceProvider();
                 await this.RunClientIndefinitelyAsync(e.Args, provider);
             }
         }
@@ -66,11 +67,7 @@ namespace SoundDeck.Plugin
                     client.RegisterAction(PlayAudio.UUID, args => provider.GetInstance<PlayAudio>(args));
                     client.RegisterAction(RecordAudio.UUID, args => provider.GetInstance<RecordAudio>(args));
 
-                    client.Error += async (sender, args) =>
-                    {
-                        await client.LogMessageAsync(args.Exception.ToString());
-                        await client.LogMessageAsync(args.WebSocketMessage);
-                    };
+                    client.Error += this.GetErrorEventHandler(client);
 
                     await client.StartAsync(CancellationToken.None);
                 }
@@ -83,10 +80,29 @@ namespace SoundDeck.Plugin
         }
 
         /// <summary>
+        /// Gets the error event handler used to log any errors encountered during the lifecycle of the <see cref="StreamDeckClient"/>.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <returns>The event handler</returns>
+        private EventHandler<StreamDeckClientErrorEventArgs> GetErrorEventHandler(StreamDeckClient client)
+        {
+            return async (sender, args) =>
+            {
+                await client.LogMessageAsync(args.Exception.ToString());
+                await client.LogMessageAsync(args.WebSocketMessage);
+
+                if (!string.IsNullOrWhiteSpace(args.Context))
+                {
+                    await client.ShowAlertAsync(args.Context);
+                }
+            };
+        }
+
+        /// <summary>
         /// Gets the service provider.
         /// </summary>
         /// <returns>The service provider.</returns>
-        private static IServiceProvider GetServiceProvider()
+        private IServiceProvider GetServiceProvider()
         {
             var provider = new ServiceCollection()
                 .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Trace))
