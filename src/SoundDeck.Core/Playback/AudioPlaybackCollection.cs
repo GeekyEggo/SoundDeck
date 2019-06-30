@@ -135,7 +135,7 @@ namespace SoundDeck.Core.Playback
                     this.CurrentIndex = 0;
                 }
 
-                await this.Player.PlayAsync(this.Items[this.CurrentIndex], CancellationToken.None, this.MaxGain);
+                await this.Player.PlayAsync(this.Items[this.CurrentIndex], this.MaxGain);
                 this.CurrentIndex++;
             }
             finally

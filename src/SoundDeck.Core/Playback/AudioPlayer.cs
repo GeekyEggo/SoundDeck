@@ -19,7 +19,8 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// The synchronization root object.
         /// </summary>
-        private readonly object _syncRoot = new object();
+        //private readonly object _syncRoot = new object();
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
         /// Private member field for <see cref="Time"/>.
@@ -60,16 +61,12 @@ namespace SoundDeck.Core.Playback
             {
                 return this._time;
             }
-
             private set
             {
-                lock (this._syncRoot)
+                if (!value.Equals(this._time))
                 {
-                    if (!value.Equals(this._time))
-                    {
-                        this._time = value;
-                        this.TimeChanged?.Invoke(this, value);
-                    }
+                    this._time = value;
+                    this.TimeChanged?.Invoke(this, value);
                 }
             }
         }
@@ -103,23 +100,28 @@ namespace SoundDeck.Core.Playback
         /// Plays the audio file asynchronously.
         /// </summary>
         /// <param name="file">The file.</param>
-        /// <param name="token">The cancellation token.</param>
         /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
         /// <returns>The task of the audio file being played.</returns>
-        public Task PlayAsync(string file, CancellationToken token, float? maxGain = null)
+        public Task PlayAsync(string file, float? maxGain = null)
         {
             if (this.IsDisposed)
             {
                 throw new ObjectDisposedException("The audio player has been disposed.");
             }
 
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
-                lock (this._syncRoot)
+                try
                 {
-                    this.InternalCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+                    await this._syncRoot.WaitAsync();
+
+                    this.InternalCancellationTokenSource = new CancellationTokenSource();
                     this.InternalPlay(file, maxGain);
                     this.InternalCancellationTokenSource = null;
+                }
+                finally
+                {
+                    this._syncRoot.Release();
                 }
             });
         }
