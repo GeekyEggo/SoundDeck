@@ -21,6 +21,7 @@ namespace SoundDeck.Plugin
     using System;
     using System.Diagnostics;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     /// <summary>
@@ -45,15 +46,39 @@ namespace SoundDeck.Plugin
                 Debugger.Launch();
 #endif
                 var provider = GetServiceProvider();
+                await this.RunClientIndefinitelyAsync(e.Args, provider);
+            }
+        }
 
-                using (var client = new StreamDeckClient(e.Args))
+        /// <summary>
+        /// Runs the Stream Deck client indefinitely, attempting to recover from exceptions where possible.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="provider">The provider.</param>
+        /// <returns>The task of running the client.</returns>
+        private async Task RunClientIndefinitelyAsync(string[] args, IServiceProvider provider)
+        {
+            try
+            {
+                using (var client = new StreamDeckClient(args))
                 {
                     client.RegisterAction(ClipAudio.UUID, args => provider.GetInstance<ClipAudio>(args));
                     client.RegisterAction(PlayAudio.UUID, args => provider.GetInstance<PlayAudio>(args));
                     client.RegisterAction(RecordAudio.UUID, args => provider.GetInstance<RecordAudio>(args));
 
+                    client.Error += async (sender, args) =>
+                    {
+                        await client.LogMessageAsync(args.Exception.ToString());
+                        await client.LogMessageAsync(args.WebSocketMessage);
+                    };
+
                     await client.StartAsync(CancellationToken.None);
                 }
+            }
+            catch
+            {
+                // restart the client
+                await this.RunClientIndefinitelyAsync(args, provider);
             }
         }
 
