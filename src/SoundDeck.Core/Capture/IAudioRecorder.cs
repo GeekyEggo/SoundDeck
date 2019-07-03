@@ -1,5 +1,7 @@
 namespace SoundDeck.Core.Capture
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Provides methods for capturing audio.
     /// </summary>
@@ -11,13 +13,15 @@ namespace SoundDeck.Core.Capture
         ISaveAudioSettings Settings { get; set; }
 
         /// <summary>
-        /// Starts capturing audio.
+        /// Starts capturing audio asynchronously.
         /// </summary>
-        void Start();
+        /// <returns>The task of starting.</returns>
+        Task StartAsync();
 
         /// <summary>
-        /// Stops capturing audio.
+        /// Stops capturing audio asynchronously.
         /// </summary>
-        void Stop();
+        /// <returns>The task of starting.</returns>
+        Task StopAsync();
     }
 }

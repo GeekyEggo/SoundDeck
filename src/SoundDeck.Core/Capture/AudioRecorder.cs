@@ -5,13 +5,19 @@ namespace SoundDeck.Core.Capture
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.IO;
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
     /// Provides audio capturing for an audio device.
     /// </summary>
-    public sealed class AudioRecorder : IAudioRecorder
+    public class AudioRecorder : IAudioRecorder
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioRecorder" /> class.
         /// </summary>
@@ -37,6 +43,11 @@ namespace SoundDeck.Core.Capture
         private WasapiCapture Capture { get; set; }
 
         /// <summary>
+        /// The capturing completion source.
+        /// </summary>
+        private TaskCompletionSource<bool> CapturingCompletionSource;
+
+        /// <summary>
         /// Gets the device.
         /// </summary>
         private MMDevice Device { get; }
@@ -47,50 +58,95 @@ namespace SoundDeck.Core.Capture
         private AudioFileWriter FileWriter { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is disposed.
-        /// </summary>
-        private bool IsDisposed { get; set; }
-
-        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            if (!this.IsDisposed)
-            {
-                this.Stop();
-
-                this.Capture?.Dispose();
-                this.Capture = null;
-
-                this.IsDisposed = true;
-            }
-
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        /// Starts capturing audio.
+        /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        public void Start()
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
         {
-            this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
-            this.Capture.DataAvailable += this.Capture_DataAvailable;
-            this.Capture.RecordingStopped += this.Capture_RecordingStopped;
-
-            this.FileWriter = new AudioFileWriter(this.Settings.GetPath(), this.Capture.WaveFormat)
+            if (disposing)
             {
-                Settings = this.Settings
-            };
+                Task.WaitAll(this.StopAsync());
+            }
 
-            this.Capture.StartRecording();
+            this.Capture?.Dispose();
+            this.Capture = null;
+
+            this.FileWriter?.Dispose();
+            this.FileWriter = null;
+
+            this.CapturingCompletionSource?.SetResult(!disposing);
+            this.CapturingCompletionSource = null;
         }
 
         /// <summary>
-        /// Stops capturing audio.
+        /// Starts capturing audio asynchronously.
         /// </summary>
-        public void Stop()
-            => this.Capture.StopRecording();
+        /// <returns>The task of starting.</returns>
+        public async Task StartAsync()
+        {
+            try
+            {
+                await this._syncRoot.WaitAsync();
+
+                // when there is already a completion source, we assume we are already capturing
+                if (this.CapturingCompletionSource != null)
+                {
+                    return;
+                }
+
+                // set the capture information
+                this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+                this.Capture.DataAvailable += this.Capture_DataAvailable;
+                this.Capture.RecordingStopped += this.Capture_RecordingStopped;
+
+                // initialize the writer, and start recording
+                this.FileWriter = new AudioFileWriter(this.Settings.GetPath(), this.Capture.WaveFormat)
+                {
+                    Settings = this.Settings
+                };
+
+                this.CapturingCompletionSource = new TaskCompletionSource<bool>();
+                this.Capture.StartRecording();
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
+        }
+
+        /// <summary>
+        /// Stops capturing audio asynchronously.
+        /// </summary>
+        /// <returns>The task of starting.</returns>
+        public async Task StopAsync()
+        {
+            try
+            {
+                // when there is no capturing completion source, assume we arent recording
+                await this._syncRoot.WaitAsync();
+                if (this.CapturingCompletionSource == null)
+                {
+                    return;
+                }
+
+                // stop recording, and awaiting actual stop
+                this.Capture.StopRecording();
+                await this.CapturingCompletionSource.Task;
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="WasapiCapture.DataAvailable"/> event of the <see cref="Capture"/>
@@ -106,12 +162,6 @@ namespace SoundDeck.Core.Capture
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="StoppedEventArgs"/> instance containing the event data.</param>
         private void Capture_RecordingStopped(object sender, StoppedEventArgs e)
-        {
-            this.FileWriter.Dispose();
-            this.FileWriter = null;
-
-            this.Capture.Dispose();
-            this.Capture = null;
-        }
+            => this.Dispose(false);
     }
 }

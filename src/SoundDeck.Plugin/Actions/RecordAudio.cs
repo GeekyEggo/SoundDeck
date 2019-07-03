@@ -29,6 +29,24 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is initialized.
+        /// </summary>
+        private bool IsInitialized { get; set; }
+
+        /// <summary>
+        /// Occurs when an instance of an action appears.
+        /// </summary>
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+        {
+            if (!this.IsInitialized)
+            {
+                this.IsInitialized = true;
+                await this.SetStateAsync(0);
+            }
+        }
+
+        /// <summary>
         /// Gets the capture device, for the specified settings.
         /// </summary>
         /// <param name="settings">The settings.</param>
@@ -45,19 +63,18 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="args">The <see cref="ActionEventArgs{KeyPayload}" /> instance containing the event data.</param>
         /// <returns>The task of the key down.</returns>
-        protected override Task OnKeyDown(ActionEventArgs<KeyPayload> args)
+        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
             if (args.Payload.State == 0)
             {
                 this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
-                this.CaptureDevice.Start();
+                await this.CaptureDevice.StartAsync();
             }
             else if (args.Payload.State == 1)
             {
-                this.CaptureDevice.Stop();
+                await this.CaptureDevice.StopAsync();
+                await this.CaptureDevice.StopAsync();
             }
-
-            return Task.CompletedTask;
         }
     }
 }
