@@ -1,6 +1,5 @@
 namespace SoundDeck.Core.Capture
 {
-    using Extensions;
     using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
@@ -34,7 +33,7 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Gets or sets the flush delay.
         /// </summary>
-        public TimeSpan FlushDelay { get; set; } = TimeSpan.FromSeconds(5);
+        public TimeSpan FlushDelay { get; set; } = TimeSpan.FromSeconds(15);
 
         /// <summary>
         /// Gets or sets the duration of the buffer.
@@ -143,9 +142,18 @@ namespace SoundDeck.Core.Capture
 
                 // add an additional buffer of 5 seconds
                 var threshold = DateTime.UtcNow.Subtract(this.BufferDuration).Subtract(TimeSpan.FromSeconds(5));
-                while (this.Data.Count > 0 && this.Data.First.Value.DateTime < threshold)
+
+                try
                 {
-                    this.Data.RemoveFirst();
+                    await _syncRoot.WaitAsync();
+                    while (this.Data.Count > 0 && this.Data.First.Value.DateTime < threshold)
+                    {
+                        this.Data.RemoveFirst();
+                    }
+                }
+                finally
+                {
+                    _syncRoot.Release();
                 }
             }
         }
