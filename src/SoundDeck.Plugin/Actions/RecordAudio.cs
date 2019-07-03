@@ -49,6 +49,7 @@ namespace SoundDeck.Plugin.Actions
         {
             if (args.Payload.State == 0)
             {
+                this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
                 this.CaptureDevice.Start();
             }
             else if (args.Payload.State == 1)

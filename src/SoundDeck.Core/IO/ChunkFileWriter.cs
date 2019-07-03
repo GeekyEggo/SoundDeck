@@ -2,31 +2,23 @@ namespace SoundDeck.Core.Capture
 {
     using NAudio.Wave;
     using SoundDeck.Core.IO;
-    using System;
-    using System.IO;
-    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
     /// Provides a wave audio file writer, used for writing <see cref="Chunk" />, and normalizing audio levels.
     /// </summary>
-    public sealed class ChunkFileWriter : IDisposable
+    public sealed class ChunkFileWriter : AudioFileWriter
     {
-        /// <summary>
-        /// The synchronize root, used to synchronize processes.
-        /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ChunkFileWriter"/> class.
         /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <param name="format">The format.</param>
         /// <param name="chunks">The chunks.</param>
-        /// <param name="outputPath">The output path.</param>
-        /// <param name="waveFormat">The wave format.</param>
-        public ChunkFileWriter(Chunk[] chunks, WaveFormat waveFormat)
+        public ChunkFileWriter(string filename, WaveFormat format, Chunk[] chunks)
+            : base(filename, format)
         {
             this.Chunks = chunks;
-            this.WaveFormat = waveFormat;
         }
 
         /// <summary>
@@ -35,90 +27,27 @@ namespace SoundDeck.Core.Capture
         public Chunk[] Chunks { get; private set; }
 
         /// <summary>
-        /// Gets or sets the settings.
+        /// Saves the written bytes, and applies encoding and volume normalization, where applicable; this will also dispose of the internal writer and will prevent any further writing.
         /// </summary>
-        public IAudioFileWriterSettings Settings { get; set; }
-
-        /// <summary>
-        /// Gets the wave format.
-        /// </summary>
-        public WaveFormat WaveFormat { get; }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
+        /// <returns>The task of saving the audio file.</returns>
+        public override async Task SaveAsync()
         {
-            try
+            foreach (var chunk in this.Chunks)
             {
-                this._syncRoot.Wait();
-                this.Chunks = null;
+                await this.WriteAsync(chunk.Buffer, 0, chunk.BytesRecorded);
             }
-            finally
-            {
-                this._syncRoot.Release();
-            }
+
+            await base.SaveAsync();
         }
 
         /// <summary>
-        /// Saves the chunks asynchronously.
+        /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="path">The file path.</param>
-        /// <returns>The task of saving.</returns>
-        public async Task SaveAsync(string path)
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
         {
-            try
-            {
-                await this._syncRoot.WaitAsync();
-
-                using (var writer = new WaveFileWriter(path, this.WaveFormat))
-                {
-                    foreach (var chunk in this.Chunks)
-                    {
-                        await writer.WriteAsync(chunk.Buffer, 0, chunk.BytesRecorded);
-                        await writer.FlushAsync();
-                    }
-                }
-
-                // determine if we need to re-write the audio file based on the desired output
-                if (this.Settings.NormalizeVolume || this.Settings.EncodeToMP3)
-                {
-                    this.EncodeAudioFile(path);
-                }
-            }
-            finally
-            {
-                this._syncRoot.Release();
-            }
-        }
-
-        /// <summary>
-        /// Writes the audio file from the specified path, applying changes based on the state of this instance.
-        /// </summary>
-        /// <param name="path">The file path.</param>
-        /// <returns>The saved audio file path.</returns>
-        private void EncodeAudioFile(string path)
-        {
-            var tempPath = path + ".tmp";
-            try
-            {
-                // move the current file to a temporary location
-                File.Move(path, tempPath);
-
-                // re-write and the file
-                using (var reader = new AudioFileReader(tempPath))
-                using (var writer = new AudioFileEncoder(reader))
-                {
-                    writer.Settings = this.Settings;
-                    writer.Save(path);
-                }
-
-                File.Delete(tempPath);
-            }
-            finally
-            {
-                FileUtils.DeleteIfExists(tempPath);
-            }
+            base.Dispose(disposing);
+            this.Chunks = null;
         }
     }
 }
