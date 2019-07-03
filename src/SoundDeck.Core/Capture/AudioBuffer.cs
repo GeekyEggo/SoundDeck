@@ -3,6 +3,7 @@ namespace SoundDeck.Core.Capture
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
+    using SoundDeck.Core.IO;
     using System;
     using System.Threading.Tasks;
 
@@ -88,9 +89,14 @@ namespace SoundDeck.Core.Capture
             var chunks = await this.Chunks.GetAsync(settings.Duration);
             using (var writer = new ChunkFileWriter(chunks, this.Capture.WaveFormat))
             {
+                // determine the name
+                var ext = settings.EncodeToMP3 ? ".mp3" : ".wav";
+                var path = FileUtils.GetTimeStampPath(settings.OutputPath, $"{{0}}{ext}");
+
+                // set up the writer, and save
                 writer.NormalizeVolume = settings.NormalizeVolume;
                 writer.EncodeToMP3 = settings.EncodeToMP3;
-                var path = await writer.SaveAsync(settings.OutputPath);
+                await writer.SaveAsync(path);
 
                 this.Logger?.LogInformation("Audio capture saved: {0}", path);
                 return path;

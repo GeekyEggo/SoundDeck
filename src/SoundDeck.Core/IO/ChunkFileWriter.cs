@@ -4,7 +4,6 @@ namespace SoundDeck.Core.Capture
     using SoundDeck.Core.IO;
     using System;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -67,18 +66,16 @@ namespace SoundDeck.Core.Capture
         }
 
         /// <summary>
-        /// Saves the chunks asynchronously, returning the name of the file path.
+        /// Saves the chunks asynchronously.
         /// </summary>
-        /// <param name="outputPath">The output directory path.</param>
-        /// <returns>The file path.</returns>
-        public async Task<string> SaveAsync(string outputPath)
+        /// <param name="path">The file path.</param>
+        /// <returns>The task of saving.</returns>
+        public async Task SaveAsync(string path)
         {
             try
             {
                 await this._syncRoot.WaitAsync();
 
-                // construct the path of the file, and write to the output
-                var path = this.GetPath(outputPath, DateTime.UtcNow.ToString("yyyy-MM-dd_HHmmss"));
                 using (var writer = new WaveFileWriter(path, this.WaveFormat))
                 {
                     foreach (var chunk in this.Chunks)
@@ -89,9 +86,10 @@ namespace SoundDeck.Core.Capture
                 }
 
                 // determine if we need to re-write the audio file based on the desired output
-                return this.NormalizeVolume || this.EncodeToMP3
-                    ? this.WriteAudioFile(path)
-                    : path;
+                if (this.NormalizeVolume || this.EncodeToMP3)
+                {
+                    this.WriteAudioFile(path);
+                }
             }
             finally
             {
@@ -100,33 +98,11 @@ namespace SoundDeck.Core.Capture
         }
 
         /// <summary>
-        /// Gets the unique file name for the specified <paramref name="outputPath"/> and <paramref name="name"/>, using the suffix as an indicator of how many files with the same name exist (regardless of extension).
-        /// </summary>
-        /// <param name="outputPath">The output path.</param>
-        /// <param name="name">The desired name of the file, without an extension.</param>
-        /// <param name="suffixIndex">The current suffix count.</param>
-        /// <returns>The unique file path.</returns>
-        private string GetPath(string outputPath, string name, int? suffixIndex = null)
-        {
-            // determine the suffix and extensionless file name
-            var suffix = suffixIndex == null ? string.Empty : $" ({suffixIndex})";
-            var partialFileName = $"{name}{suffix}";
-
-            // if any variant of the file exists, increment the suffix
-            if (Directory.EnumerateFiles(outputPath, $"{partialFileName}.*").Any())
-            {
-                return this.GetPath(outputPath, name, suffixIndex == null ? 2 : suffixIndex + 1);
-            }
-
-            return Path.Combine(outputPath, $"{partialFileName}.wav");
-        }
-
-        /// <summary>
         /// Writes the audio file from the specified path, applying changes based on the state of this instance.
         /// </summary>
         /// <param name="path">The file path.</param>
         /// <returns>The saved audio file path.</returns>
-        private string WriteAudioFile(string path)
+        private void WriteAudioFile(string path)
         {
             var tempPath = path + ".tmp";
             try
@@ -140,7 +116,7 @@ namespace SoundDeck.Core.Capture
                 {
                     writer.EncodeToMP3 = this.EncodeToMP3;
                     writer.NormalizeVolume = this.NormalizeVolume;
-                    path = writer.Save(path);
+                    writer.Save(path);
                 }
 
                 File.Delete(tempPath);
@@ -149,8 +125,6 @@ namespace SoundDeck.Core.Capture
             {
                 FileUtils.DeleteIfExists(tempPath);
             }
-
-            return path;
         }
     }
 }
