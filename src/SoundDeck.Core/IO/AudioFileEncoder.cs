@@ -8,26 +8,21 @@ namespace SoundDeck.Core.IO
     /// <summary>
     /// Provides a file writer for a <see cref="AudioFileReader"/>.
     /// </summary>
-    public sealed class AudioFileWriter : IDisposable
+    public sealed class AudioFileEncoder : IDisposable
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AudioFileWriter"/> class.
+        /// Initializes a new instance of the <see cref="AudioFileEncoder"/> class.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        public AudioFileWriter(AudioFileReader reader)
+        public AudioFileEncoder(AudioFileReader reader)
         {
             this.Reader = reader;
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to encode the file to an MP3.
+        /// Gets or sets the settings.
         /// </summary>
-        public bool EncodeToMP3 { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to normalize the volume of the audio file reader.
-        /// </summary>
-        public bool NormalizeVolume { get; set; } = false;
+        public IAudioFileWriterSettings Settings { get; set; }
 
         /// <summary>
         /// Gets or sets the normalization provider.
@@ -52,13 +47,13 @@ namespace SoundDeck.Core.IO
         public void Save(string path)
         {
             // applies peak normalization to the reader
-            if (this.NormalizeVolume)
+            if (this.Settings.NormalizeVolume)
             {
                 this.NormalizationProvider.ApplyPeakNormalization(this.Reader);
             }
 
             // determine the output type
-            if (this.EncodeToMP3)
+            if (this.Settings.EncodeToMP3)
             {
                 MediaFoundationApi.Startup();
                 MediaFoundationEncoder.EncodeToMp3(this.Reader, path);

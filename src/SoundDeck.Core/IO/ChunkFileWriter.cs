@@ -35,14 +35,9 @@ namespace SoundDeck.Core.Capture
         public Chunk[] Chunks { get; private set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to encode to MP3.
+        /// Gets or sets the settings.
         /// </summary>
-        public bool EncodeToMP3 { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to normalize the volume.
-        /// </summary>
-        public bool NormalizeVolume { get; set; } = false;
+        public IAudioFileWriterSettings Settings { get; set; }
 
         /// <summary>
         /// Gets the wave format.
@@ -86,9 +81,9 @@ namespace SoundDeck.Core.Capture
                 }
 
                 // determine if we need to re-write the audio file based on the desired output
-                if (this.NormalizeVolume || this.EncodeToMP3)
+                if (this.Settings.NormalizeVolume || this.Settings.EncodeToMP3)
                 {
-                    this.WriteAudioFile(path);
+                    this.EncodeAudioFile(path);
                 }
             }
             finally
@@ -102,7 +97,7 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="path">The file path.</param>
         /// <returns>The saved audio file path.</returns>
-        private void WriteAudioFile(string path)
+        private void EncodeAudioFile(string path)
         {
             var tempPath = path + ".tmp";
             try
@@ -112,10 +107,9 @@ namespace SoundDeck.Core.Capture
 
                 // re-write and the file
                 using (var reader = new AudioFileReader(tempPath))
-                using (var writer = new AudioFileWriter(reader))
+                using (var writer = new AudioFileEncoder(reader))
                 {
-                    writer.EncodeToMP3 = this.EncodeToMP3;
-                    writer.NormalizeVolume = this.NormalizeVolume;
+                    writer.Settings = this.Settings;
                     writer.Save(path);
                 }
 

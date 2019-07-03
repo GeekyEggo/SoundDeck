@@ -94,8 +94,7 @@ namespace SoundDeck.Core.Capture
                 var path = FileUtils.GetTimeStampPath(settings.OutputPath, $"{{0}}{ext}");
 
                 // set up the writer, and save
-                writer.NormalizeVolume = settings.NormalizeVolume;
-                writer.EncodeToMP3 = settings.EncodeToMP3;
+                writer.Settings = settings;
                 await writer.SaveAsync(path);
 
                 this.Logger?.LogInformation("Audio capture saved: {0}", path);
