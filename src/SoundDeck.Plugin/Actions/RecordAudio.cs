@@ -4,7 +4,9 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
+    using SoundDeck.Plugin.Models;
     using SoundDeck.Plugin.Models.Settings;
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,6 +20,9 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         public const string UUID = "com.geekyEggo.soundDeck.recordAudio";
 
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
@@ -72,15 +77,24 @@ namespace SoundDeck.Plugin.Actions
             {
                 await this._syncRoot.WaitAsync();
 
-                if (args.Payload.State == 0)
+                switch (args.Payload.State)
                 {
-                    this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
-                    await this.CaptureDevice.StartAsync();
+                    case RecordAudioState.START:
+                        this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
+                        await this.CaptureDevice.StartAsync();
+                        break;
+
+                    case RecordAudioState.STOP:
+                        await this.CaptureDevice.StopAsync();
+                        await this.ShowOkAsync();
+                        break;
                 }
-                else if (args.Payload.State == 1)
-                {
-                    await this.CaptureDevice.StopAsync();
-                }
+            }
+            catch (Exception e)
+            {
+                // log any errors
+                await this.StreamDeck.LogMessageAsync(e.ToString());
+                await this.ShowAlertAsync();
             }
             finally
             {

@@ -82,8 +82,16 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            await base.OnKeyDown(args);
-            await this.Playback.NextAsync();
+            try
+            {
+                await base.OnKeyDown(args);
+                await this.Playback.NextAsync();
+            }
+            catch (Exception e)
+            {
+                await this.StreamDeck.LogMessageAsync(e.ToString());
+                await this.ShowAlertAsync();
+            }
         }
 
         /// <summary>
