@@ -4,6 +4,7 @@ namespace SoundDeck.Core.IO
     using NAudio.Wave;
     using SoundDeck.Core.Playback;
     using System;
+    using System.IO;
 
     /// <summary>
     /// Provides a file writer for a <see cref="AudioFileReader"/>.
@@ -53,7 +54,8 @@ namespace SoundDeck.Core.IO
             }
 
             // determine the output type
-            if (this.Settings.EncodeToMP3)
+            if (this.Settings.EncodeToMP3
+                && this.Reader.Length > 0)
             {
                 MediaFoundationApi.Startup();
                 MediaFoundationEncoder.EncodeToMp3(this.Reader, path);

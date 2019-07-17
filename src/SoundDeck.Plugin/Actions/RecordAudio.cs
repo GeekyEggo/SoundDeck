@@ -5,6 +5,7 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models.Settings;
+    using System.Threading;
     using System.Threading.Tasks;
 
     [StreamDeckAction("Record Audio", UUID, "Images/RecordAudio/Action", Tooltip = "Record Audio", SupportedInMultiActions = false)]
@@ -16,6 +17,8 @@ namespace SoundDeck.Plugin.Actions
         /// The unique identifier for the action.
         /// </summary>
         public const string UUID = "com.geekyEggo.soundDeck.recordAudio";
+
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecordAudio"/> class.
@@ -65,15 +68,23 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of the key down.</returns>
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            if (args.Payload.State == 0)
+            try
             {
-                this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
-                await this.CaptureDevice.StartAsync();
+                await this._syncRoot.WaitAsync();
+
+                if (args.Payload.State == 0)
+                {
+                    this.CaptureDevice.Settings = args.Payload.GetSettings<RecordAudioSettings>();
+                    await this.CaptureDevice.StartAsync();
+                }
+                else if (args.Payload.State == 1)
+                {
+                    await this.CaptureDevice.StopAsync();
+                }
             }
-            else if (args.Payload.State == 1)
+            finally
             {
-                await this.CaptureDevice.StopAsync();
-                await this.CaptureDevice.StopAsync();
+                this._syncRoot.Release();
             }
         }
     }
