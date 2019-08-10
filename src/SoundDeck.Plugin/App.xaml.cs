@@ -2,8 +2,8 @@ using SharpDeck.Manifest;
 [assembly: StreamDeckPlugin(
     Name = "Sound Deck",
     Category = "Sound Deck",
+    CategoryIcon = "Images/SoundDeck/Category",
     Description = "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
-    Icon = "Images/Icon",
     CodePath = "SoundDeck.Plugin.exe",
     PropertyInspectorPath = "PI/index.html",
     Version = "1.0.0",

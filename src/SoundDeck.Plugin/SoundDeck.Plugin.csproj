@@ -14,12 +14,6 @@
         <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None Update="Images\Action%402x.png">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Images\Action.png">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
         <None Update="Images\CaptureAudioBuffer@2.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -31,12 +25,6 @@
         </None>
         <None Update="Images\ClipAudio\Key.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Images\Icon%402x.png">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Images\Icon.png">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Images\PlayAudio\Action%402.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -66,6 +54,12 @@
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Images\RecordAudio\Key1.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\SoundDeck\Category%402.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\SoundDeck\Category.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
