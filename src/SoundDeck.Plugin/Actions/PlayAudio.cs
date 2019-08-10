@@ -109,7 +109,7 @@ namespace SoundDeck.Plugin.Actions
                 }
 
                 var remaining = time.Total.Subtract(time.Current);
-                return remaining.TotalSeconds > 0.5f ? remaining.ToString("mm':'ss") : null;
+                return remaining.TotalSeconds > 0.1f ? remaining.ToString("mm':'ss") : null;
             }
 
             await this.SetTitleAsync(getTime(e));

@@ -3,7 +3,7 @@ using SharpDeck.Manifest;
     Name = "Sound Deck",
     Category = "Sound Deck",
     CategoryIcon = "Images/SoundDeck/Category",
-    Description = "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
+    Description = "An advanced soundboard with support for output audio device selection. SoundDeck also supports recording audio, or clipping the last precious seconds of audio, from any of your sound devices",
     CodePath = "SoundDeck.Plugin.exe",
     PropertyInspectorPath = "PI/index.html",
     Version = "1.0.0",
