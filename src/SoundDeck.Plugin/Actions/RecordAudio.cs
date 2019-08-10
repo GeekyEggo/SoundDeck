@@ -18,7 +18,7 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyEggo.soundDeck.recordAudio";
+        public const string UUID = "com.geekyeggo.sounddeck.recordaudio";
 
         /// <summary>
         /// The synchronization root.

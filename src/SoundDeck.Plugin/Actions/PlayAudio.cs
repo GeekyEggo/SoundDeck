@@ -23,7 +23,7 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyEggo.soundDeck.playAudio";
+        public const string UUID = "com.geekyeggo.sounddeck.playaudio";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayAudio"/> class.
