@@ -13,8 +13,7 @@
         "install:plugin": "dotnet publish %npm_package_paths_plugin% -o %APPDATA%\\%npm_package_paths_elgato% -c Release -r win10-x64 --self-contained true /p:PublishTrimmed=true",
         "debug:pi": "npx webpack --mode development --watch",
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
-        "stop": "tasklist | find /i \"StreamDeck.exe\" && taskkill /im StreamDeck.exe /f /t || echo Stream Deck not running",
-        "talk": "echo %npm_package_paths_debug%"
+        "stop": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo Stream Deck not running"
     },
     "repository": {
         "type": "git",
