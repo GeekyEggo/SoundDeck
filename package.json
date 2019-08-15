@@ -3,14 +3,16 @@
     "version": "1.0.0",
     "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
     "paths": {
+        "debug": "bin\\Debug\\netcoreapp3.0",
+        "dist":  ".\\dist",
         "elgato": "Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin",
-        "plugin": ".\\src\\SoundDeck.Plugin",
-        "debug": "bin\\Debug\\netcoreapp3.0"
+        "plugin": ".\\src\\SoundDeck.Plugin"
     },
     "scripts": {
         "install": "npm stop && npm run install:plugin && npm run install:pi",
         "install:pi": "npx webpack",
-        "install:plugin": "dotnet publish %npm_package_paths_plugin% -o %APPDATA%\\%npm_package_paths_elgato% -c Release -r win10-x64 --self-contained true /p:PublishTrimmed=true",
+        "install:plugin": "dotnet publish %npm_package_paths_plugin% -o %APPDATA%\\%npm_package_paths_elgato% -c Release -r win10-x64",
+        "dist:plugin": "dotnet publish %npm_package_paths_plugin% -o %npm_package_paths_dist% -c Release -r win10-x64 --self-contained true /p:PublishTrimmed=true",
         "debug:pi": "npx webpack --mode development --watch",
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
         "stop": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo Stream Deck not running"
