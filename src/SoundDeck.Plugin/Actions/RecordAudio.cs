@@ -1,14 +1,15 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models;
     using SoundDeck.Plugin.Models.Settings;
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
+    using SoundDeck.Plugin.Models.UI;
 
     [StreamDeckAction("Record Audio", UUID, "Images/RecordAudio/Action", Tooltip = "Record Audio", SupportedInMultiActions = false)]
     [StreamDeckActionState("Images/RecordAudio/Key0")]
@@ -29,9 +30,10 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="RecordAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
+        /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public RecordAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
-            : base(audioService)
+        public RecordAudio(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider, ActionEventArgs<AppearancePayload> args)
+            : base(audioService, folderBrowserDialogProvider)
         {
             this.CaptureDevice = this.GetCaptureDevice(args.Payload.GetSettings<RecordAudioSettings>());
         }

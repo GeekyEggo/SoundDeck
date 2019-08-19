@@ -1,13 +1,14 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
+    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models.Settings;
-    using System;
-    using System.Threading.Tasks;
+    using SoundDeck.Plugin.Models.UI;
 
     /// <summary>
     /// Provides capturing of an audio buffer, similar to an instat replay.
@@ -25,9 +26,10 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="ClipAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
+        /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public ClipAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
-            : base(audioService)
+        public ClipAudio(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider, ActionEventArgs<AppearancePayload> args)
+            : base(audioService, folderBrowserDialogProvider)
         {
             this.CaptureDevice = this.GetCaptureDevice(args.Payload.GetSettings<ClipAudioSettings>());
         }

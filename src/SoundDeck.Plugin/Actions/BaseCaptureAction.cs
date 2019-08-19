@@ -1,5 +1,7 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System.Linq;
+    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
@@ -8,9 +10,9 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models.Payloads;
     using SoundDeck.Plugin.Models.Settings;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
+    using SoundDeck.Plugin.Models.UI;
+
+    //using System.Windows.Forms;
 
     /// <summary>
     /// Provides a base class for capturing audio.
@@ -24,15 +26,22 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="BaseCaptureAction{TSettings}"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
-        public BaseCaptureAction(IAudioService audioService)
+        /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
+        public BaseCaptureAction(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
         {
             this.AudioService = audioService;
+            this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
         }
 
         /// <summary>
         /// Gets the audio service.
         /// </summary>
         public IAudioService AudioService { get; }
+
+        /// <summary>
+        /// Gets the folder browser dialog provider.
+        /// </summary>
+        public IFolderBrowserDialogProvider FolderBrowserDialogProvider { get; }
 
         /// <summary>
         /// Gets or sets the capture device.
@@ -66,23 +75,15 @@ namespace SoundDeck.Plugin.Actions
         public async Task<FolderPickerPayload> GetOutputPath()
         {
             var settings = await this.GetSettingsAsync();
-            using (var dialog = new FolderBrowserDialog())
+
+            var result = this.FolderBrowserDialogProvider.ShowDialog("Output Path", settings.OutputPath);
+            if (result.IsSelected)
             {
-                dialog.Description = "Output Path";
-                dialog.SelectedPath = settings.OutputPath;
-                dialog.UseDescriptionForTitle = true;
-
-                var result = dialog.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    settings.OutputPath = dialog.SelectedPath;
-                    await this.SetSettingsAsync(settings);
-
-                    return new FolderPickerPayload(settings.OutputPath, true);
-                }
+                settings.OutputPath = result.SelectedPath;
+                await this.SetSettingsAsync(settings);
             }
 
-            return new FolderPickerPayload(settings?.OutputPath, false);
+            return new FolderPickerPayload(settings?.OutputPath, result.IsSelected);
         }
 
         /// <summary>

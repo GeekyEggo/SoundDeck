@@ -1,9 +1,9 @@
 namespace SoundDeck.Plugin.Models.Settings
 {
+    using System;
     using Newtonsoft.Json;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Serialization;
-    using System;
 
     /// <summary>
     /// Provides settings for <see cref="Actions.ClipAudio"/>.

@@ -13,62 +13,65 @@ using SharpDeck.Manifest;
 
 namespace SoundDeck.Plugin
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using SharpDeck;
-    using SharpDeck.Exceptions;
-    using SoundDeck.Core;
-    using SoundDeck.Core.Extensions;
-    using SoundDeck.Plugin.Actions;
     using System;
-    using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows;
+    using SharpDeck;
+    using SharpDeck.Exceptions;
+    using SoundDeck.Core.Extensions;
+    using SoundDeck.Plugin.Actions;
 
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// The main de-coupled entry point for the Sound Deck plugin.
     /// </summary>
-    public partial class App : Application
+    public static class SoundDeckPlugin
     {
         /// <summary>
-        /// Handles the Startup event of the Application control.
+        /// The synchronization root.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
-        private async void Application_Startup(object sender, StartupEventArgs e)
+        private readonly static object _syncRoot = new object();
+
+        /// <summary>
+        /// Gets or sets the running plugin.
+        /// </summary>
+        private static Task Plugin { get; set; }
+
+        /// <summary>
+        /// Runs the Sound Deck plugin asynchronously.
+        /// </summary>
+        /// <param name="args">The arguments supplied by the console or entry point.</param>
+        /// <param name="provider">The service provider.</param>
+        /// <returns>The task of running the Sound Deck.</returns>
+        public static Task RunAsync(string[] args, IServiceProvider provider)
         {
-            if (ManifestWriter.TryWrite(e.Args, out int result))
+            lock (_syncRoot)
             {
-                Application.Current.Shutdown();
+                if (Plugin == null)
+                {
+                    Plugin = RunClientIndefinitelyAsync(args, provider);
+                }
             }
-            else
-            {
-#if DEBUG
-                Debugger.Launch();
-#endif
-                var provider = this.GetServiceProvider();
-                await this.RunClientIndefinitelyAsync(e.Args, provider);
-            }
+
+            return Plugin;
         }
 
         /// <summary>
         /// Runs the Stream Deck client indefinitely, attempting to recover from exceptions where possible.
         /// </summary>
-        /// <param name="args">The arguments.</param>
-        /// <param name="provider">The provider.</param>
+        /// <param name="clientArgs">The arguments.</param>
+        /// <param name="provider">The service provider.</param>
         /// <returns>The task of running the client.</returns>
-        private async Task RunClientIndefinitelyAsync(string[] args, IServiceProvider provider)
+        private static async Task RunClientIndefinitelyAsync(string[] clientArgs, IServiceProvider provider)
         {
             try
             {
-                using (var client = new StreamDeckClient(args))
+                using (var client = new StreamDeckClient(clientArgs))
                 {
                     client.RegisterAction(ClipAudio.UUID, args => provider.GetInstance<ClipAudio>(args));
                     client.RegisterAction(PlayAudio.UUID, args => provider.GetInstance<PlayAudio>(args));
                     client.RegisterAction(RecordAudio.UUID, args => provider.GetInstance<RecordAudio>(args));
 
-                    client.Error += this.GetErrorEventHandler(client);
+                    client.Error += GetErrorEventHandler(client);
 
                     await client.StartAsync(CancellationToken.None);
                 }
@@ -76,7 +79,7 @@ namespace SoundDeck.Plugin
             catch
             {
                 // restart the client
-                await this.RunClientIndefinitelyAsync(args, provider);
+                await RunClientIndefinitelyAsync(clientArgs, provider);
             }
         }
 
@@ -85,7 +88,7 @@ namespace SoundDeck.Plugin
         /// </summary>
         /// <param name="client">The client.</param>
         /// <returns>The event handler</returns>
-        private EventHandler<StreamDeckClientErrorEventArgs> GetErrorEventHandler(StreamDeckClient client)
+        private static EventHandler<StreamDeckClientErrorEventArgs> GetErrorEventHandler(StreamDeckClient client)
         {
             return async (sender, args) =>
             {
@@ -97,20 +100,6 @@ namespace SoundDeck.Plugin
                     await client.ShowAlertAsync(args.Context);
                 }
             };
-        }
-
-        /// <summary>
-        /// Gets the service provider.
-        /// </summary>
-        /// <returns>The service provider.</returns>
-        private IServiceProvider GetServiceProvider()
-        {
-            var provider = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Trace))
-                .AddSingleton<IAudioService, AudioService>()
-                .BuildServiceProvider();
-
-            return provider;
         }
     }
 }

@@ -1,5 +1,8 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
@@ -9,9 +12,6 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Enums;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
@@ -101,7 +101,7 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="e">The <see cref="PlaybackTimeEventArgs" /> instance containing the event data.</param>
         private async void Player_TimeChanged(object sender, PlaybackTimeEventArgs e)
         {
-            static string getTime(PlaybackTimeEventArgs time)
+            string getTime(PlaybackTimeEventArgs time)
             {
                 if (time.Current == TimeSpan.Zero)
                 {
