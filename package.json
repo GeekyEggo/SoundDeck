@@ -3,12 +3,12 @@
     "version": "1.0.0",
     "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
     "paths": {
-        "debug": "bin\\Debug\\netcoreapp3.0",
+        "debug": "bin\\Debug",
         "dist": "./dist/com.geekyeggo.sounddeck.sdPlugin",
         "elgato": "Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin",
         "package": "./dist",
         "pi": ".\\src\\SoundDeck.PI",
-        "plugin": ".\\src\\SoundDeck.Plugin"
+        "plugin": ".\\src\\SoundDeck.Plugin.Windows"
     },
     "scripts": {
         "install": "npm stop && npm run install:plugin && npm run install:pi",

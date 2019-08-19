@@ -1,13 +1,19 @@
 namespace SoundDeck.Plugin.Windows
 {
-    using System.Windows.Forms;
     using SoundDeck.Plugin.Models.UI;
+    using System.Windows.Forms;
+    using System.Windows.Threading;
 
     /// <summary>
     /// Provides a Windows implementation of a <see cref="IFolderBrowserDialogProvider"/>
     /// </summary>
     public class FolderBrowserDialogWrapper : IFolderBrowserDialogProvider
     {
+        /// <summary>
+        /// Gets the dispatcher.
+        /// </summary>
+        private Dispatcher Dispatcher => System.Windows.Application.Current.Dispatcher;
+
         /// <summary>
         /// Shows a folder browser dialog.
         /// </summary>
@@ -16,15 +22,18 @@ namespace SoundDeck.Plugin.Windows
         /// <returns>The result of the dialog.</returns>
         public FolderBrowserDialogResult ShowDialog(string description, string selectedPath)
         {
-            using (var dialog = new FolderBrowserDialog())
+            return this.Dispatcher.Invoke(() =>
             {
-                dialog.Description = description;
-                dialog.SelectedPath = selectedPath;
+                using (var dialog = new FolderBrowserDialog())
+                {
+                    dialog.Description = description;
+                    dialog.SelectedPath = selectedPath;
 
-                return new FolderBrowserDialogResult(
-                    dialog.ShowDialog() == DialogResult.OK,
-                    dialog.SelectedPath);
-            }
+                    return new FolderBrowserDialogResult(
+                        dialog.ShowDialog() == DialogResult.OK,
+                        dialog.SelectedPath);
+                }
+            });
         }
     }
 }

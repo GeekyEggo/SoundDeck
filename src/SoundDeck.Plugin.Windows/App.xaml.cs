@@ -1,28 +1,28 @@
 namespace SoundDeck.Plugin.Windows
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
     using Microsoft.Extensions.DependencyInjection;
     using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
+    using System;
+    using System.Diagnostics;
+    using System.Windows;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public static class Program
+    public partial class App : Application
     {
         /// <summary>
-        /// The Windows entry point for the application.
+        /// Handles the Startup event of the Application control.
         /// </summary>
-        /// <param name="args">The entry arguments.</param>
-        [STAThread]
-        public static void Main(string[] args)
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (ManifestWriter.TryWrite(args, out int result))
+            if (ManifestWriter.TryWrite(e.Args, out int result))
             {
-                return;
+                Application.Current.Shutdown();
             }
             else
             {
@@ -30,13 +30,8 @@ namespace SoundDeck.Plugin.Windows
                 Debugger.Launch();
 #endif
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
-                var plugin = SoundDeckPlugin.RunAsync(args, GetServiceProvider());
-                Application.Run(new ApplicationContext());
-
-                Task.WaitAll(plugin);
+                var provider = this.GetServiceProvider();
+                _ = SoundDeckPlugin.RunAsync(e.Args, provider).ConfigureAwait(false);
             }
         }
 
@@ -44,9 +39,10 @@ namespace SoundDeck.Plugin.Windows
         /// Gets the service provider.
         /// </summary>
         /// <returns>The service provider.</returns>
-        private static IServiceProvider GetServiceProvider()
+        private IServiceProvider GetServiceProvider()
         {
             var provider = new ServiceCollection()
+                .AddLogging()
                 .AddSingleton<IAudioService, AudioService>()
                 .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
                 .BuildServiceProvider();

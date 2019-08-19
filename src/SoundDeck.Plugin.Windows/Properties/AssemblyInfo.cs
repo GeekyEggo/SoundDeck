@@ -1,8 +1,11 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows;
 
-[assembly: AssemblyTitle("Sound Deck (Windows)")]
+[assembly: AssemblyTitle("Sound Deck")]
 [assembly: AssemblyProduct("Sound Deck")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: ComVisible(false)]
-[assembly: Guid("9b9509ad-62fe-41d8-9b59-d42125dcacce")]
+[assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

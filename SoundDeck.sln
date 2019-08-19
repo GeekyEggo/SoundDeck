@@ -20,9 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.PI", "src\SoundDe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{C149BEBE-95F0-4A4D-9281-9B94D973D861}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{F2324141-149B-44E8-8E10-02A18F025842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{F2324141-149B-44E8-8E10-02A18F025842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin.Windows", "src\SoundDeck.Plugin.Windows\SoundDeck.Plugin.Windows.csproj", "{9B9509AD-62FE-41D8-9B59-D42125DCACCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin.Windows", "src\SoundDeck.Plugin.Windows\SoundDeck.Plugin.Windows.csproj", "{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +46,10 @@ Global
 		{F2324141-149B-44E8-8E10-02A18F025842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2324141-149B-44E8-8E10-02A18F025842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2324141-149B-44E8-8E10-02A18F025842}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B9509AD-62FE-41D8-9B59-D42125DCACCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B9509AD-62FE-41D8-9B59-D42125DCACCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B9509AD-62FE-41D8-9B59-D42125DCACCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B9509AD-62FE-41D8-9B59-D42125DCACCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

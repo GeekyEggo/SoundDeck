@@ -4,7 +4,7 @@ using SharpDeck.Manifest;
     Category = "Sound Deck",
     CategoryIcon = "Images/SoundDeck/Category",
     Description = "An advanced soundboard with support for output audio device selection. SoundDeck also supports recording audio, or clipping the last precious seconds of audio, from any of your sound devices",
-    CodePath = "SoundDeck.Plugin.exe",
+    CodePath = "SoundDeck.exe",
     Icon = "Images/SoundDeck/Icon",
     PropertyInspectorPath = "PI/index.html",
     Version = "1.0.0",
