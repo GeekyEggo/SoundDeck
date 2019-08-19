@@ -4,7 +4,10 @@
         <OutputType>Library</OutputType>
     </PropertyGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent" />
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="cd ..\.. &amp;&amp; npm run install:pi" />
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent"  Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <Exec Command="cd ..\.. &amp;&amp; npm run build:pi" />
+    </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent"  Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <Exec Command="cd ..\.. &amp;&amp; npm run dist:pi" />
     </Target>
 </Project>

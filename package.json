@@ -11,14 +11,13 @@
         "plugin": ".\\src\\SoundDeck.Plugin.Windows"
     },
     "scripts": {
-        "install": "npm stop && npm run install:plugin && npm run install:pi",
-        "install:pi": "npx webpack",
-        "install:plugin": "dotnet publish %npm_package_paths_plugin% -o %APPDATA%\\%npm_package_paths_elgato% -c Release -r win10-x64",
-        "dist": "npm run dist:clean && npm run dist:plugin && npm run dist:pi && npm run dist:package",
+        "install": "MSBuild.exe -p:Configuration=Debug -t:Rebuild",
+        "build:pi": "npx webpack",
+        "build:release": "MSBuild.exe -p:Configuration=Release -t:Rebuild",
+        "dist": "npm run dist:clean && npm run build:release && npm run dist:package",
         "dist:clean": "rm -rf %npm_package_paths_package%/*",
         "dist:package": "cd tools && DistributionTool -b -i ../%npm_package_paths_dist% -o ../%npm_package_paths_package% || exit 0",
         "dist:pi": "npx webpack --dist",
-        "dist:plugin": "dotnet publish %npm_package_paths_plugin% -o %npm_package_paths_dist% -c Release -r win10-x64 --self-contained true /p:PublishTrimmed=true",
         "debug:pi": "npx webpack --mode development --watch",
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
         "stop": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo Stream Deck not running"
