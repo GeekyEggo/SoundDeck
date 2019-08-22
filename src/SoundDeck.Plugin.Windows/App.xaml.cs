@@ -1,12 +1,11 @@
 namespace SoundDeck.Plugin.Windows
 {
+    using System;
+    using System.Windows;
     using Microsoft.Extensions.DependencyInjection;
     using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
-    using System;
-    using System.Diagnostics;
-    using System.Windows;
 
     /// <summary>
     /// Interaction logic for App.xaml
