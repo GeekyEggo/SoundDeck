@@ -3,7 +3,11 @@ using SharpDeck.Manifest;
     Name = "Sound Deck",
     Category = "Sound Deck",
     CategoryIcon = "Images/SoundDeck/Category",
-    Description = "An advanced soundboard with support for output audio device selection. SoundDeck also supports recording audio, or clipping the last precious seconds of audio, from any of your sound devices",
+    Description = @"With advanced audio device support; Sound Deck lets you play, record, and clip from any device!
+
+- Multiple clip support, with custom Play-Action.
+- Start/stop recording from any device.
+- Clip-it recording... to record the last x seconds!",
     CodePath = "SoundDeck.exe",
     Icon = "Images/SoundDeck/Icon",
     PropertyInspectorPath = "PI/index.html",
@@ -16,14 +20,14 @@ namespace SoundDeck.Plugin
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.DependencyInjection;
     using SharpDeck;
+    using SharpDeck.Events.Received;
     using SharpDeck.Exceptions;
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Plugin.Actions;
-    using Microsoft.Extensions.DependencyInjection;
     using SoundDeck.Plugin.Models.Settings;
-    using SharpDeck.Events.Received;
 
     /// <summary>
     /// The main de-coupled entry point for the Sound Deck plugin.
