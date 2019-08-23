@@ -1,6 +1,7 @@
 namespace SoundDeck.Plugin.Windows
 {
     using System;
+    using System.Diagnostics;
     using System.Windows;
     using Microsoft.Extensions.DependencyInjection;
     using SharpDeck.Manifest;
@@ -30,7 +31,8 @@ namespace SoundDeck.Plugin.Windows
 #endif
 
                 var provider = this.GetServiceProvider();
-                _ = SoundDeckPlugin.RunAsync(e.Args, provider).ConfigureAwait(false);
+                var plugin = new SoundDeckPlugin(provider);
+                _ = plugin.RunAsync(e.Args).ConfigureAwait(false);
             }
         }
 
