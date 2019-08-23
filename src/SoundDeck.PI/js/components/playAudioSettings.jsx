@@ -1,5 +1,5 @@
 import React from "react";
-import { PropertyInspectorWrapper, Select, store } from "react-sharpdeck";
+import { PropertyInspectorWrapper, Select, store, streamDeckClient } from "react-sharpdeck";
 import FilesPicker from "./filesPicker";
 
 class PlayAudioSettings extends React.Component {
@@ -19,6 +19,8 @@ class PlayAudioSettings extends React.Component {
         this.state = { enableSort: this.isSortEnabled() };
         store.subscribe(() => this.setState({ enableSort: this.isSortEnabled() }));
 
+        streamDeckClient.getGlobalSettings()
+            .then((ev) => this.setState({ defaultPlaybackDeviceId: ev.payload.settings.defaultPlaybackDeviceId }));
     }
 
     isSortEnabled() {
@@ -29,7 +31,7 @@ class PlayAudioSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
+                <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" defaultValue={this.state.defaultPlaybackDeviceId} />
                 <Select label="Action" options={this.actionTypes} valuePath="action" defaultValue="0" onChange={this.onActionTypeChange} />
                 <Select label="Order" options={this.orderTypes} valuePath="order" defaultValue="0" />
                 <FilesPicker label="Files" valuePath="files" accept="audio/mpeg,audio/wav" buttonLabel="Add file..." enableSort={this.state.enableSort} />

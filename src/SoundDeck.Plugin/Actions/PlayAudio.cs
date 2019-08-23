@@ -121,6 +121,8 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="deviceId">The device identifier.</param>
         private void SetPlayer(string deviceId)
         {
+            deviceId = string.IsNullOrWhiteSpace(deviceId) ? this.AudioService.Devices.DefaultPlaybackDevice?.Id : deviceId;
+
             // dispose of the current player, if the device identifiers differ
             if (this.Playback.Player?.DeviceId != deviceId)
             {
