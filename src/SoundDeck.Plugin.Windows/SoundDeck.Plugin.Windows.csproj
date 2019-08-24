@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -71,10 +71,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SharpDeck\src\SharpDeck\SharpDeck.csproj">
-      <Project>{C149BEBE-95F0-4A4D-9281-9B94D973D861}</Project>
-      <Name>SharpDeck</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj">
       <Project>{4336c68f-d7f1-4a1a-a87a-aeec27dc6aca}</Project>
       <Name>SoundDeck.Core</Name>
