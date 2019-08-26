@@ -17,20 +17,16 @@ module.exports = (env, argv) => {
             rules: [{
                 test: /\.css$/,
                 use: [
-                    { loader: 'style-loader/url' },
+                    { loader: "style-loader/url" },
                     {
-                        loader: 'file-loader',
+                        loader: "file-loader",
                         options: {
                             name: "./css/[name].css"
                         }
                     }],
-            },
-            {
+            }, {
                 test: /\.jsx$/,
-                include: [
-                    /react-sharpdeck/,
-                    source
-                ],
+                include: source,
                 exclude: /node_modules/,
                 use: {
                     loader: "babel-loader",
@@ -53,21 +49,20 @@ module.exports = (env, argv) => {
                 from: source,
                 to: dest,
                 context: source,
-                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*", "js/react-sharpdeck/**/*"]
+                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
             }])
         ],
         resolve: {
-            extensions: [".js", ".jsx"]
+            extensions: [".js", ".jsx"],
+            alias: {
+                react: path.resolve("./node_modules/react"),
+                "react-dom": path.resolve("./node_modules/react-dom"),
+                "react-redux": path.resolve("./node_modules/react-redux")
+            },
         },
         optimization: {
             splitChunks: {
                 cacheGroups: {
-                    reactSharpdeck: {
-                        test: /react-sharpdeck/,
-                        chunks: 'all',
-                        name: "react-sharpdeck",
-                        enforce: true
-                    },
                     vendor: {
                         test: /node_modules/,
                         chunks: "all",
