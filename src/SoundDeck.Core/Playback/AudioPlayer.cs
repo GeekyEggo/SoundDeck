@@ -1,10 +1,11 @@
 namespace SoundDeck.Core.Playback
 {
-    using NAudio.CoreAudioApi;
-    using NAudio.Wave;
     using System;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using NAudio.CoreAudioApi;
+    using NAudio.Wave;
 
     /// <summary>
     /// Provides an audio player for an audio device.
@@ -48,6 +49,11 @@ namespace SoundDeck.Core.Playback
         public string DeviceId { get; private set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is looped.
+        /// </summary>
+        public bool IsLooped { get; set; }
+
+        /// <summary>
         /// Gets the state.
         /// </summary>
         public PlaybackStateType State { get; private set; }
@@ -85,6 +91,14 @@ namespace SoundDeck.Core.Playback
         /// Gets or sets the internal cancellation token source; this is used to cancel all audio on the player.
         /// </summary>
         private CancellationTokenSource InternalCancellationTokenSource { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is in a playable state.
+        /// </summary>
+        private bool IsPlayableState
+        {
+            get { return this.InternalCancellationTokenSource?.IsCancellationRequested == false && !this.IsDisposed; }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -155,6 +169,7 @@ namespace SoundDeck.Core.Playback
             using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, 0))
             using (var reader = new AudioFileReader(file))
             {
+                // prepare the player
                 if (maxGain != null)
                 {
                     this.NormalizationProvider.ApplyLoudnessNormalization(reader, maxGain.Value);
@@ -163,21 +178,24 @@ namespace SoundDeck.Core.Playback
                 player.Init(reader);
                 player.PlaybackStopped += (_, __) => this.Time = PlaybackTimeEventArgs.Zero;
 
-                player.Play();
-
-                this.Time = PlaybackTimeEventArgs.FromReader(reader);
-                this.State = PlaybackStateType.Playing;
-
-                while (player.PlaybackState != PlaybackState.Stopped
-                    && !this.InternalCancellationTokenSource.IsCancellationRequested
-                    && !this.IsDisposed)
+                do
                 {
-                    Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
-                    this.Time = PlaybackTimeEventArgs.FromReader(reader);
-                }
+                    // play the audio clip
+                    reader.Seek(0, SeekOrigin.Begin);
+                    player.Play();
 
-                player.Stop();
-                this.State = PlaybackStateType.Stopped;
+                    this.Time = PlaybackTimeEventArgs.FromReader(reader);
+                    this.State = PlaybackStateType.Playing;
+
+                    while (player.PlaybackState != PlaybackState.Stopped && this.IsPlayableState)
+                    {
+                        Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
+                        this.Time = PlaybackTimeEventArgs.FromReader(reader);
+                    }
+
+                    player.Stop();
+                    this.State = PlaybackStateType.Stopped;
+                } while (this.IsLooped && this.IsPlayableState);
             }
         }
     }

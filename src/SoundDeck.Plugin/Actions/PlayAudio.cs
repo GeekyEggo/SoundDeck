@@ -73,7 +73,9 @@ namespace SoundDeck.Plugin.Actions
             var settings = args.Payload.GetSettings<PlayAudioSettings>();
 
             this.SetPlayer(settings.AudioDeviceId);
-            return this.Playback.SetOptionsAsync(settings);
+            this.Playback.SetOptions(settings);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

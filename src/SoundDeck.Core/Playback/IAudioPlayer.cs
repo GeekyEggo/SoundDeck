@@ -19,6 +19,11 @@ namespace SoundDeck.Core.Playback
         string DeviceId { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is looped.
+        /// </summary>
+        bool IsLooped { get; set; }
+
+        /// <summary>
         /// Gets the state.
         /// </summary>
         PlaybackStateType State { get; }

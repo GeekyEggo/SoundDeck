@@ -21,16 +21,22 @@ namespace SoundDeck.Core.Playback
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
+        /// Private member field for <see cref="Player"/>.
+        /// </summary>
+        private IAudioPlayer _player;
+
+        /// <summary>
+        /// Private member field for <see cref="Action"/>.
+        /// </summary>
+        private PlaybackActionType _action;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlaybackCollection"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
         public AudioPlaybackCollection(IAudioPlaybackOptions options)
         {
-            this.Action = options.Action;
-            this.Files = options.Files ?? new string[0];
-            this.Order = options.Order;
-
-            this.RefreshOrder();
+            this.SetOptions(options);
         }
 
         /// <summary>
@@ -41,12 +47,34 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets or sets the player.
         /// </summary>
-        public IAudioPlayer Player { get; set; }
+        public IAudioPlayer Player
+        {
+            get
+            {
+                return this._player;
+            }
+            set
+            {
+                this._player = value;
+                this.SetPlayerLoopState();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the action.
         /// </summary>
-        public PlaybackActionType Action { get; set; }
+        public PlaybackActionType Action
+        {
+            get
+            {
+                return this._action;
+            }
+            set
+            {
+                this._action = value;
+                this.SetPlayerLoopState();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the playback order.
@@ -69,15 +97,14 @@ namespace SoundDeck.Core.Playback
         private string[] Items { get; set; }
 
         /// <summary>
-        /// Sets the options asynchronously.
+        /// Sets the options.
         /// </summary>
         /// <param name="options">The options.</param>
-        /// <returns>The task of updating the options.</returns>
-        public async Task SetOptionsAsync(IAudioPlaybackOptions options)
+        public void SetOptions(IAudioPlaybackOptions options)
         {
             try
             {
-                await this._syncRoot.WaitAsync();
+                this._syncRoot.Wait();
 
                 // set the files
                 if (this.TrySetFiles(options.Files))
@@ -112,7 +139,7 @@ namespace SoundDeck.Core.Playback
                 return;
             }
 
-            var completeAfterCancel = this.Action == PlaybackActionType.PlayStop && this.Player.State == PlaybackStateType.Playing;
+            var completeAfterCancel = (this.Action == PlaybackActionType.PlayStop || this.Action == PlaybackActionType.LoopStop) && this.Player.State == PlaybackStateType.Playing;
             this.Player.Stop();
 
             if (!completeAfterCancel)
@@ -160,6 +187,17 @@ namespace SoundDeck.Core.Playback
         }
 
         /// <summary>
+        /// Sets the loop state of the player.
+        /// </summary>
+        private void SetPlayerLoopState()
+        {
+            if (this.Player != null)
+            {
+                this.Player.IsLooped = this.Action == PlaybackActionType.LoopStop;
+            }
+        }
+
+        /// <summary>
         /// Tries to set <see cref="Files"/>, based on the equality of <paramref name="newFiles"/>.
         /// </summary>
         /// <param name="newFiles">The new files.</param>
@@ -167,7 +205,7 @@ namespace SoundDeck.Core.Playback
         private bool TrySetFiles(string[] newFiles)
         {
             newFiles = newFiles ?? new string[0];
-            if (this.Files.SequenceEqual(newFiles))
+            if (this.Files?.SequenceEqual(newFiles) == true)
             {
                 return false;
             }
