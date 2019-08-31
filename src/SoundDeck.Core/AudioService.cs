@@ -9,6 +9,7 @@ namespace SoundDeck.Core
     using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
     using SoundDeck.Core.Playback.Players;
+    using SoundDeck.Core.Playback.Volume;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.

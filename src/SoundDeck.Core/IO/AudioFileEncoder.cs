@@ -1,10 +1,10 @@
 namespace SoundDeck.Core.IO
 {
+    using System;
     using NAudio.MediaFoundation;
     using NAudio.Wave;
     using SoundDeck.Core.Playback;
-    using System;
-    using System.IO;
+    using SoundDeck.Core.Playback.Volume;
 
     /// <summary>
     /// Provides a file writer for a <see cref="AudioFileReader"/>.
