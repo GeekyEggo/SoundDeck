@@ -1,4 +1,4 @@
-namespace SoundDeck.Core.Playback
+namespace SoundDeck.Core.Playback.Players
 {
     using System;
     using System.IO;
@@ -10,7 +10,7 @@ namespace SoundDeck.Core.Playback
     /// <summary>
     /// Provides an audio player for an audio device.
     /// </summary>
-    internal class AudioPlayer : IAudioPlayer
+    public class AudioPlayer : IAudioPlayer
     {
         /// <summary>
         /// The playback state polling delay, in milliseconds.
@@ -20,7 +20,6 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// The synchronization root object.
         /// </summary>
-        //private readonly object _syncRoot = new object();
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
@@ -105,8 +104,7 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         public void Dispose()
         {
-            this.InternalCancellationTokenSource?.Cancel();
-            this.IsDisposed = true;
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -145,6 +143,19 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         public void Stop()
             => this.InternalCancellationTokenSource?.Cancel();
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool dispose)
+        {
+            this.InternalCancellationTokenSource?.Cancel();
+            if (dispose)
+            {
+                this.IsDisposed = true;
+            }
+        }
 
         /// <summary>
         /// Gets the audio device this instance is associated with.

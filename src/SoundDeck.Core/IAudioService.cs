@@ -1,8 +1,8 @@
 namespace SoundDeck.Core
 {
+    using System;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
-    using System;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
@@ -41,5 +41,14 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio recorder.</returns>
         IAudioRecorder GetAudioRecorder(string deviceId);
+
+        /// <summary>
+        /// Gets the playlist player for the associated playlist player action type.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="action">The action type.</param>
+        /// <param name="playlist">The playlist.</param>
+        /// <returns>The playlist player.</returns>
+        IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, Playlist playlist);
     }
 }

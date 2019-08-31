@@ -5,7 +5,7 @@ namespace SoundDeck.Plugin.Models.Settings
     /// <summary>
     /// Provides settings for <see cref="Actions.PlayAudio"/>
     /// </summary>
-    public class PlayAudioSettings : IAudioPlaybackOptions
+    public class PlayAudioSettings : IPlaylistOptions
     {
         /// <summary>
         /// Gets or sets the audio device identifier to capture.
@@ -15,7 +15,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the type of the action that occurs upon the button being pressed.
         /// </summary>
-        public PlaybackActionType Action { get; set; } = PlaybackActionType.PlayNext;
+        public PlaylistPlayerActionType Action { get; set; } = PlaylistPlayerActionType.PlayNext;
 
         /// <summary>
         /// Gets or sets the audio files to play.
@@ -25,6 +25,6 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the playback order.
         /// </summary>
-        public PlaybackOrderType Order { get; set; } = PlaybackOrderType.Sequential;
+        public PlaylistOrderType Order { get; set; } = PlaylistOrderType.Sequential;
     }
 }

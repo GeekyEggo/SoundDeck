@@ -1,5 +1,6 @@
 namespace SoundDeck.Core
 {
+    using System;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using NAudio.MediaFoundation;
@@ -7,7 +8,7 @@ namespace SoundDeck.Core
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
-    using System;
+    using SoundDeck.Core.Playback.Players;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
@@ -78,5 +79,29 @@ namespace SoundDeck.Core
         /// <returns>The audio recorder.</returns>
         public IAudioRecorder GetAudioRecorder(string deviceId)
             => new AudioRecorder(new MMDeviceEnumerator().GetDevice(deviceId));
+
+        /// <summary>
+        /// Gets the playlist player for the associated playlist player action type.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="action">The action type.</param>
+        /// <param name="playlist">The playlist.</param>
+        /// <returns>The playlist player.</returns>
+        public IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, Playlist playlist)
+        {
+            switch (action)
+            {
+                case PlaylistPlayerActionType.LoopStop:
+                    return new LoopStopPlayer(deviceId, playlist, this.NormalizationProvider);
+
+                case PlaylistPlayerActionType.PlayNext:
+                    return new PlayNextPlayer(deviceId, playlist, this.NormalizationProvider);
+
+                case PlaylistPlayerActionType.PlayStop:
+                    return new PlayStopPlayer(deviceId, playlist, this.NormalizationProvider);
+            }
+
+            throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
+        }
     }
 }

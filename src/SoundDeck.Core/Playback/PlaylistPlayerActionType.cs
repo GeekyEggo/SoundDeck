@@ -1,9 +1,9 @@
 namespace SoundDeck.Core.Playback
 {
     /// <summary>
-    /// Provides an enumeration of actions that a <see cref="AudioPlaybackCollection"/> can perform when <see cref="AudioPlaybackCollection.NextAsync"/> is invoked.
+    /// Provides an enumeration of actions that a <see cref="Playlist"/> can perform when <see cref="Playlist.NextAsync"/> is invoked.
     /// </summary>
-    public enum PlaybackActionType
+    public enum PlaylistPlayerActionType
     {
         /// <summary>
         /// Stops the current audio clip, and plays the next one.
