@@ -1,7 +1,7 @@
 namespace SoundDeck.Plugin.Windows
 {
+    using Ookii.Dialogs.Wpf;
     using SoundDeck.Plugin.Models.UI;
-    using System.Windows.Forms;
     using System.Windows.Threading;
 
     /// <summary>
@@ -24,15 +24,16 @@ namespace SoundDeck.Plugin.Windows
         {
             return this.Dispatcher.Invoke(() =>
             {
-                using (var dialog = new FolderBrowserDialog())
+                var dialog = new VistaFolderBrowserDialog
                 {
-                    dialog.Description = description;
-                    dialog.SelectedPath = selectedPath;
+                    Description = description,
+                    SelectedPath = selectedPath,
+                    ShowNewFolderButton = true,
+                    UseDescriptionForTitle = true,
+                };
 
-                    return new FolderBrowserDialogResult(
-                        dialog.ShowDialog() == DialogResult.OK,
-                        dialog.SelectedPath);
-                }
+                var isSelected = dialog.ShowDialog() ?? false;
+                return new FolderBrowserDialogResult(isSelected, dialog.SelectedPath);
             });
         }
     }
