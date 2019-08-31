@@ -1,8 +1,5 @@
 namespace SoundDeck.Plugin.Actions
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
@@ -12,6 +9,9 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Enums;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
@@ -69,18 +69,17 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
-        /// Raises the <see cref="E:SharpDeck.StreamDeckActionEventReceiver.DidReceiveSettings" /> event.
+        /// Handles the <see cref="DidReceiveSettings" /> event.
         /// </summary>
-        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The task of updating the state of the object based on the settings.</returns>
-        protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
+        protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, PlayAudioSettings settings)
         {
-            var settings = args.Payload.GetSettings<PlayAudioSettings>();
-
             this.SetPlayer(settings);
             this.Playlist.SetOptions(settings);
 
-            return Task.CompletedTask;
+            return base.OnDidReceiveSettings(args, settings);
         }
 
         /// <summary>
