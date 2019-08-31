@@ -65,7 +65,7 @@ namespace SoundDeck.Core.Playback.Players
                 await this._syncRoot.WaitAsync();
                 if (this.Playlist.MoveNext())
                 {
-                    await this.PlayAsync(this.Playlist.Current, this.MaxGain);
+                    await this.PlayAsync(this.Playlist.Current.Path, this.MaxGain);
                 }
             }
             finally
