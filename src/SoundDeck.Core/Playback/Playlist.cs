@@ -8,7 +8,7 @@ namespace SoundDeck.Core.Playback
     /// <summary>
     /// Provides a playlist for a collection of audio files.
     /// </summary>
-    public class Playlist : IEnumerator<string>
+    public class Playlist : IEnumerator<PlaylistFile>
     {
         /// <summary>
         /// Random number generator.
@@ -32,7 +32,7 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
         /// </summary>
-        public string Current => this.OrderedItems[this.CurrentIndex];
+        public PlaylistFile Current => this.OrderedItems[this.CurrentIndex];
 
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
@@ -57,12 +57,12 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets or sets the items; these are the ordered <see cref="OriginalItems"/>.
         /// </summary>
-        private string[] OrderedItems { get; set; }
+        private PlaylistFile[] OrderedItems { get; set; }
 
         /// <summary>
         /// Gets or sets the original items.
         /// </summary>
-        private string[] OriginalItems { get; set; }
+        private PlaylistFile[] OriginalItems { get; set; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -152,10 +152,10 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <param name="newFiles">The new files.</param>
         /// <returns><c>true</c> when the files were updated; otherwise <c>false</c>.</returns>
-        private bool TrySetFiles(string[] newFiles)
+        private bool TrySetFiles(PlaylistFile[] newFiles)
         {
-            newFiles = newFiles ?? new string[0];
-            if (this.OriginalItems?.SequenceEqual(newFiles) == true)
+            newFiles = newFiles ?? new PlaylistFile[0];
+            if (this.OriginalItems?.SequenceEqual(newFiles, new PlaylistFilePathComparer()) == true)
             {
                 return false;
             }

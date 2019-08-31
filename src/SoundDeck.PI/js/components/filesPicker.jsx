@@ -65,12 +65,7 @@ class FilesPicker extends React.Component {
 
         this.handleChange(value => {
             return files.reduce((seed, { name }) => {
-                const path = decodeURIComponent(name);
-
-                if (seed.indexOf(path) < 0) {
-                    seed.push(path);
-                }
-
+                seed.push({ path: decodeURIComponent(name) });
                 return seed;
             }, [...value]);
         });
@@ -114,7 +109,7 @@ class FilesPicker extends React.Component {
                     <div className="sdpi-item-label opacity-zero">&nbsp;</div>
                     <SortableList className="sdpi-item-value files-list"
                         enableSort={this.props.enableSort}
-                        items={this.state.value.map(path => path.replace(/^.*[\\\/]/, ''))}
+                        items={this.state.value.map(file => file.path.replace(/^.*[\\\/]/, ''))}
                         lockAxis="y"
                         onDelete={this.handleDelete}
                         onSortEnd={this.handleSortEnd}
