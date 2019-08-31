@@ -13,7 +13,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="deviceId">The device identifier.</param>
         /// <param name="playlist">The playlist.</param>
         /// <param name="normalizationProvider">The normalization provider.</param>
-        public PlayNextPlayer(string deviceId, Playlist playlist, INormalizationProvider normalizationProvider)
+        public PlayNextPlayer(string deviceId, IPlaylist playlist, INormalizationProvider normalizationProvider)
             : base(deviceId, playlist, normalizationProvider)
         {
             this.IsLooped = false;

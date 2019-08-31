@@ -2,13 +2,12 @@ namespace SoundDeck.Core.Playback
 {
     using System;
     using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>
     /// Provides a playlist for a collection of audio files.
     /// </summary>
-    public class Playlist : IEnumerator<PlaylistFile>
+    public class Playlist : IPlaylist
     {
         /// <summary>
         /// Random number generator.
@@ -42,7 +41,7 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets the number of items within the playlist.
         /// </summary>
-        public int Length => this.OrderedItems.Length;
+        public int Count => this.OrderedItems.Length;
 
         /// <summary>
         /// Gets or sets the playback order.

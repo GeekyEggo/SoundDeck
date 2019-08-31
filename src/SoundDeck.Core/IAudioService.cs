@@ -49,6 +49,6 @@ namespace SoundDeck.Core
         /// <param name="action">The action type.</param>
         /// <param name="playlist">The playlist.</param>
         /// <returns>The playlist player.</returns>
-        IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, Playlist playlist);
+        IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist);
     }
 }

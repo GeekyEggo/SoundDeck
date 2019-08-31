@@ -19,7 +19,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="deviceId">The device identifier.</param>
         /// <param name="playlist">The playlist.</param>
         /// <param name="normalizationProvider">The normalization provider.</param>
-        public PlaylistPlayer(string deviceId, Playlist playlist, INormalizationProvider normalizationProvider)
+        public PlaylistPlayer(string deviceId, IPlaylist playlist, INormalizationProvider normalizationProvider)
             : base(deviceId, normalizationProvider)
         {
             this.Playlist = playlist;
@@ -38,7 +38,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets or sets the playlist.
         /// </summary>
-        private Playlist Playlist { get; set; }
+        private IPlaylist Playlist { get; set; }
 
         /// <summary>
         /// Moves to the next item within the playlist, and plays it asynchronously; this may stop audio depending on the type of player.
@@ -46,7 +46,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <returns>The task of playing the item.</returns>
         public virtual Task NextAsync()
         {
-            if (this.Playlist.Length == 0)
+            if (this.Playlist.Count == 0)
             {
                 return Task.CompletedTask;
             }
