@@ -20,7 +20,7 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 ### ![Record Audio action icon](src/SoundDeck.Plugin/Images/RecordAudio/Action-Black.png) Record Audio
 
 ## Frequently Asked Questions
-An FAQ can be found [here](FAQ.md); for general queries, please context me on [![Twitter](https://i.imgur.com/wWzX9uB.png)Twitter](https://twitter.com/geekyeggo).
+Please see [Frequently Asked Questions](FAQ.md) for issues or requests; for general queries, please [contact me](https://twitter.com/geekyeggo) on ![Twitter](https://i.imgur.com/wWzX9uB.png) Twitter.
 
 ## Licence
 Sound Deck is licenced under [The MIT License (MIT)](LICENSE.md) and is not officially associated with Elgato or TC-Helicon Gaming.
