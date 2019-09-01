@@ -1,10 +1,10 @@
 [![Twitter icon](https://img.shields.io/badge/GeekyEggo--brightgreen?style=social&logo=twitter)](https://www.twitter.com/geekyeggo) [![version-icon]](https://github.com/GeekyEggo/SoundDeck) 
 
-# Sound Deck
+# ![Sound Deck logo](assets/sound-deck-large.png) Sound Deck
 
 Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control and capture on **any audio device**. Each of Sound Deck's actions allow you to choose which audio device they're associated with, meaning you can record one device, and play clips on another!
 
-[![goxlr](assets/elgato.png) Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + Sound Deck + [![goxlr](assets/goxlr.png) GoXLR](https://www.tc-helicon.com/broadcast) = :heart:
+[![goxlr](assets/elgato.png) Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [![goxlr](assets/goxlr.png) GoXLR](https://www.tc-helicon.com/broadcast) + ![Sound Deck](assets/sound-deck.png) Sound Deck = :heart:
 
 ## Contents
 
