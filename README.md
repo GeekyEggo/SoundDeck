@@ -20,22 +20,7 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 ### ![Record Audio action icon](src/SoundDeck.Plugin/Images/RecordAudio/Action-Black.png) Record Audio
 
 ## Frequently Asked Questions
-* [What operating systems are supported?](#)
-* [I see an exclamation mark when I press an action](#)
-* [Clicking the directory button doesn't do anything](#)
-* [Audio clips are really quiet](#)
-
-#### _What operating systems are supported?_
-Currently Sound Deck supports Windows 10, and requires [Microsoft .NET Framework](https://dotnet.microsoft.com/download/dotnet-framework) runtime.
-
-#### _I see an exclamation mark when I press an action_
-This indicates an error has occurred with the plugin; restarting the Stream Deck application usually resolve most errors. If the problem persists, please consider submitting an [issue](https://github.com/geekyeggo/sounddeck/issues), including any log files is really helpful. Logs can be found in `%APPDATA%\Elgato\StreamDeck\logs`, and will be named `com.geekyeggo.sounddeck#.log`.
-
-#### _Clicking the directory button doesn't do anything_
-The button _should_ open a dialog that lets you choose a folder; if it appears nothing has happened, the dialog might just be hiding behind the Stream Deck window.
-
-#### _Audio clips are really quiet_
-The volume of audio clips are currently normalized within Sound Deck; I intend to make this configurable within future releases; if you'd like to see this sooner, please let me know.
+An FAQ can be found [here](FAQ.md); for general queries, please context me on [![Twitter](https://i.imgur.com/wWzX9uB.png)Twitter](https://twitter.com/geekyeggo).
 
 ## Licence
 Sound Deck is licenced under [The MIT License (MIT)](LICENSE.md) and is not officially associated with Elgato or TC-Helicon Gaming.
