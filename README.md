@@ -6,8 +6,6 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 
 [![goxlr](assets/elgato.png)Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + Sound Deck + [![goxlr](assets/goxlr.png)GoXLR](https://www.tc-helicon.com/broadcast) = :heart:
 
-
-
 ## Contents
 1. [Actions](#actions)
    1. [Clip Audio](#-clip-audio)
@@ -17,9 +15,9 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 1. [Licence](#Licence)
 
 ## Actions
-### ![Clip Audio action icon](assets/ClipAudio.png) Clip Audio
-### ![Play Audio action icon](assets/PlayAudio.png) Play Audio
-### ![Record Audio action icon](assets/RecordAudio.png) Record Audio
+### ![Clip Audio action icon](assets/clip-audio.png) Clip Audio
+### ![Play Audio action icon](assets/play-audio.png) Play Audio
+### ![Record Audio action icon](assets/record-audio.png) Record Audio
 
 ## Frequently Asked Questions
 Please see [Frequently Asked Questions](FAQ.md) for issues or requests; for general queries, please [contact me](https://twitter.com/geekyeggo) on ![Twitter](https://i.imgur.com/wWzX9uB.png) Twitter.
