@@ -1,7 +1,9 @@
 {
     "name": "sounddeck",
     "version": "1.0.0",
-    "description": "Sound capturing, buffering, and sound deck for Elgato Stream Deck.",
+    "description": "An Elgato Stream Deck plugin that lets you capture and play audio, on any audio device.",
+    "author": "GeekyEggo",
+    "license": "MIT",
     "paths": {
         "debug": "bin\\Debug",
         "dist": "./dist/com.geekyeggo.sounddeck.sdPlugin",
@@ -22,22 +24,6 @@
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
         "stop": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo Stream Deck not running"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/GeekyEggo/SoundDeck.git"
-    },
-    "keywords": [
-        "elgato-stream-deck",
-        "audio",
-        "sound-deck",
-        "capture"
-    ],
-    "author": "GeekyEggo",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/GeekyEggo/SoundDeck/issues"
-    },
-    "homepage": "https://github.com/GeekyEggo/SoundDeck#readme",
     "devDependencies": {
         "@babel/core": "^7.4.5",
         "@babel/preset-react": "^7.0.0",
