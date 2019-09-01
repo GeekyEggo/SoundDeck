@@ -15,11 +15,23 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 1. [Licence](#Licence)
 
 ## Actions
-#### ![Clip Audio action icon](src/SoundDeck.Plugin/Images/ClipAudio/Action-Black.png) Clip Audio
-#### ![Play Audio action icon](src/SoundDeck.Plugin/Images/PlayAudio/Action-Black.png) Play Audio
-#### ![Record Audio action icon](src/SoundDeck.Plugin/Images/RecordAudio/Action-Black.png) Record Audio
+### ![Clip Audio action icon](src/SoundDeck.Plugin/Images/ClipAudio/Action-Black.png) Clip Audio
+### ![Play Audio action icon](src/SoundDeck.Plugin/Images/PlayAudio/Action-Black.png) Play Audio
+### ![Record Audio action icon](src/SoundDeck.Plugin/Images/RecordAudio/Action-Black.png) Record Audio
 
 ## Frequently Asked Questions
+* [What operating systems are supported?](#)
+* [I see an exclamation mark when I press an action](#)
+* [Clicking the directory button doesn't do anything](#)
+
+#### _What operating systems are supported?_
+Currently Sound Deck supports Windows 10.
+
+#### _I see an exclamation mark when I press an action_
+
+
+#### _Clicking the directory button doesn't do anything_
+The button _should_ open a dialog that lets you choose a folder; if it appears nothing has happened, the dialog might just be hiding behind the Stream Deck window.
 
 ## Licence
 Sound Deck is licenced under [The MIT License (MIT)](LICENSE.md) and is not officially associated with Elgato or TC-Helicon Gaming.
