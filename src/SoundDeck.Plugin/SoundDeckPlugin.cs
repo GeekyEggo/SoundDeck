@@ -13,6 +13,7 @@ using SharpDeck.Manifest;
     PropertyInspectorPath = "PI/index.html",
     Version = "1.0.0",
     Author = "GeekyEggo",
+    URL = "https://github.com/GeekyEggo/SoundDeck",
     WindowsMinimumVersion = "10")]
 
 namespace SoundDeck.Plugin
