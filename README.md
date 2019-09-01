@@ -1,4 +1,4 @@
-[![version-icon]](/) [![twitter-icon]](https://www.twitter.com/geekyeggo)
+[![version-icon]](https://github.com/GeekyEggo/SoundDeck) [![twitter-icon]](https://www.twitter.com/geekyeggo)
 
 # Sound Deck
 
