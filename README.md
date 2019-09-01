@@ -6,9 +6,9 @@ Sound Deck is an Elgato [Stream Deck](https://www.elgato.com/en/gaming/stream-de
 
 ## Contents
 1. Actions
-   1. Clip Audio
-   1. Play Audio
-   1. Record Audio
+   1. [Clip Audio](#-clip-audio)
+   1. [Play Audio](#-play-audio)
+   1. [Record Audio](#-record-audio)
 1. [Licence](#Licence)
 
 ## Actions
