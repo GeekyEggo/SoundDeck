@@ -1,6 +1,7 @@
-# Frequently Asked Questions
-If you have a general question about Sound Deck, please contact me on [![Twitter](https://i.imgur.com/wWzX9uB.png)Twitter](https://twitter.com/geekyeggo).
+[![Twitter icon](https://img.shields.io/badge/GeekyEggo--brightgreen?style=social&logo=twitter)](https://www.twitter.com/geekyeggo)
 
+# Frequently Asked Questions
+If you have a general question about Sound Deck, please [contact me](https://twitter.com/geekyeggo) on ![Twitter](https://i.imgur.com/wWzX9uB.png) Twitter.
 
 ## Contents
 * [What operating systems are supported?](#what-operating-systems-are-supported)
