@@ -1,6 +1,12 @@
 [![Twitter icon](https://img.shields.io/badge/GeekyEggo--brightgreen?style=social&logo=twitter)](https://www.twitter.com/geekyeggo) [![version-icon]](https://github.com/GeekyEggo/SoundDeck) 
 
-# ![Sound Deck logo](./assets/sound-deck.svg?s=30) Sound Deck
+# ![Sound Deck logo](./assets/sound-deck.svg) Sound Deck
+
+![Sound Deck logo](./assets/sound-deck.svg?sanitize=true)
+
+![Sound Deck logo](./assets/sound-deck.svg?sanitize=true)
+
+![Sound Deck logo](./assets/sound-deck.svg?sanitize=true&s=20)
 
 Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control and capture on **any audio device**. Each of Sound Deck's actions allow you to choose which audio device they're associated with, meaning you can record one device, and play clips on another!
 
