@@ -4,7 +4,7 @@
 
 Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control and capture on **any audio device**. Each of Sound Deck's actions allow you to choose which audio device they're associated with, meaning you can record one device, and play clips on another!
 
-[<img src="./assets/elgato.svg" width="16" alt="Stream Deck Logo" /> Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [<img src="./assets/go-xlr.svg" width="16" alt="GoXLR Logo" /> GoXLR](https://www.tc-helicon.com/broadcast) + <img src="./assets/sound-deck.svg" width="16" alt="Sound Deck Logo" /> Sound Deck = :heart:
+[<img src="./assets/elgato.svg" width="18" alt="Stream Deck Logo" /> Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [<img src="./assets/go-xlr.svg" width="18" alt="GoXLR Logo" /> GoXLR](https://www.tc-helicon.com/broadcast) + <img src="./assets/sound-deck.svg" width="18" alt="Sound Deck Logo" /> Sound Deck = :heart:
 
 ## Contents
 
@@ -27,7 +27,7 @@ Think Twitch clips, but audio only, simple! The Clip Audio action lets you recor
 <code>Encode&nbsp;to&nbsp;MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
 <code>Normalize&nbsp;Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
 
-## <img src="./assets/play-audio.svg" width="16" alt="Play Audio Action" /> Play Audio
+## <img src="./assets/play-audio.svg" width="18" alt="Play Audio Action" /> Play Audio
 
 Like the default _play audio_ action, but with more options and hype! The Play Audio action lets you play a list of audio files in the order you want, on the audio device you want. The action also lets you control how clips are played, via the `Action` option.
 
