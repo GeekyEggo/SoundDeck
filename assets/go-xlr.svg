@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.95 14.95">
+    <defs>
+        <style>rect { fill: #59B1B6; }</style>
+    </defs>
+    <title>GoXLR X Logo</title>
+    <rect x="10.61" y="-1.08" width="1.73" height="9.1" rx="0.86" transform="translate(5.81 -7.1) rotate(45)"/>
+    <rect x="2.6" y="6.93" width="1.73" height="9.1" rx="0.86" transform="translate(9.13 0.91) rotate(45)"/>
+    <rect x="10.61" y="6.93" width="1.73" height="9.1" rx="0.86" transform="translate(27.71 11.48) rotate(135)"/>
+    <rect x="2.6" y="-1.08" width="1.73" height="9.1" rx="0.86" transform="translate(8.37 3.47) rotate(135)"/>
+</svg>

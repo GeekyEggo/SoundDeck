@@ -4,7 +4,7 @@
 
 Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control and capture on **any audio device**. Each of Sound Deck's actions allow you to choose which audio device they're associated with, meaning you can record one device, and play clips on another!
 
-[![goxlr](assets/elgato.png) Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [![goxlr](assets/goxlr.png) GoXLR](https://www.tc-helicon.com/broadcast) + <img src="./assets/sound-deck.svg" width="16" alt="Sound Deck Logo" /> Sound Deck = :heart:
+[<img src="./assets/elgato.svg" width="16" alt="Stream Deck Logo" /> Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [<img src="./assets/go-xlr.svg" width="16" alt="GoXLR Logo" /> GoXLR](https://www.tc-helicon.com/broadcast) + <img src="./assets/sound-deck.svg" width="16" alt="Sound Deck Logo" /> Sound Deck = :heart:
 
 ## Contents
 
@@ -27,7 +27,7 @@ Think Twitch clips, but audio only, simple! The Clip Audio action lets you recor
 <code>Encode&nbsp;to&nbsp;MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
 <code>Normalize&nbsp;Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
 
-## ![Play Audio action icon](assets/play-audio.png) Play Audio
+## <img src="./assets/play-audio.svg" width="16" alt="Play Audio Action" /> Play Audio
 
 Like the default _play audio_ action, but with more options and hype! The Play Audio action lets you play a list of audio files in the order you want, on the audio device you want. The action also lets you control how clips are played, via the `Action` option.
 
@@ -38,7 +38,7 @@ Like the default _play audio_ action, but with more options and hype! The Play A
 `Order` | Defines the order the audio files are played in; can be either `Random` or `Sequential`. Please note, when `Sequential` is selected, files can be re-ordered manually.
 `Files` | The playlist of audio files to play. Files can be added by selecting <code>Add&nbsp;file...</code>, removed by pressing the X, or re-ordered (when `Order` is `Sequential`) by dragging the bullet point up/down.
 
-## ![Record Audio action icon](assets/record-audio.png) Record Audio
+## <img src="./assets/record-audio.svg" width="20" alt="Record Audio Action" /> Record Audio
 
 The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the <code>Output&nbsp;Path</code> as an MP3/WAV file.
 
@@ -51,7 +51,7 @@ The Record Audio action lets you record an audio device for any duration of time
 
 ## Frequently Asked Questions
 
-Please see [Frequently Asked Questions](FAQ.md) for issues or requests; for general queries, please [contact me](https://twitter.com/geekyeggo) on ![Twitter](https://i.imgur.com/wWzX9uB.png) Twitter.
+Please see [Frequently Asked Questions](FAQ.md) for issues or requests; for general queries, please [contact me](https://twitter.com/geekyeggo) on <img src="./assets/twitter.svg" width="18" alt="Twitter" /> Twitter.
 
 ## Licence
 
