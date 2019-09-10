@@ -15,7 +15,7 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 1. [F.A.Q.](#frequently-asked-questions)
 1. [Licence](#Licence)
 
-## ![Clip Audio action icon](assets/clip-audio.png) Clip Audio
+## <img src="./assets/clip.svg" width="20" alt="Clip Audio Action" /> Clip Audio
 
 Think Twitch clips, but audio only, simple! The Clip Audio action lets you record the last _x_ seconds of audio for any of your computer's audio devices. After activating the action, the audio is clipped, and saved to the <code>Output&nbsp;Path</code> as an MP3/WAV file. Tip: this works great for recording silly moments in party chat!
 
@@ -27,7 +27,7 @@ Think Twitch clips, but audio only, simple! The Clip Audio action lets you recor
 <code>Encode&nbsp;to&nbsp;MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
 <code>Normalize&nbsp;Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
 
-## <img src="./assets/play-audio.svg" width="18" alt="Play Audio Action" /> Play Audio
+## <img src="./assets/play.svg" width="18" alt="Play Audio Action" /> Play Audio
 
 Like the default _play audio_ action, but with more options and hype! The Play Audio action lets you play a list of audio files in the order you want, on the audio device you want. The action also lets you control how clips are played, via the `Action` option.
 
@@ -38,7 +38,7 @@ Like the default _play audio_ action, but with more options and hype! The Play A
 `Order` | Defines the order the audio files are played in; can be either `Random` or `Sequential`. Please note, when `Sequential` is selected, files can be re-ordered manually.
 `Files` | The playlist of audio files to play. Files can be added by selecting <code>Add&nbsp;file...</code>, removed by pressing the X, or re-ordered (when `Order` is `Sequential`) by dragging the bullet point up/down.
 
-## <img src="./assets/record-audio.svg" width="20" alt="Record Audio Action" /> Record Audio
+## <img src="./assets/record.svg" width="20" alt="Record Audio Action" /> Record Audio
 
 The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the <code>Output&nbsp;Path</code> as an MP3/WAV file.
 
