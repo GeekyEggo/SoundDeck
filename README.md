@@ -54,6 +54,8 @@ The Record Audio action lets you record an audio device for any duration of time
 
 The Stop Audio action lets you quickly and easily stop all audio currently being played through Sound Deck. This can be particularly useful if a Play Audio action is being played from a Multi-Action.
 
+*There are no options associated with the Stop Audio action.*
+
 ## Frequently Asked Questions
 
 Please see [Frequently Asked Questions](FAQ.md) for issues or requests; for general queries, please [contact me](https://twitter.com/geekyeggo) on <img src="./assets/twitter.svg" width="18" alt="Twitter" /> Twitter.
