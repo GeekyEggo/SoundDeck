@@ -12,20 +12,21 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
    1. [Clip Audio](#-clip-audio)
    1. [Play Audio](#-play-audio)
    1. [Record Audio](#-record-audio)
+   1. [Stop Audio](#-stop-audio)
 1. [F.A.Q.](#frequently-asked-questions)
 1. [Licence](#Licence)
 
 ## <img src="./assets/clip.svg" width="20" alt="Clip Audio Action" /> Clip Audio
 
-Think Twitch clips, but audio only, simple! The Clip Audio action lets you record the last _x_ seconds of audio for any of your computer's audio devices. After activating the action, the audio is clipped, and saved to the <code>Output&nbsp;Path</code> as an MP3/WAV file. Tip: this works great for recording silly moments in party chat!
+Think Twitch clips, but audio only, simple! The Clip Audio action lets you record the last _x_ seconds of audio for any of your computer's audio devices. After activating the action, the audio is clipped, and saved to the <code>Output Path</code> as an MP3/WAV file. Tip: this works great for recording silly moments in party chat!
 
 | Option | Description |
 --- | ---
-<code>Audio&nbsp;Device</code> | The audio device to create clips from; this can be either an input (e.g. microphone) or output (e.g. speaker, headphone, etc.) device connected to your computer.
+<code>Audio Device</code> | The audio device to create clips from; this can be either an input (e.g. microphone) or output (e.g. speaker, headphone, etc.) device connected to your computer.
 `Duration` | The length of the audio clip; can be 15 / 30 / 60 / 90 / 120 seconds.
-<code>Output&nbsp;Path</code> | A directory path where audio clips should be saved to.
-<code>Encode&nbsp;to&nbsp;MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
-<code>Normalize&nbsp;Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
+<code>Output Path</code> | A directory path where audio clips should be saved to.
+<code>Encode to MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
+<code>Normalize Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
 
 ## <img src="./assets/play.svg" width="18" alt="Play Audio Action" /> Play Audio
 
@@ -33,21 +34,25 @@ Like the default _play audio_ action, but with more options and hype! The Play A
 
 | Option | Description |
 --- | ---
-<code>Audio&nbsp;Device</code> | The audio device to play clips on; this can be any output (e.g. speaker, headphone, etc.) device connected to your computer.
+<code>Audio Device</code> | The audio device to play clips on; this can be any output (e.g. speaker, headphone, etc.) device connected to your computer.
 `Action` | Tells the plugin what to do when the button is pressed.<br />`Play / Next` - Plays the next clip; stopping the current clip if there is one.<br />`Play / Stop` - Plays the next clip when one isn't already playing; otherwise the current clip is stopped.<br />`Loop / Stop` - Loops the next clip when one isn't already playing; otherwise the current clip is stopped
 `Order` | Defines the order the audio files are played in; can be either `Random` or `Sequential`. Please note, when `Sequential` is selected, files can be re-ordered manually.
-`Files` | The playlist of audio files to play. Files can be added by selecting <code>Add&nbsp;file...</code>, removed by pressing the X, or re-ordered (when `Order` is `Sequential`) by dragging the bullet point up/down.
+`Files` | The playlist of audio files to play. Files can be added by selecting <code>Add file...</code>, removed by pressing the X, or re-ordered (when `Order` is `Sequential`) by dragging the bullet point up/down.
 
 ## <img src="./assets/record.svg" width="20" alt="Record Audio Action" /> Record Audio
 
-The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the <code>Output&nbsp;Path</code> as an MP3/WAV file.
+The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the <code>Output Path</code> as an MP3/WAV file.
 
 | Option | Description |
 --- | ---
-<code>Audio&nbsp;Device</code> | The audio device to listen to; this can be either an input (e.g. microphone) or output (e.g. speaker, headphone, etc.) device connected to your computer.
-<code>Output&nbsp;Path</code> | A directory path where audio clips should be saved to.
-<code>Encode&nbsp;to&nbsp;MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
-<code>Normalize&nbsp;Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
+<code>Audio Device</code> | The audio device to listen to; this can be either an input (e.g. microphone) or output (e.g. speaker, headphone, etc.) device connected to your computer.
+<code>Output Path</code> | A directory path where audio clips should be saved to.
+<code>Encode to MP3</code> | When checked, audio clips are encoded to MP3; otherwise audio clips are saved as WAV.
+<code>Normalize Volume</code> | When checked, volume levels within the audio clip are normalized. This can reduce excessive peeking, but might reduce overall volume in some scenarios.
+
+## <img src="./assets/stop.svg" width="20" alt="Record Audio Action" /> Stop Audio
+
+The Stop Audio action lets you quickly and easily stop all audio currently being played through Sound Deck. This can be particularly useful if a Play Audio action is being played from a Multi-Action.
 
 ## Frequently Asked Questions
 
