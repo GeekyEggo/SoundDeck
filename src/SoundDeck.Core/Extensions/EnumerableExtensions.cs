@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Extensions
+namespace SoundDeck.Core.Extensions
 {
     using System;
     using System.Collections.Generic;
@@ -8,6 +8,15 @@
     /// </summary>
     public static class EnumerableExtensions
     {
+        /// <summary>
+        /// Iterates over each item within the <paramref name="source"/> an executes the <paramref name="action"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of items within the source.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="action">The action.</param>
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+            => source.ForEach((item, _) => action(item));
+
         /// <summary>
         /// Iterates over each item within the <paramref name="source"/> an executes the <paramref name="action"/>.
         /// </summary>

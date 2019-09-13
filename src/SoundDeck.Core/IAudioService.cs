@@ -50,5 +50,10 @@ namespace SoundDeck.Core
         /// <param name="playlist">The playlist.</param>
         /// <returns>The playlist player.</returns>
         IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist);
+
+        /// <summary>
+        /// Stops all <see cref="IAudioPlayer"/> associated with this instance.
+        /// </summary>
+        void StopAll();
     }
 }

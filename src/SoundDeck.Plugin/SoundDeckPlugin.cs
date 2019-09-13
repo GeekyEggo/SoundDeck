@@ -92,6 +92,7 @@ namespace SoundDeck.Plugin
                     client.RegisterAction(ClipAudio.UUID, args => this.Provider.GetInstance<ClipAudio>(args));
                     client.RegisterAction(PlayAudio.UUID, args => this.Provider.GetInstance<PlayAudio>(args));
                     client.RegisterAction(RecordAudio.UUID, args => this.Provider.GetInstance<RecordAudio>(args));
+                    client.RegisterAction(StopAudio.UUID, _ => this.Provider.GetInstance<StopAudio>());
 
                     // register events
                     client.DeviceDidConnect += this.Client_DeviceDidConnect;

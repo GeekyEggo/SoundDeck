@@ -38,6 +38,11 @@ namespace SoundDeck.Core.Playback.Players
         }
 
         /// <summary>
+        /// Occurs when the audio player is disposed.
+        /// </summary>
+        public event EventHandler Disposed;
+
+        /// <summary>
         /// Occurs when the time of the current audio being played, changed.
         /// </summary>
         public event EventHandler<PlaybackTimeEventArgs> TimeChanged;
@@ -153,6 +158,11 @@ namespace SoundDeck.Core.Playback.Players
             this.InternalCancellationTokenSource?.Cancel();
             if (dispose)
             {
+                if (!this.IsDisposed)
+                {
+                    this.Disposed?.Invoke(this, EventArgs.Empty);
+                }
+
                 this.IsDisposed = true;
             }
         }
