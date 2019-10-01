@@ -9,6 +9,11 @@ namespace SoundDeck.Core.Playback
     public interface IAudioPlayer : IDisposable
     {
         /// <summary>
+        /// Occurs when the audio player is disposed.
+        /// </summary>
+        event EventHandler Disposed;
+
+        /// <summary>
         /// Occurs when the time of the current audio being played, changed.
         /// </summary>
         event EventHandler<PlaybackTimeEventArgs> TimeChanged;
