@@ -73,6 +73,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\SharpDeck\src\SharpDeck\SharpDeck.csproj">
+      <Project>{41b4ca9f-a603-413d-9632-d7366c069eae}</Project>
+      <Name>SharpDeck</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj">
       <Project>{4336c68f-d7f1-4a1a-a87a-aeec27dc6aca}</Project>
       <Name>SoundDeck.Core</Name>

@@ -1,5 +1,8 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
@@ -9,9 +12,6 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core.Enums;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Settings;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
@@ -66,6 +66,18 @@ namespace SoundDeck.Plugin.Actions
                 .Select(d => new Option(d.FriendlyName, d.Id));
 
             return Task.FromResult(new OptionsPayload(options));
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            this.Player?.Dispose();
+            this.SetTitleAsync();
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

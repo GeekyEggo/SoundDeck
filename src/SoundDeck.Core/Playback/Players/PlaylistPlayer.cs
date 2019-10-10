@@ -80,8 +80,8 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool dispose)
         {
-            this._syncRoot?.Dispose();
             base.Dispose(dispose);
+            this._syncRoot?.Dispose();
         }
     }
 }

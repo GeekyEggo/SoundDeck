@@ -76,7 +76,10 @@ namespace SoundDeck.Core.Playback.Players
                 if (!value.Equals(this._time))
                 {
                     this._time = value;
-                    this.TimeChanged?.Invoke(this, value);
+                    if (!this.IsDisposed)
+                    {
+                        this.TimeChanged?.Invoke(this, value);
+                    }
                 }
             }
         }
@@ -201,6 +204,8 @@ namespace SoundDeck.Core.Playback.Players
 
                 do
                 {
+                    this.InternalCancellationTokenSource.Token.Register(player.Stop);
+
                     // play the audio clip
                     reader.Seek(0, SeekOrigin.Begin);
                     player.Play();

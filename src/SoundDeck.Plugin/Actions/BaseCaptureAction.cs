@@ -12,8 +12,6 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Plugin.Models.Settings;
     using SoundDeck.Plugin.Models.UI;
 
-    //using System.Windows.Forms;
-
     /// <summary>
     /// Provides a base class for capturing audio.
     /// </summary>
@@ -92,6 +90,16 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="settings">The settings.</param>
         /// <returns>The capture device.</returns>
         protected abstract TCaptureDevice GetCaptureDevice(TSettings settings);
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            this.CaptureDevice?.Dispose();
+            base.Dispose(disposing);
+        }
 
         /// <summary>
         /// Handles the <see cref="StreamDeckActionEventReceiver.DidReceiveSettings" /> event.
