@@ -104,4 +104,8 @@ cd ../.. &amp;&amp; npm run debug:plugin</PostBuildEvent>
     <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll"</PostBuildEvent>
     <PreBuildEvent>cd ../.. &amp;&amp; npm stop</PreBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll" -n "$(TargetDir)..\..\..\..\package.json"
+cd ../.. &amp;&amp; npm run debug:plugin</PostBuildEvent>
+  </PropertyGroup>
 </Project>

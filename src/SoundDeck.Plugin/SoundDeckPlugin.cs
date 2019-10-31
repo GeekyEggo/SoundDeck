@@ -11,7 +11,6 @@ using SharpDeck.Manifest;
     CodePath = "SoundDeck.exe",
     Icon = "Images/SoundDeck/Icon",
     PropertyInspectorPath = "PI/index.html",
-    Version = "1.1.0",
     Author = "GeekyEggo",
     URL = "https://github.com/GeekyEggo/SoundDeck",
     WindowsMinimumVersion = "10")]
