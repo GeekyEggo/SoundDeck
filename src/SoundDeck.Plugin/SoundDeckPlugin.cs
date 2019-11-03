@@ -133,17 +133,12 @@ namespace SoundDeck.Plugin
         /// </summary>
         /// <param name="client">The client.</param>
         /// <returns>The event handler</returns>
-        private EventHandler<StreamDeckClientErrorEventArgs> GetErrorEventHandler(StreamDeckClient client)
+        private EventHandler<StreamDeckConnectionErrorEventArgs> GetErrorEventHandler(StreamDeckClient client)
         {
             return async (sender, args) =>
             {
                 await client.LogMessageAsync(args.Exception.ToString());
-                await client.LogMessageAsync(args.WebSocketMessage);
-
-                if (!string.IsNullOrWhiteSpace(args.Context))
-                {
-                    await client.ShowAlertAsync(args.Context);
-                }
+                await client.LogMessageAsync(args.Message);
             };
         }
     }
