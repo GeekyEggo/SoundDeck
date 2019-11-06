@@ -121,5 +121,16 @@ namespace SoundDeck.Plugin.Actions
                 this.CaptureDevice = this.GetCaptureDevice(settings);
             }
         }
+
+        /// <summary>
+        /// Occurs when this instance is initialized.
+        /// </summary>
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="settings">The settings.</param>
+        protected override void OnInit(ActionEventArgs<AppearancePayload> args, TSettings settings)
+        {
+            base.OnInit(args, settings);
+            this.CaptureDevice = this.GetCaptureDevice(settings);
+        }
     }
 }

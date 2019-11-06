@@ -30,9 +30,8 @@ namespace SoundDeck.Plugin.Windows
                 Debugger.Launch();
 #endif
 
-                var provider = this.GetServiceProvider();
-                var plugin = new SoundDeckPlugin(provider);
-                _ = plugin.RunAsync(e.Args).ConfigureAwait(false);
+                _ = SoundDeckPlugin.RunAsync(e.Args, this.GetServiceProvider())
+                    .ConfigureAwait(false);
             }
         }
 

@@ -30,13 +30,9 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="audioService">The audio service.</param>
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public PlayAudio(IAudioService audioService, ActionEventArgs<AppearancePayload> args)
+        public PlayAudio(IAudioService audioService)
         {
             this.AudioService = audioService;
-
-            var settings = args.Payload.GetSettings<PlayAudioSettings>();
-            this.Playlist = new Playlist(settings);
-            this.SetPlayer(settings);
         }
 
         /// <summary>
@@ -50,9 +46,9 @@ namespace SoundDeck.Plugin.Actions
         private IPlaylistPlayer Player { get; set; }
 
         /// <summary>
-        /// Gets the playlist.
+        /// Gets or sets the playlist.
         /// </summary>
-        private Playlist Playlist { get; }
+        private Playlist Playlist { get; set; }
 
         /// <summary>
         /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
@@ -92,6 +88,19 @@ namespace SoundDeck.Plugin.Actions
             this.Playlist.SetOptions(settings);
 
             return base.OnDidReceiveSettings(args, settings);
+        }
+
+        /// <summary>
+        /// Occurs when this instance is initialized.
+        /// </summary>
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="settings">The settings.</param>
+        protected override void OnInit(ActionEventArgs<AppearancePayload> args, PlayAudioSettings settings)
+        {
+            base.OnInit(args, settings);
+
+            this.Playlist = new Playlist(settings);
+            this.SetPlayer(settings);
         }
 
         /// <summary>

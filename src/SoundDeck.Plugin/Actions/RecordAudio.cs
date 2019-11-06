@@ -32,10 +32,9 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="audioService">The audio service.</param>
         /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
         /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public RecordAudio(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider, ActionEventArgs<AppearancePayload> args)
+        public RecordAudio(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
             : base(audioService, folderBrowserDialogProvider)
         {
-            this.CaptureDevice = this.GetCaptureDevice(args.Payload.GetSettings<RecordAudioSettings>());
         }
 
         /// <summary>
