@@ -67,6 +67,11 @@ namespace SoundDeck.Plugin.Actions
         {
             try
             {
+                if (this.CaptureDevice == null)
+                {
+                    throw new NullReferenceException($"Unable to capture audio for {args.Context}; the capture device is null.");
+                }
+
                 var settings = args.Payload.GetSettings<ClipAudioSettings>();
                 if (this.CaptureDevice != null)
                 {

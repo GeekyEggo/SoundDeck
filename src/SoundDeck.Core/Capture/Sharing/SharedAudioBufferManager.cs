@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture.Sharing
+namespace SoundDeck.Core.Capture.Sharing
 {
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
@@ -96,6 +96,11 @@
             if (device == null)
             {
                 throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
+            }
+
+            if (device.State != DeviceState.Active)
+            {
+                throw new InvalidOperationException($"The chosen device is not active: {device.DeviceFriendlyName} ({deviceId})");
             }
 
             return new AudioBuffer(device, bufferDuration, this.Logger);

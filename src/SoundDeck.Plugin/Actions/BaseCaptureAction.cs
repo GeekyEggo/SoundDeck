@@ -1,5 +1,6 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using SharpDeck;
@@ -118,7 +119,7 @@ namespace SoundDeck.Plugin.Actions
 
             if (this.CaptureDevice == null)
             {
-                this.CaptureDevice = this.GetCaptureDevice(settings);
+                this.CaptureDevice = this.TryGetCaptureDevice(settings);
             }
         }
 
@@ -130,7 +131,27 @@ namespace SoundDeck.Plugin.Actions
         protected override void OnInit(ActionEventArgs<AppearancePayload> args, TSettings settings)
         {
             base.OnInit(args, settings);
-            this.CaptureDevice = this.GetCaptureDevice(settings);
+            this.CaptureDevice = this.TryGetCaptureDevice(settings);
+        }
+
+        /// <summary>
+        /// Attempts to get the capture device; otherwise logs the exception and shows an error on the Stream Deck.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The capture device; otherwise <c>false</c>.</returns>
+        private TCaptureDevice TryGetCaptureDevice(TSettings settings)
+        {
+            try
+            {
+                return this.GetCaptureDevice(settings);
+            }
+            catch (Exception ex)
+            {
+                _ = this.StreamDeck.LogMessageAsync(ex.Message);
+                _ = this.ShowAlertAsync();
+            }
+
+            return null;
         }
     }
 }
