@@ -21,16 +21,16 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioRecorder" /> class.
         /// </summary>
-        /// <param name="device">The device.</param>
-        public AudioRecorder(MMDevice device)
+        /// <param name="deviceId">The device identifier.</param>
+        public AudioRecorder(string deviceId)
         {
-            this.Device = device;
+            this.DeviceId = deviceId;
         }
 
         /// <summary>
         /// Gets the audio device identifier.
         /// </summary>
-        public string DeviceId => this.Device.ID;
+        public string DeviceId { get; }
 
         /// <summary>
         /// Gets or sets the settings.
@@ -46,11 +46,6 @@ namespace SoundDeck.Core.Capture
         /// The capturing completion source.
         /// </summary>
         private TaskCompletionSource<bool> CapturingCompletionSource;
-
-        /// <summary>
-        /// Gets the device.
-        /// </summary>
-        private MMDevice Device { get; }
 
         /// <summary>
         /// Gets or sets the file writer.
@@ -104,7 +99,8 @@ namespace SoundDeck.Core.Capture
                 }
 
                 // set the capture information
-                this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+                var device = this.GetDevice();
+                this.Capture = device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
                 this.Capture.DataAvailable += this.Capture_DataAvailable;
                 this.Capture.RecordingStopped += this.Capture_RecordingStopped;
 
@@ -163,5 +159,17 @@ namespace SoundDeck.Core.Capture
         /// <param name="e">The <see cref="StoppedEventArgs"/> instance containing the event data.</param>
         private void Capture_RecordingStopped(object sender, StoppedEventArgs e)
             => this.Dispose(false);
+
+        /// <summary>
+        /// Gets the device associated with the audio recorder.
+        /// </summary>
+        /// <returns>The device.</returns>
+        private MMDevice GetDevice()
+        {
+            using (var enumerator = new MMDeviceEnumerator())
+            {
+                return enumerator.GetDevice(this.DeviceId);
+            }
+        }
     }
 }

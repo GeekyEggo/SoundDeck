@@ -91,7 +91,7 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio recorder.</returns>
         public IAudioRecorder GetAudioRecorder(string deviceId)
-            => new AudioRecorder(new MMDeviceEnumerator().GetDevice(deviceId));
+            => new AudioRecorder(deviceId);
 
         /// <summary>
         /// Gets the playlist player for the associated playlist player action type.
