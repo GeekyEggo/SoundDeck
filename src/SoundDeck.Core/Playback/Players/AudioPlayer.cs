@@ -222,6 +222,8 @@ namespace SoundDeck.Core.Playback.Players
                     player.Stop();
                     this.State = PlaybackStateType.Stopped;
                 } while (this.IsLooped && this.IsPlayableState);
+
+                this.TimeChanged?.Invoke(this, new PlaybackTimeEventArgs(TimeSpan.Zero, TimeSpan.Zero));
             }
         }
     }
