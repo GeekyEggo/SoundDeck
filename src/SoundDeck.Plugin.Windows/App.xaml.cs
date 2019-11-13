@@ -30,7 +30,7 @@ namespace SoundDeck.Plugin.Windows
                 Debugger.Launch();
 #endif
 
-                _ = SoundDeckPlugin.RunAsync(e.Args, this.GetServiceProvider());
+                _ = SoundDeckPlugin.RunAsync(this.GetServiceProvider());
             }
         }
 

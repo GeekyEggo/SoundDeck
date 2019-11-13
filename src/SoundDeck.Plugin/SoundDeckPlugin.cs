@@ -47,7 +47,7 @@ namespace SoundDeck.Plugin
         /// <param name="args">The arguments supplied by the console or entry point.</param>
         /// <param name="provider">The service provider.</param>
         /// <returns>The task of running the Sound Deck.</returns>
-        public static async Task RunAsync(string[] args, IServiceProvider provider)
+        public static async Task RunAsync(IServiceProvider provider)
         {
             AudioService = provider.GetRequiredService<IAudioService>();
 
