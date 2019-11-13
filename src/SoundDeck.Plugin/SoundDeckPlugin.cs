@@ -51,7 +51,7 @@ namespace SoundDeck.Plugin
         {
             AudioService = provider.GetRequiredService<IAudioService>();
 
-            await StreamDeckClient.RunAsync(provider: provider, setup: client =>
+            await StreamDeckPlugin.RunAsync(provider: provider, setup: client =>
             {
                 client.DeviceDidConnect += Client_DeviceDidConnect;
                 client.Error += Client_Error;
