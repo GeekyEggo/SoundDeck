@@ -87,7 +87,6 @@ namespace SoundDeck.Plugin.Actions
 
                     case RecordAudioState.STOP:
                         await this.CaptureDevice.StopAsync();
-                        await this.ShowOkAsync();
                         break;
                 }
             }
