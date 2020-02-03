@@ -18,11 +18,11 @@ using SharpDeck.Manifest;
 namespace SoundDeck.Plugin
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Exceptions;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.Settings;
 
@@ -37,9 +37,9 @@ namespace SoundDeck.Plugin
         private static IAudioService AudioService { get; set; }
 
         /// <summary>
-        /// Gets or sets the Stream Deck client.
+        /// Gets or sets the connection.
         /// </summary>
-        private static IStreamDeckClient Client { get; set; }
+        private static IStreamDeckConnection Connection { get; set; }
 
         /// <summary>
         /// Runs the Sound Deck plugin asynchronously.
@@ -47,15 +47,14 @@ namespace SoundDeck.Plugin
         /// <param name="args">The arguments supplied by the console or entry point.</param>
         /// <param name="provider">The service provider.</param>
         /// <returns>The task of running the Sound Deck.</returns>
-        public static async Task RunAsync(IServiceProvider provider)
+        public static Task RunAsync(IServiceProvider provider)
         {
             AudioService = provider.GetRequiredService<IAudioService>();
 
-            await StreamDeckPlugin.RunAsync(provider: provider, setup: client =>
-            {
-                client.DeviceDidConnect += Client_DeviceDidConnect;
-                client.Error += Client_Error;
-            });
+            return StreamDeckPlugin.Create()
+                .WithServiceProvider(provider)
+                .OnSetup(conn => conn.DeviceDidConnect += Client_DeviceDidConnect)
+                .RunAsync(CancellationToken.None);
         }
 
         /// <summary>
@@ -65,10 +64,10 @@ namespace SoundDeck.Plugin
         /// <param name="e">The <see cref="DeviceConnectEventArgs"/> instance containing the event data.</param>
         private static void Client_DeviceDidConnect(object sender, DeviceConnectEventArgs e)
         {
-            if (sender is StreamDeckClient client)
+            if (sender is IStreamDeckConnection connection)
             {
-                Client = client;
-                client.DeviceDidConnect -= Client_DeviceDidConnect;
+                Connection = connection;
+                connection.DeviceDidConnect -= Client_DeviceDidConnect;
 
                 // set the global settings, and update them if the default playback device changes
                 UpdateGlobalSettings();
@@ -82,18 +81,7 @@ namespace SoundDeck.Plugin
         private static async void UpdateGlobalSettings()
         {
             var settings = new PluginSettings(AudioService.Devices.DefaultPlaybackDevice?.Id);
-            await Client.SetGlobalSettingsAsync(settings).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Handles the <see cref="IStreamDeckClient.Error"/> event of the main Stream Deck client.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="StreamDeckConnectionErrorEventArgs"/> instance containing the event data.</param>
-        private static async void Client_Error(IStreamDeckClient sender, StreamDeckConnectionErrorEventArgs e)
-        {
-            await sender.LogMessageAsync(e.Exception.ToString());
-            await sender.LogMessageAsync(e.Message);
+            await Connection.SetGlobalSettingsAsync(settings).ConfigureAwait(false);
         }
     }
 }
