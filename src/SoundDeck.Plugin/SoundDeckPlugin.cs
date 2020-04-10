@@ -53,12 +53,29 @@ namespace SoundDeck.Plugin
 
             return StreamDeckPlugin.Create()
                 .WithServiceProvider(provider)
-                .OnSetup(conn => conn.DeviceDidConnect += Client_DeviceDidConnect)
+                .OnSetup(conn =>
+                {
+                    conn.DeviceDidConnect += Client_DeviceDidConnect;
+                    conn.SystemDidWakeUp += Client_SystemDidWakeUp;
+                })
                 .RunAsync(CancellationToken.None);
         }
 
         /// <summary>
-        /// Handles the <see cref="IStreamDeckClient.DeviceDidConnect"/> event of the main Stream Deck client.
+        /// Handles the <see cref="IStreamDeckConnection.SystemDidWakeUp"/> event on the main Stream Deck connection.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="StreamDeckEventArgs"/> instance containing the event data.</param>
+        private static void Client_SystemDidWakeUp(object sender, StreamDeckEventArgs e)
+        {
+            foreach (var audioBuffer in AudioService.GetAudioBuffers())
+            {
+                audioBuffer.Restart();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IStreamDeckConnection.DeviceDidConnect"/> event of the main Stream Deck connection.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="DeviceConnectEventArgs"/> instance containing the event data.</param>

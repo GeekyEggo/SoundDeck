@@ -1,17 +1,23 @@
 namespace SoundDeck.Core.Capture
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;
-    using System;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an audio buffer designed to capture and save audio data.
     /// </summary>
     public sealed class AudioBuffer : IAudioBuffer
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioBuffer" /> class.
         /// </summary>
@@ -20,14 +26,11 @@ namespace SoundDeck.Core.Capture
         /// <param name="logger">The logger.</param>
         public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger logger = null)
         {
-            this.DeviceId = device.ID;
+            this.Device = device;
             this.Chunks = new ChunkCollection(bufferDuration, logger);
             this.Logger = logger;
 
-            // initialize the capture
-            this.Capture = device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
-            this.Capture.DataAvailable += this.Capture_DataAvailable;
-            this.Capture.StartRecording();
+            this.StartRecording();
         }
 
         /// <summary>
@@ -42,17 +45,22 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Gets the audio device identifier.
         /// </summary>
-        public string DeviceId { get; }
+        public string DeviceId => this.Device.ID;
 
         /// <summary>
-        /// Gets the audio capturer.
+        /// Gets or sets the audio capturer.
         /// </summary>
-        private WasapiCapture Capture { get; }
+        private WasapiCapture Capture { get; set; }
 
         /// <summary>
         /// Gets the chunks of captured audio data.
         /// </summary>
         private IChunkCollection Chunks { get; }
+
+        /// <summary>
+        /// Gets the underlying audio device.
+        /// </summary>
+        private MMDevice Device { get; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -71,11 +79,20 @@ namespace SoundDeck.Core.Capture
         {
             if (!this.IsDisposed)
             {
-                this.Capture?.StopRecording();
-                this.Capture?.Dispose();
-                this.Chunks?.Dispose();
+                try
+                {
+                    _syncRoot.Wait();
 
-                this.IsDisposed = true;
+                    this.Capture?.StopRecording();
+                    this.Capture?.Dispose();
+                    this.Chunks?.Dispose();
+
+                    this.IsDisposed = true;
+                }
+                finally
+                {
+                    _syncRoot.Release();
+                }
             }
         }
 
@@ -86,18 +103,53 @@ namespace SoundDeck.Core.Capture
         /// <returns>The file path.</returns>
         public async Task<string> SaveAsync(ISaveBufferSettings settings)
         {
-            // determine the name
-            var path = settings.GetPath();
-            var chunks = await this.Chunks.GetAsync(settings.Duration);
-
-            using (var writer = new ChunkFileWriter(path, this.Capture.WaveFormat, chunks))
+            try
             {
-                writer.Settings = settings;
-                await writer.SaveAsync();
-            }
+                await _syncRoot.WaitAsync();
 
-            this.Logger?.LogInformation("Audio capture saved: {0}", path);
-            return path;
+                // determine the name
+                var path = settings.GetPath();
+                var chunks = await this.Chunks.GetAsync(settings.Duration);
+
+                using (var writer = new ChunkFileWriter(path, this.Capture.WaveFormat, chunks))
+                {
+                    writer.Settings = settings;
+                    await writer.SaveAsync();
+                }
+
+                this.Logger?.LogInformation("Audio capture saved: {0}", path);
+                return path;
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
+        }
+
+        /// <summary>
+        /// Restarts the audio buffer.
+        /// </summary>
+        public void Restart()
+        {
+            try
+            {
+                _syncRoot.Wait();
+
+                // clear the previous capture
+                if (this.Capture != null)
+                {
+                    this.Capture.DataAvailable -= this.Capture_DataAvailable;
+                    this.Capture.StopRecording();
+                    this.Capture.Dispose();
+                }
+
+                // start recording
+                this.StartRecording();
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
 
         /// <summary>
@@ -109,6 +161,16 @@ namespace SoundDeck.Core.Capture
         {
             var chunk = new Chunk(e);
             await this.Chunks.AddAsync(chunk);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="AudioBuffer.Capture"/> and starts recording.
+        /// </summary>
+        private void StartRecording()
+        {
+            this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+            this.Capture.DataAvailable += this.Capture_DataAvailable;
+            this.Capture.StartRecording();
         }
     }
 }

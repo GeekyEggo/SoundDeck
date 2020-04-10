@@ -68,6 +68,12 @@ namespace SoundDeck.Core.Capture.Sharing
         }
 
         /// <summary>
+        /// Restarts the audio buffer.
+        /// </summary>
+        public void Restart()
+            => this.AudioBuffer.Restart();
+
+        /// <summary>
         /// Saves an audio file of the current buffer.
         /// </summary>
         /// <param name="settings">The settings containing information about how, and where to save the capture.</param>

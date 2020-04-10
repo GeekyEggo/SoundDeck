@@ -3,7 +3,6 @@ namespace SoundDeck.Core
     using System;
     using System.Collections.Generic;
     using Microsoft.Extensions.Logging;
-    using NAudio.CoreAudioApi;
     using NAudio.MediaFoundation;
     using NAudio.Wave;
     using SoundDeck.Core.Capture;
@@ -76,6 +75,13 @@ namespace SoundDeck.Core
         /// <returns>The audio buffer.</returns>
         public IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration)
             => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceId, clipDuration);
+
+        /// <summary>
+        /// Gets all active audio buffers.
+        /// </summary>
+        /// <returns>The audio buffers.</returns>
+        public IEnumerable<IAudioBuffer> GetAudioBuffers()
+            => this.SharedAudioBufferManager.GetAudioBuffers();
 
         /// <summary>
         /// Gets an audio player for the specified device identifier.

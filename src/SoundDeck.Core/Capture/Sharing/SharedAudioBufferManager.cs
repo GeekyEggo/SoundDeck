@@ -1,11 +1,11 @@
 namespace SoundDeck.Core.Capture.Sharing
 {
-    using Microsoft.Extensions.Logging;
-    using NAudio.CoreAudioApi;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using Microsoft.Extensions.Logging;
+    using NAudio.CoreAudioApi;
 
     /// <summary>
     /// Provides a manager for sharing <see cref="IAudioBuffer"/>.
@@ -48,6 +48,18 @@ namespace SoundDeck.Core.Capture.Sharing
 
             this.AudioBuffers.Clear();
             this.DeviceEnumerator.Dispose();
+        }
+
+        /// <summary>
+        /// Gets the audio buffers that are currently being managed.
+        /// </summary>
+        /// <returns>The audio buffers.</returns>
+        public IEnumerable<IAudioBuffer> GetAudioBuffers()
+        {
+            foreach (var sharedAudioBuffer in this.AudioBuffers.Values)
+            {
+                yield return sharedAudioBuffer.Parent;
+            }
         }
 
         /// <summary>

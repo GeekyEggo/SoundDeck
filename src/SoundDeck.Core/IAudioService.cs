@@ -1,6 +1,7 @@
 namespace SoundDeck.Core
 {
     using System;
+    using System.Collections.Generic;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
 
@@ -27,6 +28,12 @@ namespace SoundDeck.Core
         /// <param name="clipDuration">Duration of the clip.</param>
         /// <returns>The audio buffer.</returns>
         IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration);
+
+        /// <summary>
+        /// Gets all active audio buffers.
+        /// </summary>
+        /// <returns>The audio buffers.</returns>
+        IEnumerable<IAudioBuffer> GetAudioBuffers();
 
         /// <summary>
         /// Gets an audio player for the specified device identifier.

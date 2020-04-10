@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Capture.Sharing
+namespace SoundDeck.Core.Capture.Sharing
 {
     using System;
     using System.Collections.Generic;
@@ -114,7 +114,7 @@
                 }
             }
         }
-        
+
         /// <summary>
         /// Refreshes the duration of <see cref="AudioBuffer.BufferDuration"/> of the <see cref="Parent"/> based on the shared instances.
         /// </summary>

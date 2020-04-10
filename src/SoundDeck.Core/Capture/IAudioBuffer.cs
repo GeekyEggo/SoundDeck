@@ -14,6 +14,11 @@ namespace SoundDeck.Core.Capture
         TimeSpan BufferDuration { get; set; }
 
         /// <summary>
+        /// Restarts the audio buffer.
+        /// </summary>
+        void Restart();
+
+        /// <summary>
         /// Saves an audio file of the current buffer.
         /// </summary>
         /// <param name="settings">The settings containing information about how, and where to save the capture.</param>
