@@ -8,30 +8,28 @@ namespace SoundDeck.Core.Playback.Players
     public class PlayNextPlayer : PlaylistPlayer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayNextPlayer"/> class.
+        /// Initializes a new instance of the <see cref="PlayNextPlayer" /> class.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <param name="normalizationProvider">The normalization provider.</param>
-        public PlayNextPlayer(string deviceId, IPlaylist playlist, INormalizationProvider normalizationProvider)
-            : base(deviceId, playlist, normalizationProvider)
+        /// <param name="options">The options.</param>
+        public PlayNextPlayer(PlaylistPlayerOptions options)
+            : base(options)
         {
-            this.IsLooped = false;
+            this.PlaybackType = PlaylistPlaybackType.Single;
         }
 
         /// <summary>
         /// Gets the underlying action that determines how the player functions.
         /// </summary>
-        public override PlaylistPlayerActionType Action => PlaylistPlayerActionType.PlayNext;
+        public override PlaylistPlayerActionType Action { get; } = PlaylistPlayerActionType.PlayNext;
 
         /// <summary>
-        /// Plays the next item within the playlist.
+        /// Applies the next action asynchronously.
         /// </summary>
-        /// <returns>The task of playing the next item.</returns>
-        protected override Task PlayNextAsnyc()
+        /// <returns>The task of running the action.</returns>
+        protected override Task ActionAsync()
         {
             this.Stop();
-            return base.PlayNextAsnyc();
+            return this.PlayAsync();
         }
     }
 }

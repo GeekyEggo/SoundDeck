@@ -8,35 +8,37 @@ namespace SoundDeck.Core.Playback.Players
     public class PlayStopPlayer : PlaylistPlayer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayStopPlayer"/> class.
+        /// Initializes a new instance of the <see cref="PlayStopPlayer" /> class.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <param name="normalizationProvider">The normalization provider.</param>
-        public PlayStopPlayer(string deviceId, IPlaylist playlist, INormalizationProvider normalizationProvider)
-            : base(deviceId, playlist, normalizationProvider)
+        /// <param name="options">The options.</param>
+        /// <param name="actionType">Type of the action.</param>
+        /// <param name="playbackType">Type of the playback.</param>
+        public PlayStopPlayer(PlaylistPlayerOptions options, PlaylistPlayerActionType actionType, PlaylistPlaybackType playbackType)
+            : base(options)
         {
-            this.IsLooped = false;
+            this.Action = actionType;
+            this.PlaybackType = playbackType;
         }
 
         /// <summary>
         /// Gets the underlying action that determines how the player functions.
         /// </summary>
-        public override PlaylistPlayerActionType Action => PlaylistPlayerActionType.PlayStop;
+        public override PlaylistPlayerActionType Action { get; }
 
         /// <summary>
-        /// Plays the next item within the playlist.
+        /// Applies the next action asynchronously.
         /// </summary>
-        /// <returns>The task of playing the next item.</returns>
-        protected override Task PlayNextAsnyc()
+        /// <returns>The task of running the action.</returns>
+        protected override Task ActionAsync()
         {
-            if (this.State == PlaybackStateType.Playing)
+            if (this.State == PlaybackStateType.Playing
+                || this.Player.State == PlaybackStateType.Playing)
             {
                 this.Stop();
                 return Task.CompletedTask;
             }
 
-            return base.PlayNextAsnyc();
+            return this.PlayAsync();
         }
     }
 }

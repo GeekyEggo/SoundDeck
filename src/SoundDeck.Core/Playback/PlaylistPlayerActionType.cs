@@ -29,5 +29,10 @@ namespace SoundDeck.Core.Playback
         /// Starts the first audio clip and loops the entire playlist; stops on next press.
         /// </summary>
         LoopAllStopReset = 4,
+
+        /// <summary>
+        /// Continues to the play the playlist from the next clip, until stopped or the end of the playlist is reached.
+        /// </summary>
+        PlayAllStop = 5
     }
 }

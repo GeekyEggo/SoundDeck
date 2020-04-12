@@ -36,13 +36,6 @@ namespace SoundDeck.Core
         IEnumerable<IAudioBuffer> GetAudioBuffers();
 
         /// <summary>
-        /// Gets an audio player for the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio player.</returns>
-        IAudioPlayer GetAudioPlayer(string deviceId);
-
-        /// <summary>
         /// Gets an audio recorder, capable of capturing the audio from the specified device identifier.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>

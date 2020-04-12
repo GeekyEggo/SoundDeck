@@ -84,14 +84,6 @@ namespace SoundDeck.Core
             => this.SharedAudioBufferManager.GetAudioBuffers();
 
         /// <summary>
-        /// Gets an audio player for the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio player.</returns>
-        public IAudioPlayer GetAudioPlayer(string deviceId)
-            => new AudioPlayer(deviceId, this.NormalizationProvider);
-
-        /// <summary>
         /// Gets an audio recorder, capable of capturing the audio from the specified device identifier.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
@@ -154,24 +146,34 @@ namespace SoundDeck.Core
         /// <param name="action">The action type.</param>
         /// <param name="playlist">The playlist.</param>
         /// <returns>The playlist player.</returns>
-        private PlaylistPlayer GetPlaylistPlayerInternal(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist)
+        private IPlaylistPlayer GetPlaylistPlayerInternal(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist)
         {
+            var options = new PlaylistPlayerOptions
+            {
+                DeviceId = deviceId,
+                NormalizationProvider = this.NormalizationProvider,
+                Playlist = playlist
+            };
+
             switch (action)
             {
                 case PlaylistPlayerActionType.LoopStop:
-                    return new LoopStopPlayer(deviceId, playlist, this.NormalizationProvider);
+                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.SingleLoop);
 
                 case PlaylistPlayerActionType.LoopAllStop:
-                    return new LoopAllStopPlayer(deviceId, playlist, this.NormalizationProvider);
+                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.ContiunousLoop);
 
                 case PlaylistPlayerActionType.LoopAllStopReset:
-                    return new LoopAllStopResetPlayer(deviceId, playlist, this.NormalizationProvider);
+                    return new PlayStopResetPlayer(options, action, PlaylistPlaybackType.ContiunousLoop);
 
                 case PlaylistPlayerActionType.PlayNext:
-                    return new PlayNextPlayer(deviceId, playlist, this.NormalizationProvider);
+                    return new PlayNextPlayer(options);
 
                 case PlaylistPlayerActionType.PlayStop:
-                    return new PlayStopPlayer(deviceId, playlist, this.NormalizationProvider);
+                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.Single);
+
+                case PlaylistPlayerActionType.PlayAllStop:
+                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.Continuous);
             }
 
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");

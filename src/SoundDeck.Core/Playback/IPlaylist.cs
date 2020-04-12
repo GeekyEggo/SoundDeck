@@ -11,5 +11,10 @@ namespace SoundDeck.Core.Playback
         /// Gets the number of items within the playlist.
         /// </summary>
         int Count { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="IEnumerator{T}.Current"/> is the last.
+        /// </summary>
+        bool IsLast { get; }
     }
 }

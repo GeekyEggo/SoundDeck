@@ -10,7 +10,7 @@ namespace SoundDeck.Core.Playback.Players
     /// <summary>
     /// Provides an audio player for an audio device.
     /// </summary>
-    public class AudioPlayer : IAudioPlayer
+    public class AudioPlayer : IAudioFilePlayer
     {
         /// <summary>
         /// The playback state polling delay, in milliseconds.
@@ -35,6 +35,9 @@ namespace SoundDeck.Core.Playback.Players
         {
             this.DeviceId = deviceId;
             this.NormalizationProvider = normalizationProvider;
+
+            this.IsLooped = false;
+            this.State = PlaybackStateType.Stopped;
         }
 
         /// <summary>

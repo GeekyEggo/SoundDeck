@@ -44,6 +44,20 @@ namespace SoundDeck.Core.Playback
         public int Count => this.OrderedItems.Length;
 
         /// <summary>
+        /// Gets a value indicating whether the <see cref="IEnumerator{T}.Current" /> is the last.
+        /// </summary>
+        public bool IsLast
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+                    return this.CurrentIndex >= (this.OrderedItems.Length - 1);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the playback order.
         /// </summary>
         private PlaylistOrderType Order { get; set; }
