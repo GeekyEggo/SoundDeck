@@ -35,7 +35,7 @@ Like the default _play audio_ action, but with more options and hype! The Play A
 | Option | Description |
 --- | ---
 <code>Audio Device</code> | The audio device to play clips on; this can be any output (e.g. speaker, headphone, etc.) device connected to your computer.
-`Action` | Tells the plugin what to do when the button is pressed.<br />`Play / Next` - Plays the next clip; stopping the current clip if there is one.<br />`Play / Stop` - Plays the next clip when one isn't already playing; otherwise the current clip is stopped.<br />`Loop / Stop` - Loops the next clip when one isn't already playing; otherwise the current clip is stopped
+`Action` | Tells the plugin what to do when the button is pressed.<br />`Play / Next` plays the next track, stopping the current track if one is playing.<br />`Play / Stop` plays the next track, or stops the current track if one is playing.<br />`Play All / Stop` plays the playlist from the next track, or stops playback if a track is playing. *(v1.1.0)*<br />`Loop / Stop` loops  the next track, or stops the current track if one is playing.<br />`Loop All / Stop` loops the playlist from the next track, or stops playback if a track is playing. *(v1.1.0)*<br />`Loop All / Stop (Reset)` loops the playlist from the first track, or stops playback if a track is playing. *(v1.1.0)*
 `Order` | Defines the order the audio files are played in; can be either `Random` or `Sequential`. Please note, when `Sequential` is selected, files can be re-ordered manually.
 `Files` | The playlist of audio files to play. Files can be added by selecting <code>Add file...</code>, removed by pressing the X, or re-ordered (when `Order` is `Sequential`) by dragging the bullet point up/down.
 
@@ -52,7 +52,7 @@ The Record Audio action lets you record an audio device for any duration of time
 
 ## <img src="./assets/stop.svg" width="20" alt="Record Audio Action" /> Stop Audio
 
-The Stop Audio action lets you quickly and easily stop all audio currently being played through Sound Deck. This can be particularly useful if a Play Audio action is being played from a Multi-Action.
+The Stop Audio action lets you quickly and easily stop all audio currently being played through Sound Deck. This can be particularly useful if a Play Audio action is being played from a Multi-Action. *(v1.1.0)*
 
 *There are no options associated with the Stop Audio action.*
 
