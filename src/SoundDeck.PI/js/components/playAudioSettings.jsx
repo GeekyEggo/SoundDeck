@@ -10,6 +10,8 @@ class PlayAudioSettings extends React.Component {
             { label: "Play / Next", value: "0" },
             { label: "Play / Stop", value: "1" },
             { label: "Loop / Stop", value: "2" },
+            { label: "Loop All / Stop", value: "3" },
+            { label: "Loop All / Stop (Reset)", value: "4" }
         ]
 
         this.orderTypes = [

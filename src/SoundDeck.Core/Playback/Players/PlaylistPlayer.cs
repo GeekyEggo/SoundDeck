@@ -22,6 +22,7 @@ namespace SoundDeck.Core.Playback.Players
         public PlaylistPlayer(string deviceId, IPlaylist playlist, INormalizationProvider normalizationProvider)
             : base(deviceId, normalizationProvider)
         {
+            this.IsLooped = false;
             this.Playlist = playlist;
         }
 
@@ -36,9 +37,9 @@ namespace SoundDeck.Core.Playback.Players
         public abstract PlaylistPlayerActionType Action { get; }
 
         /// <summary>
-        /// Gets or sets the playlist.
+        /// Gets the playlist.
         /// </summary>
-        private IPlaylist Playlist { get; set; }
+        protected IPlaylist Playlist { get; }
 
         /// <summary>
         /// Moves to the next item within the playlist, and plays it asynchronously; this may stop audio depending on the type of player.

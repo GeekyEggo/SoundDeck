@@ -161,6 +161,12 @@ namespace SoundDeck.Core
                 case PlaylistPlayerActionType.LoopStop:
                     return new LoopStopPlayer(deviceId, playlist, this.NormalizationProvider);
 
+                case PlaylistPlayerActionType.LoopAllStop:
+                    return new LoopAllStopPlayer(deviceId, playlist, this.NormalizationProvider);
+
+                case PlaylistPlayerActionType.LoopAllStopReset:
+                    return new LoopAllStopResetPlayer(deviceId, playlist, this.NormalizationProvider);
+
                 case PlaylistPlayerActionType.PlayNext:
                     return new PlayNextPlayer(deviceId, playlist, this.NormalizationProvider);
 
