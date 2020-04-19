@@ -1,6 +1,6 @@
 {
     "name": "sounddeck",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "An Elgato Stream Deck plugin that lets you capture and play audio, on any audio device.",
     "author": "GeekyEggo",
     "license": "MIT",
@@ -15,11 +15,11 @@
     "scripts": {
         "build": "MSBuild.exe %npm_package_paths_plugin% -p:Configuration=Debug -t:Rebuild && npm run build:pi",
         "build:pi": "npx webpack",
-        "build:release": "MSBuild.exe %npm_package_paths_plugin% -p:Configuration=Release -t:Rebuild",
-        "dist": "npm run restore && npm run dist:clean && npm run build:release && npm run dist:package",
+        "dist": "npm i && npm run restore && npm run dist:clean && npm run dist:plugin && npm run dist:pi && npm run dist:package",
         "dist:clean": "rm -rf %npm_package_paths_package%/*",
         "dist:package": "cd tools && DistributionTool -b -i ../%npm_package_paths_dist% -o ../%npm_package_paths_package% || exit 0",
         "dist:pi": "npx webpack --dist",
+        "dist:plugin": "MSBuild.exe %npm_package_paths_plugin% -p:Configuration=Release -t:Rebuild",
         "debug:pi": "npx webpack --mode development --watch",
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
         "restore": ".\\tools\\nuget.exe restore",
