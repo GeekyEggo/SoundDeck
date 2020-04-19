@@ -96,16 +96,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll"
+    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll" -n "$(TargetDir)..\..\..\..\package.json"
 cd ../.. &amp;&amp; npm run debug:plugin</PostBuildEvent>
     <PreBuildEvent>cd ../.. &amp;&amp; npm stop</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll"</PostBuildEvent>
+    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll" -n "$(TargetDir)..\..\package.json"</PostBuildEvent>
     <PreBuildEvent>cd ../.. &amp;&amp; npm stop</PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>$(TargetDir)$(TargetName).exe -m -a "$(TargetDir)SoundDeck.Plugin.dll" -n "$(TargetDir)..\..\..\..\package.json"
-cd ../.. &amp;&amp; npm run debug:plugin</PostBuildEvent>
   </PropertyGroup>
 </Project>
