@@ -29,7 +29,7 @@ class PlayAudioSettings extends React.Component {
 
     isSortEnabled() {
         const { settings: { order } } = store.getState();
-        return order !== 1; // default to true
+        return order != 1; // default to true
     }
 
     render() {
