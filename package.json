@@ -23,7 +23,9 @@
         "debug:pi": "npx webpack --mode development --watch",
         "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
         "restore": ".\\tools\\nuget.exe restore",
-        "stop": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo Stream Deck not running"
+        "stop": "npm run stop:streamdeck && npm run stop:plugin",
+        "stop:plugin": "tasklist | findstr \"SoundDeck.exe\" && taskkill -im SoundDeck.exe -f -t || echo SoundDeck not running",
+        "stop:streamdeck": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo StreamDeck not running"
     },
     "devDependencies": {
         "@babel/core": "^7.9.0",
