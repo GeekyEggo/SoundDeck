@@ -5,7 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SharpDeck\src\SharpDeck\SharpDeck.csproj" />
+    <PackageReference Include="SharpDeck" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj" />
   </ItemGroup>
 
