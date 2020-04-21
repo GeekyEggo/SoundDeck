@@ -15,7 +15,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// The playback state polling delay, in milliseconds.
         /// </summary>
-        private const int PLAYBACK_STATE_POLL_DELAY = 250;
+        private const int PLAYBACK_STATE_POLL_DELAY = 200;
 
         /// <summary>
         /// The synchronization root object.
@@ -193,7 +193,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
         private void InternalPlay(string file, float? maxGain = null)
         {
-            using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, 0))
+            using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, PLAYBACK_STATE_POLL_DELAY))
             using (var reader = new AudioFileReader(file))
             {
                 // prepare the player
