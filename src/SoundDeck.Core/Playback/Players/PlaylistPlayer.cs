@@ -126,6 +126,7 @@ namespace SoundDeck.Core.Playback.Players
         protected virtual void Dispose(bool dispose)
         {
             this.InternalCancellationTokenSource?.Cancel();
+
             if (dispose)
             {
                 if (!this.IsDisposed)
@@ -143,14 +144,14 @@ namespace SoundDeck.Core.Playback.Players
         /// </summary>
         public void Stop()
         {
+            this.InternalCancellationTokenSource?.Cancel();
+            this.Player.Stop();
+
             try
             {
                 this._syncRoot.Wait();
 
-                this.Player.Stop();
-                this.InternalCancellationTokenSource?.Cancel();
                 this.InternalCancellationTokenSource = null;
-
                 this.State = PlaybackStateType.Stopped;
             }
             finally
