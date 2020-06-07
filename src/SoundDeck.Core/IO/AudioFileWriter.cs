@@ -22,8 +22,14 @@ namespace SoundDeck.Core.IO
         /// <param name="format">The format.</param>
         public AudioFileWriter(string filename, WaveFormat format)
         {
+            this.Filename = filename;
             this.Writer = new WaveFileWriter(filename, format);
         }
+
+        /// <summary>
+        /// Gets the name of the file.
+        /// </summary>
+        public string Filename { get; }
 
         /// <summary>
         /// Gets or sets the settings.

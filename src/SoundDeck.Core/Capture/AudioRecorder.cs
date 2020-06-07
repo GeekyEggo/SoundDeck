@@ -43,9 +43,9 @@ namespace SoundDeck.Core.Capture
         private WasapiCapture Capture { get; set; }
 
         /// <summary>
-        /// The capturing completion source.
+        /// The capturing completion source containing the location of the file where the audio was saved to.
         /// </summary>
-        private TaskCompletionSource<bool> CapturingCompletionSource;
+        private TaskCompletionSource<string> CapturingCompletionSource;
 
         /// <summary>
         /// Gets or sets the file writer.
@@ -75,10 +75,11 @@ namespace SoundDeck.Core.Capture
             this.Capture?.Dispose();
             this.Capture = null;
 
+            var filename = this.FileWriter?.Filename;
             this.FileWriter?.Dispose();
             this.FileWriter = null;
 
-            this.CapturingCompletionSource?.SetResult(!disposing);
+            this.CapturingCompletionSource?.SetResult(filename);
             this.CapturingCompletionSource = null;
         }
 
@@ -110,7 +111,7 @@ namespace SoundDeck.Core.Capture
                     Settings = this.Settings
                 };
 
-                this.CapturingCompletionSource = new TaskCompletionSource<bool>();
+                this.CapturingCompletionSource = new TaskCompletionSource<string>();
                 this.Capture.StartRecording();
             }
             finally
@@ -122,21 +123,21 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Stops capturing audio asynchronously.
         /// </summary>
-        /// <returns>The task of starting.</returns>
-        public async Task StopAsync()
+        /// <returns>The file name of where the audio was saved.</returns>
+        public Task<string> StopAsync()
         {
             try
             {
                 // when there is no capturing completion source, assume we arent recording
-                await this._syncRoot.WaitAsync();
+                this._syncRoot.Wait();
                 if (this.CapturingCompletionSource == null)
                 {
-                    return;
+                    return null;
                 }
 
                 // stop recording, and awaiting actual stop
                 this.Capture.StopRecording();
-                await this.CapturingCompletionSource.Task;
+                return this.CapturingCompletionSource.Task;
             }
             finally
             {

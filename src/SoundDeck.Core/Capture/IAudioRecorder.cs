@@ -21,7 +21,7 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Stops capturing audio asynchronously.
         /// </summary>
-        /// <returns>The task of starting.</returns>
-        Task StopAsync();
+        /// <returns>The file name of where the audio was saved.</returns>
+        Task<string> StopAsync();
     }
 }
