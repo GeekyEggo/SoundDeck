@@ -11,6 +11,7 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core;
     using SoundDeck.Core.Enums;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Plugin.Extensions;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>
@@ -18,7 +19,7 @@ namespace SoundDeck.Plugin.Actions
     /// </summary>
     [StreamDeckAction("Play Audio", UUID, "Images/PlayAudio/Action", Tooltip = "Play an audio clip, or three... or more, in the order your heart desires.")]
     [StreamDeckActionState("Images/PlayAudio/Key")]
-    public class PlayAudio  : StreamDeckAction<PlayAudioSettings>
+    public class PlayAudio  : StreamDeckAction<PlayAudioSettings>, IPlayAudioAction
     {
         /// <summary>
         /// The unique identifier for the action.
@@ -38,17 +39,17 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// Gets the audio service.
         /// </summary>
-        private IAudioService AudioService { get; }
+        public IAudioService AudioService { get; }
 
         /// <summary>
-        /// Gets the player.
+        /// Gets or sets the player.
         /// </summary>
-        private IPlaylistPlayer Player { get; set; }
+        public IPlaylistPlayer Player { get; set; }
 
         /// <summary>
         /// Gets or sets the playlist.
         /// </summary>
-        private Playlist Playlist { get; set; }
+        public Playlist Playlist { get; set; }
 
         /// <summary>
         /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
@@ -84,7 +85,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of updating the state of the object based on the settings.</returns>
         protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, PlayAudioSettings settings)
         {
-            this.SetPlayer(settings);
+            this.SetPlayer(settings, this.SetTitleAsync);
             this.Playlist.SetOptions(settings);
 
             return base.OnDidReceiveSettings(args, settings);
@@ -100,7 +101,7 @@ namespace SoundDeck.Plugin.Actions
             base.OnInit(args, settings);
 
             this.Playlist = new Playlist(settings);
-            this.SetPlayer(settings);
+            this.SetPlayer(settings, this.SetTitleAsync);
         }
 
         /// <summary>
@@ -118,44 +119,6 @@ namespace SoundDeck.Plugin.Actions
             {
                 await this.StreamDeck.LogMessageAsync(e.ToString());
                 await this.ShowAlertAsync();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="IAudioPlayer.TimeChanged"/> event of <see cref="Playlist.Player"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PlaybackTimeEventArgs" /> instance containing the event data.</param>
-        private async void Player_TimeChanged(object sender, PlaybackTimeEventArgs e)
-        {
-            string getTime(PlaybackTimeEventArgs time)
-            {
-                if (time.Current == TimeSpan.Zero)
-                {
-                    return null;
-                }
-
-                var remaining = time.Total.Subtract(time.Current);
-                return remaining.TotalSeconds > 0.1f ? remaining.ToString("mm':'ss") : null;
-            }
-
-            await this.SetTitleAsync(getTime(e));
-        }
-
-        /// <summary>
-        /// Sets the <see cref="IAudioPlayer" /> of <see cref="Playlist" />.
-        /// </summary>
-        /// <param name="settings">The settings.</param>
-        private void SetPlayer(PlayAudioSettings settings)
-        {
-            var deviceId = string.IsNullOrWhiteSpace(settings.AudioDeviceId) ? this.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.AudioDeviceId;
-
-            if (this.Player?.DeviceId != deviceId
-                || this.Player?.Action != settings.Action)
-            {
-                this.Player?.Dispose();
-                this.Player = this.AudioService.GetPlaylistPlayer(deviceId, settings.Action, this.Playlist);
-                this.Player.TimeChanged += this.Player_TimeChanged;
             }
         }
     }
