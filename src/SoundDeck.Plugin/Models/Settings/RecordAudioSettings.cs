@@ -1,7 +1,8 @@
-using SoundDeck.Core.Capture;
-
 namespace SoundDeck.Plugin.Models.Settings
 {
+    using Newtonsoft.Json;
+    using SoundDeck.Core.Capture;
+
     /// <summary>
     /// Provides settings for recording audio.
     /// </summary>
@@ -10,7 +11,8 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the audio device identifier to capture.
         /// </summary>
-        public string AudioDeviceId { get; set; }
+        [JsonProperty("audioDeviceId")]
+        public string CaptureAudioDeviceId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether to encode the audio buffer to an MP3.

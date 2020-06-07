@@ -111,7 +111,7 @@ namespace SoundDeck.Plugin.Actions
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, TSettings settings)
         {
             await base.OnDidReceiveSettings(args, settings);
-            if (this.CaptureDevice?.DeviceId != settings.AudioDeviceId)
+            if (this.CaptureDevice?.DeviceId != settings.CaptureAudioDeviceId)
             {
                 this.CaptureDevice?.Dispose();
                 this.CaptureDevice = null;

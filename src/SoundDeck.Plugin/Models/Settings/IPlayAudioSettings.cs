@@ -8,9 +8,9 @@ namespace SoundDeck.Plugin.Models.Settings
     public interface IPlayAudioSettings : IPlaylistOptions
     {
         /// <summary>
-        /// Gets or sets the audio device identifier to capture.
+        /// Gets or sets the audio device identifier to playback the audio.
         /// </summary>
-        string AudioDeviceId { get; set; }
+        string PlaybackAudioDeviceId { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the action that occurs upon the button being pressed.

@@ -8,7 +8,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the audio device identifier to capture.
         /// </summary>
-        string AudioDeviceId { get; set; }
+        string CaptureAudioDeviceId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether to encode the audio buffer to an MP3.

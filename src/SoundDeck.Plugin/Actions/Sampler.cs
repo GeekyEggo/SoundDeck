@@ -56,8 +56,8 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The capture device.</returns>
         protected override IAudioRecorder GetCaptureDevice(SamplerSettings settings)
         {
-            return !string.IsNullOrWhiteSpace(settings?.AudioDeviceId)
-                ? this.AudioService.GetAudioRecorder(settings.AudioDeviceId)
+            return !string.IsNullOrWhiteSpace(settings?.CaptureAudioDeviceId)
+                ? this.AudioService.GetAudioRecorder(settings.CaptureAudioDeviceId)
                 : null;
         }
 

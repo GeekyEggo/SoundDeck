@@ -39,8 +39,8 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The capture device.</returns>
         protected sealed override IAudioBuffer GetCaptureDevice(ClipAudioSettings settings)
         {
-            return !string.IsNullOrWhiteSpace(settings?.AudioDeviceId)
-                ? this.AudioService.GetAudioBuffer(settings.AudioDeviceId, settings.Duration)
+            return !string.IsNullOrWhiteSpace(settings?.CaptureAudioDeviceId)
+                ? this.AudioService.GetAudioBuffer(settings.CaptureAudioDeviceId, settings.Duration)
                 : null;
         }
 
@@ -77,7 +77,7 @@ namespace SoundDeck.Plugin.Actions
                 {
                     var path = await this.CaptureDevice.SaveAsync(settings);
 
-                    await this.StreamDeck.LogMessageAsync($"Saved captured from device {settings.AudioDeviceId} to {path}");
+                    await this.StreamDeck.LogMessageAsync($"Saved captured from device {settings.CaptureAudioDeviceId} to {path}");
                     await this.ShowOkAsync();
                 }
             }

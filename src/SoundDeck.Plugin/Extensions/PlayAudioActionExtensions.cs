@@ -20,7 +20,7 @@ namespace SoundDeck.Plugin.Extensions
         /// <param name="setTitleAsync">The delegate used to set the title of the action asynchronously.</param>
         public static void SetPlayer(this IPlayAudioAction action, IPlayAudioSettings settings, Func<string, TargetType, Task> setTitleAsync)
         {
-            var deviceId = string.IsNullOrWhiteSpace(settings.AudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.AudioDeviceId;
+            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
 
             if (action.Player?.DeviceId != deviceId
                 || action.Player?.Action != settings.Action)

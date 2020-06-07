@@ -1,5 +1,6 @@
 namespace SoundDeck.Plugin.Models.Settings
 {
+    using Newtonsoft.Json;
     using SoundDeck.Core.Playback;
 
     /// <summary>
@@ -8,9 +9,10 @@ namespace SoundDeck.Plugin.Models.Settings
     public class PlayAudioSettings : IPlayAudioSettings
     {
         /// <summary>
-        /// Gets or sets the audio device identifier to capture.
+        /// Gets or sets the audio device identifier to playback the audio.
         /// </summary>
-        public string AudioDeviceId { get; set; }
+        [JsonProperty("audioDeviceId")]
+        public string PlaybackAudioDeviceId { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the action that occurs upon the button being pressed.
