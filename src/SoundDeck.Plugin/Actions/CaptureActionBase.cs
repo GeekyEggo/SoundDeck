@@ -1,12 +1,9 @@
 namespace SoundDeck.Plugin.Actions
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
-    using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
-    using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models.Payloads;
@@ -17,7 +14,7 @@ namespace SoundDeck.Plugin.Actions
     /// Provides a base class for capturing audio.
     /// </summary>
     /// <typeparam name="TSettings">The type of the settings.</typeparam>
-    public abstract class BaseCaptureAction<TSettings, TCaptureDevice> : StreamDeckAction<TSettings>
+    public abstract class CaptureActionBase<TSettings, TCaptureDevice> : ActionBase<TSettings>
         where TSettings : class, ICaptureAudioSettings
         where TCaptureDevice : class, ICaptureDevice
     {
@@ -26,16 +23,11 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="audioService">The audio service.</param>
         /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
-        public BaseCaptureAction(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
+        public CaptureActionBase(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
+            : base(audioService)
         {
-            this.AudioService = audioService;
             this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
         }
-
-        /// <summary>
-        /// Gets the audio service.
-        /// </summary>
-        public IAudioService AudioService { get; }
 
         /// <summary>
         /// Gets the folder browser dialog provider.
@@ -46,25 +38,6 @@ namespace SoundDeck.Plugin.Actions
         /// Gets or sets the capture device.
         /// </summary>
         protected TCaptureDevice CaptureDevice { get; set; }
-
-        /// <summary>
-        /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
-        /// </summary>
-        /// <returns>The payload containing the audio devices.</returns>
-        [PropertyInspectorMethod]
-        public Task<OptionsPayload> GetAudioDevices()
-        {
-            var options = this.AudioService.Devices
-                .Where(d => d.Enabled)
-                .GroupBy(d => d.Flow)
-                .Select(g =>
-                {
-                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
-                    return new Option(g.Key.ToString(), children);
-                });
-
-            return Task.FromResult(new OptionsPayload(options));
-        }
 
         /// <summary>
         /// Provides an entry point for the property inspector, allowing the user to select an output path.

@@ -14,7 +14,7 @@ namespace SoundDeck.Plugin.Actions
     [StreamDeckAction("Record Audio", UUID, "Images/RecordAudio/Action", Tooltip = "Record Audio", SupportedInMultiActions = false)]
     [StreamDeckActionState("Images/RecordAudio/Key0")]
     [StreamDeckActionState("Images/RecordAudio/Key1")]
-    public class RecordAudio : BaseCaptureAction<RecordAudioSettings, IAudioRecorder>
+    public class RecordAudio : CaptureActionBase<RecordAudioSettings, IAudioRecorder>
     {
         /// <summary>
         /// The unique identifier for the action.

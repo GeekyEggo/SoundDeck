@@ -4,7 +4,7 @@ namespace SoundDeck.Plugin.Extensions
     using System.Threading.Tasks;
     using SharpDeck.Enums;
     using SoundDeck.Core.Playback;
-    using SoundDeck.Plugin.Actions;
+    using SoundDeck.Plugin.Contracts;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>
@@ -18,40 +18,65 @@ namespace SoundDeck.Plugin.Extensions
         /// <param name="action">This instance.</param>
         /// <param name="settings">The settings.</param>
         /// <param name="setTitleAsync">The delegate used to set the title of the action asynchronously.</param>
-        public static void SetPlayer(this IPlayAudioAction action, IPlayAudioSettings settings, Func<string, TargetType, Task> setTitleAsync)
+        public static void SetPlayerSettings(this IPlayAudioAction action, IPlayAudioSettings settings, Func<string, TargetType, Task> setTitleAsync)
         {
-            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
+            action.SetPlaylist(settings);
+            action.SetPlayer(settings);
+        }
 
+        /// <summary>
+        /// Sets the playlist based on its current state.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="setting">The setting.</param>
+        private static void SetPlaylist(this IPlayAudioAction action, IPlayAudioSettings settings)
+        {
+            // update the playlist
+            if (action.Playlist == null)
+            {
+                action.Playlist = new Playlist(settings);
+            }
+            else
+            {
+                action.Playlist.SetOptions(settings);
+            }
+        }
+
+        /// <summary>
+        /// Sets the player of the action.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="settings">The settings.</param>
+        private static void SetPlayer(this IPlayAudioAction action, IPlayAudioSettings settings)
+        {
+            // update the player
+            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
             if (action.Player?.DeviceId != deviceId
                 || action.Player?.Action != settings.Action)
             {
                 action.Player?.Dispose();
                 action.Player = action.AudioService.GetPlaylistPlayer(deviceId, settings.Action, action.Playlist);
-                action.Player.TimeChanged += GetTimeChangedHandler(setTitleAsync);
+                action.Player.TimeChanged += GetTimeChangedHandler(action);
             }
         }
 
         /// <summary>
         /// Constructs an event handler for <see cref="IAudioPlayer.TimeChanged"/>.
         /// </summary>
-        /// <param name="setTitleAsync">The delegate used to set the title of the action asynchronously.</param>
+        /// <param name="action">The action.</param>
         /// <returns>The event handler.</returns>
-        private static EventHandler<PlaybackTimeEventArgs> GetTimeChangedHandler(Func<string, TargetType, Task> setTitleAsync)
+        private static EventHandler<PlaybackTimeEventArgs> GetTimeChangedHandler(IPlayAudioAction action)
         {
             return async (obj, e) =>
             {
-                string getTime(PlaybackTimeEventArgs time)
+                string title = null;
+                if (e.Current != TimeSpan.Zero)
                 {
-                    if (time.Current == TimeSpan.Zero)
-                    {
-                        return null;
-                    }
-
-                    var remaining = time.Total.Subtract(time.Current);
-                    return remaining.TotalSeconds > 0.1f ? remaining.ToString("mm':'ss") : null;
+                    var remaining = e.Total.Subtract(e.Current);
+                    title = remaining.TotalSeconds > 0.1f ? remaining.ToString("mm':'ss") : null;
                 }
 
-                await setTitleAsync(getTime(e), TargetType.Both);
+                await action.SetTitleAsync(title, TargetType.Both);
             };
         }
     }

@@ -1,7 +1,5 @@
 namespace SoundDeck.Plugin.Actions
 {
-    using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
@@ -9,6 +7,8 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Plugin.Contracts;
+    using SoundDeck.Plugin.Extensions;
     using SoundDeck.Plugin.Models.Settings;
     using SoundDeck.Plugin.Models.UI;
 
@@ -17,17 +17,12 @@ namespace SoundDeck.Plugin.Actions
     /// </summary>
     [StreamDeckAction("Sampler", UUID, "Images/PlayAudio/Action", Tooltip = "Record and playback samples!")]
     [StreamDeckActionState("Images/PlayAudio/Key")]
-    public class Sampler : BaseCaptureAction<SamplerSettings, IAudioRecorder>
+    public class Sampler : CaptureActionBase<SamplerSettings, IAudioRecorder>, IPlayAudioAction
     {
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
         public const string UUID = "com.geekyeggo.sounddeck.sampler";
-
-        /// <summary>
-        /// The synchronization root.
-        /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Sampler"/> class.
@@ -62,28 +57,61 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            this.Player?.Dispose();
+            this.SetTitleAsync();
+
+            base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DidReceiveSettings" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The task of updating the state of the object based on the settings.</returns>
+        protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, SamplerSettings settings)
+        {
+            this.SetPlayerSettings(settings, this.SetTitleAsync);
+            return base.OnDidReceiveSettings(args, settings);
+        }
+
+        /// <summary>
+        /// Occurs when this instance is initialized.
+        /// </summary>
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="settings">The settings.</param>
+        protected override void OnInit(ActionEventArgs<AppearancePayload> args, SamplerSettings settings)
+        {
+            base.OnInit(args, settings);
+            this.SetPlayerSettings(settings, this.SetTitleAsync);
+        }
+
+        /// <summary>
         /// Occurs when <see cref="IStreamDeckConnection.KeyDown" /> is received for this instance.
         /// </summary>
         /// <param name="args">The <see cref="ActionEventArgs{TPayload}" /> instance containing the event data.</param>
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            try
-            {
-                await this._syncRoot.WaitAsync();
+            await base.OnKeyDown(args);
+            var settings = args.Payload.GetSettings<SamplerSettings>();
 
-                if (this.CaptureDevice != null)
-                {
-                    this.CaptureDevice.Settings = args.Payload.GetSettings<SamplerSettings>();
-                    await this.CaptureDevice?.StartAsync();
-                }
-            }
-            catch (Exception)
+            // when there is a file, play it
+            if (!string.IsNullOrWhiteSpace(settings.FilePath))
             {
-                throw;
+                await this.Player.NextAsync();
+                return;
             }
-            finally
+
+            // otherwise, lets check if we can capture
+            if (this.CaptureDevice != null)
             {
-                this._syncRoot.Release();
+                this.CaptureDevice.Settings = settings;
+                await this.CaptureDevice?.StartAsync();
             }
         }
 
@@ -93,18 +121,17 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="args">The <see cref="ActionEventArgs{TPayload}" /> instance containing the event data.</param>
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
         {
-            try
+            await base.OnKeyUp(args);
+            var settings = args.Payload.GetSettings<SamplerSettings>();
+
+            if (string.IsNullOrWhiteSpace(settings.FilePath))
             {
-                await this._syncRoot.WaitAsync();
-                var filename = await this.CaptureDevice?.StopAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                this._syncRoot.Release();
+                // save the capture, and settings
+                settings.FilePath = await this.CaptureDevice?.StopAsync();
+                await this.SetSettingsAsync(settings);
+                this.Playlist.SetOptions(settings);
+
+                await this.ShowOkAsync();
             }
         }
     }

@@ -17,13 +17,13 @@ class CaptureAudioSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
+                <Select label="Audio Device" dataSourceUri="GetCaptureAudioDevices" valuePath="audioDeviceId" />
                 {this.props.showDuration &&
                     <Select label="Duration" options={this.durationOptions} valuePath="duration" />
                 }
                 <FolderPicker label="Output Path" pluginUri="GetOutputPath" valuePath="outputPath" />
-                <Checkbox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={true} id="encodeToMP3" />
-                <Checkbox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={false} id="normalizeVolume" />
+                <Checkbox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={false} id="encodeToMP3" />
+                <Checkbox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={true} id="normalizeVolume" />
             </PropertyInspectorWrapper>
         );
     }

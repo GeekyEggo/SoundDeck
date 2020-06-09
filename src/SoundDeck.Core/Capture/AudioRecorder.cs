@@ -132,7 +132,7 @@ namespace SoundDeck.Core.Capture
                 this._syncRoot.Wait();
                 if (this.CapturingCompletionSource == null)
                 {
-                    return null;
+                    return Task.FromResult(string.Empty);
                 }
 
                 // stop recording, and awaiting actual stop

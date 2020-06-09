@@ -15,7 +15,7 @@ namespace SoundDeck.Plugin.Actions
     /// </summary>
     [StreamDeckAction("Clip Audio", UUID, "Images/ClipAudio/Action", Tooltip = "Clip those last precious seconds of audio; you'll never miss a funny moment again.")]
     [StreamDeckActionState("Images/ClipAudio/Key")]
-    public class ClipAudio : BaseCaptureAction<ClipAudioSettings, IAudioBuffer>
+    public class ClipAudio : CaptureActionBase<ClipAudioSettings, IAudioBuffer>
     {
         /// <summary>
         /// The unique identifier for the action.
