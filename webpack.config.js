@@ -49,7 +49,7 @@ module.exports = (env, argv) => {
                 from: source,
                 to: dest,
                 context: source,
-                ignore: [".babelrc", "*.csproj", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
+                ignore: [".babelrc", "*.csproj", "*.csproj*", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
             }])
         ],
         resolve: {
