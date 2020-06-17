@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.gitmodules = .gitmodules
+		CHANGELOG.MD = CHANGELOG.MD
 		LICENSE = LICENSE
 		package.json = package.json
 		webpack.config.js = webpack.config.js

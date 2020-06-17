@@ -15,7 +15,8 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides a sampler action used to record audio, and then play it back.
     /// </summary>
-    [StreamDeckAction("Sampler", UUID, "Images/PlayAudio/Action", Tooltip = "Record and playback samples!")]
+    [StreamDeckAction("Sampler", UUID, "Images/Sampler/Action", Tooltip = "Record and playback samples!")]
+    [StreamDeckActionState("Images/RecordAudio/Key0")]
     [StreamDeckActionState("Images/PlayAudio/Key")]
     public class Sampler : CaptureActionBase<SamplerSettings, IAudioRecorder>, IPlayAudioAction
     {
@@ -23,6 +24,16 @@ namespace SoundDeck.Plugin.Actions
         /// The unique identifier for the action.
         /// </summary>
         public const string UUID = "com.geekyeggo.sounddeck.sampler";
+
+        /// <summary>
+        /// Represents the state at which the action will record a sample.
+        /// </summary>
+        private const int RECORD_STATE = 0;
+
+        /// <summary>
+        /// Represents the state at which the action will play the sample.
+        /// </summary>
+        private const int PLAY_STATE = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Sampler"/> class.
@@ -43,6 +54,11 @@ namespace SoundDeck.Plugin.Actions
         /// Gets or sets the playlist.
         /// </summary>
         public Playlist Playlist { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is initialized.
+        /// </summary>
+        private bool IsInitialized { get; set; } = false;
 
         /// <summary>
         /// Gets the capture device, for the specified settings.
@@ -66,6 +82,21 @@ namespace SoundDeck.Plugin.Actions
             this.SetTitleAsync();
 
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Occurs when an instance of an action appears.
+        /// </summary>
+        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+        {
+            if (!this.IsInitialized)
+            {
+                this.IsInitialized = true;
+
+                var state = string.IsNullOrWhiteSpace(args.Payload.GetSettings<SamplerSettings>().FilePath) ? RECORD_STATE : PLAY_STATE;
+                await this.SetStateAsync(state);
+            }
         }
 
         /// <summary>
@@ -100,6 +131,18 @@ namespace SoundDeck.Plugin.Actions
             await base.OnKeyDown(args);
             var settings = args.Payload.GetSettings<SamplerSettings>();
 
+            // determine if clearing is active
+            if (ClearSample.IsActive)
+            {
+                if (!string.IsNullOrWhiteSpace(settings.FilePath))
+                {
+                    settings.FilePath = string.Empty;
+                    await this.SetSettingsAsync(settings);
+                }
+
+                return;
+            }
+
             // when there is a file, play it
             if (!string.IsNullOrWhiteSpace(settings.FilePath))
             {
@@ -124,6 +167,17 @@ namespace SoundDeck.Plugin.Actions
             await base.OnKeyUp(args);
             var settings = args.Payload.GetSettings<SamplerSettings>();
 
+            // clearing, do nothing
+            if (ClearSample.IsActive)
+            {
+                await this.SetStateAsync(RECORD_STATE);
+                ClearSample.SetIsActive(false, this);
+
+                await this.ShowOkAsync();
+                return;
+            }
+
+            // no audio file, so finish capturing
             if (string.IsNullOrWhiteSpace(settings.FilePath))
             {
                 // save the capture, and settings
@@ -132,7 +186,11 @@ namespace SoundDeck.Plugin.Actions
                 this.Playlist.SetOptions(settings);
 
                 await this.ShowOkAsync();
+                return;
             }
+
+            // reset to play audio state
+            await this.SetStateAsync(PLAY_STATE);
         }
     }
 }

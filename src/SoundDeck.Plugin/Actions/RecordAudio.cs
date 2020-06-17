@@ -11,6 +11,9 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Plugin.Models.Settings;
     using SoundDeck.Plugin.Models.UI;
 
+    /// <summary>
+    /// Provides an action for recording audio via start/stop.
+    /// </summary>
     [StreamDeckAction("Record Audio", UUID, "Images/RecordAudio/Action", Tooltip = "Record Audio", SupportedInMultiActions = false)]
     [StreamDeckActionState("Images/RecordAudio/Key0")]
     [StreamDeckActionState("Images/RecordAudio/Key1")]
