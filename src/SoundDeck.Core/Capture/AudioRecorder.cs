@@ -1,12 +1,12 @@
 namespace SoundDeck.Core.Capture
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.IO;
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides audio capturing for an audio device.
@@ -38,6 +38,11 @@ namespace SoundDeck.Core.Capture
         public ISaveAudioSettings Settings { get; set; }
 
         /// <summary>
+        /// Gets or sets the file writer.
+        /// </summary>
+        protected AudioFileWriter FileWriter { get; set; }
+
+        /// <summary>
         /// Gets or sets the audio capturer.
         /// </summary>
         private WasapiCapture Capture { get; set; }
@@ -46,11 +51,6 @@ namespace SoundDeck.Core.Capture
         /// The capturing completion source containing the location of the file where the audio was saved to.
         /// </summary>
         private TaskCompletionSource<string> CapturingCompletionSource;
-
-        /// <summary>
-        /// Gets or sets the file writer.
-        /// </summary>
-        private AudioFileWriter FileWriter { get; set; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -150,7 +150,7 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
-        private void Capture_DataAvailable(object sender, WaveInEventArgs e)
+        protected virtual void Capture_DataAvailable(object sender, WaveInEventArgs e)
             => Task.WaitAll(this.FileWriter.WriteAsync(e.Buffer, 0, e.BytesRecorded));
 
         /// <summary>
