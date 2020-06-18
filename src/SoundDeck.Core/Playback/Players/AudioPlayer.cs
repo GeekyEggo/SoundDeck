@@ -1,11 +1,9 @@
 namespace SoundDeck.Core.Playback.Players
 {
     using System;
-    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
-    using NAudio.Wave;
 
     /// <summary>
     /// Provides an audio player for an audio device.
@@ -13,19 +11,9 @@ namespace SoundDeck.Core.Playback.Players
     public class AudioPlayer : IAudioFilePlayer
     {
         /// <summary>
-        /// The playback state polling delay, in milliseconds.
-        /// </summary>
-        private const int PLAYBACK_STATE_POLL_DELAY = 200;
-
-        /// <summary>
         /// The synchronization root object.
         /// </summary>
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
-
-        /// <summary>
-        /// Private member field for <see cref="Time"/>.
-        /// </summary>
-        private PlaybackTimeEventArgs _time = PlaybackTimeEventArgs.Zero;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
@@ -64,28 +52,6 @@ namespace SoundDeck.Core.Playback.Players
         /// Gets the state.
         /// </summary>
         public PlaybackStateType State { get; private set; }
-
-        /// <summary>
-        /// Gets the current and total time of the audio being played.
-        /// </summary>
-        public PlaybackTimeEventArgs Time
-        {
-            get
-            {
-                return this._time;
-            }
-            private set
-            {
-                if (!value.Equals(this._time))
-                {
-                    this._time = value;
-                    if (!this.IsDisposed)
-                    {
-                        this.TimeChanged?.Invoke(this, value);
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the normalization provider.
@@ -139,7 +105,7 @@ namespace SoundDeck.Core.Playback.Players
                     await this._syncRoot.WaitAsync();
 
                     this.InternalCancellationTokenSource = new CancellationTokenSource();
-                    this.InternalPlay(file, maxGain);
+                    await this.InternalPlayAsync(file, maxGain);
                     this.InternalCancellationTokenSource = null;
                 }
                 finally
@@ -191,38 +157,26 @@ namespace SoundDeck.Core.Playback.Players
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
-        private void InternalPlay(string file, float? maxGain = null)
+        private async Task InternalPlayAsync(string file, float? maxGain = null)
         {
-            using (var player = new WasapiOut(this.GetDevice(), AudioClientShareMode.Shared, false, PLAYBACK_STATE_POLL_DELAY))
-            using (var reader = new AudioFileReader(file))
+            using (var player = new AsyncWasapiOut(this.GetDevice(), file))
             {
                 // prepare the player
+                player.TimeChanged += this.TimeChanged;
                 if (maxGain != null)
                 {
-                    this.NormalizationProvider.ApplyLoudnessNormalization(reader, maxGain.Value);
+                    player.Init(maxGain.Value, this.NormalizationProvider);
                 }
-
-                player.Init(reader);
-                player.PlaybackStopped += (_, __) => this.Time = PlaybackTimeEventArgs.Zero;
+                else
+                {
+                    player.Init();
+                }
 
                 do
                 {
-                    this.InternalCancellationTokenSource.Token.Register(player.Stop);
-
-                    // play the audio clip
-                    reader.Seek(0, SeekOrigin.Begin);
-                    player.Play();
-
-                    this.Time = PlaybackTimeEventArgs.FromReader(reader);
                     this.State = PlaybackStateType.Playing;
+                    await player.PlayAsync(this.InternalCancellationTokenSource.Token);
 
-                    while (player.PlaybackState != PlaybackState.Stopped && this.IsPlayableState)
-                    {
-                        Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
-                        this.Time = PlaybackTimeEventArgs.FromReader(reader);
-                    }
-
-                    player.Stop();
                     this.State = PlaybackStateType.Stopped;
                 } while (this.IsLooped && this.IsPlayableState);
 
