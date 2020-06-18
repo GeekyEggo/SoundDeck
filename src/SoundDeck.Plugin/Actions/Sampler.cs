@@ -134,6 +134,7 @@ namespace SoundDeck.Plugin.Actions
             // determine if clearing is active
             if (SamplerClearer.IsActive)
             {
+                this.Player.Stop();
                 if (!string.IsNullOrWhiteSpace(settings.FilePath))
                 {
                     settings.FilePath = string.Empty;
