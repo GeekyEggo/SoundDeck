@@ -132,7 +132,7 @@ namespace SoundDeck.Plugin.Actions
             var settings = args.Payload.GetSettings<SamplerSettings>();
 
             // determine if clearing is active
-            if (ClearSample.IsActive)
+            if (SamplerClearer.IsActive)
             {
                 if (!string.IsNullOrWhiteSpace(settings.FilePath))
                 {
@@ -168,10 +168,10 @@ namespace SoundDeck.Plugin.Actions
             var settings = args.Payload.GetSettings<SamplerSettings>();
 
             // clearing, do nothing
-            if (ClearSample.IsActive)
+            if (SamplerClearer.IsActive)
             {
                 await this.SetStateAsync(RECORD_STATE);
-                ClearSample.SetIsActive(false, this);
+                SamplerClearer.SetIsActive(false, this);
 
                 await this.ShowOkAsync();
                 return;
