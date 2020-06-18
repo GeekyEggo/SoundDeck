@@ -24,7 +24,7 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.samplerclearer";
+        public const string UUID = "com.geekyeggo.sounddeck.clearsample";
 
         /// <summary>
         /// The active state.
