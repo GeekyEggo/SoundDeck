@@ -42,14 +42,6 @@ namespace SoundDeck.Plugin.Actions
         public static bool IsActive { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SamplerClearer"/> class.
-        /// </summary>
-        public SamplerClearer()
-        {
-            SamplerClearer.IsActiveChanged += this.SamplerClear_StateChanged;
-        }
-
-        /// <summary>
         /// Occurs when <see cref="SamplerClearer.IsActive"/> changes.
         /// </summary>
         private static event MultiStateChangedEventHandler IsActiveChanged;
@@ -78,13 +70,44 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
-        /// Occurs when this instance is initialized.
+        /// Occurs when <see cref="IStreamDeckConnection.WillAppear" /> is received for this instance.
         /// </summary>
         /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
-        protected override void OnInit(ActionEventArgs<AppearancePayload> args)
+        /// <returns>The task of handling the event.</returns>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
-            base.OnInit(args);
-            this.RefreshState();
+            try
+            {
+                await _syncRoot.WaitAsync();
+
+                await base.OnWillAppear(args);
+                SamplerClearer.IsActiveChanged += this.SamplerClear_StateChanged;
+
+                this.RefreshState();
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
+        }
+
+        /// <summary>
+        /// Occurs when <see cref="IStreamDeckConnection.WillDisappear" /> is received for this instance.
+        /// </summary>
+        /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
+        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
+        {
+            try
+            {
+                await _syncRoot.WaitAsync();
+
+                await base.OnWillDisappear(args);
+                SamplerClearer.IsActiveChanged -= this.SamplerClear_StateChanged;
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
 
         /// <summary>
