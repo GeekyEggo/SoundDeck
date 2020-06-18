@@ -4,9 +4,9 @@
 
 # <img src="./assets/sound-deck.svg" width="25" alt="Sound Deck Logo" /> Sound Deck
 
-*"Clip, record, sample, and playback... on **any audio device**!"*
+*"Clip, record, sample, and playback... **on any audio device**!"*
 
-Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control, audio capture, sampling, and audio playback... on any audio device; this makes Sound Deck a fantastic pairing with the Elgato Wave, or any other audio device provider, like the GoXLR or Voicemeter.
+Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control, audio capture, sampling, and audio playback... on any audio device; this makes Sound Deck a fantastic pairing with the Elgato Wave, or any other audio device provider, such as the GoXLR or Voicemeter.
 
 [<img src="./assets/elgato.svg" width="18" alt="Stream Deck Logo" /> Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [🌊 Elgato Wave](https://www.elgato.com/en/wave-3) + [<img src="./assets/sound-deck.svg" width="18" alt="Sound Deck Logo" /> Sound Deck](https://github.com/geekyeggo/sounddeck) = :heart:
 
@@ -24,7 +24,7 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 
 ## <img src="./assets/clip.svg" width="20" alt="Clip Audio Action" /> Clip Audio
 
-Think Twitch clips, but audio only, simple! The Clip Audio action lets you record the last _x_ seconds of audio for any of your computer's audio devices. After activating the action, the audio is clipped, and saved to the `Output Path` as an MP3/WAV file. Tip: this works great for recording silly moments in party chat!
+Think Twitch clips, but audio only, simple! The Clip Audio action lets you record the last _x_ seconds of audio for any of your computer's audio devices. After activating the action, the audio is clipped, and saved to the **Output Path** as an MP3/WAV file. Tip: this works great for recording silly moments in party chat!
 
 | Option | Description |
 --- | ---
@@ -36,7 +36,7 @@ Normalize Volume | When checked, volume levels within the audio clip are normali
 
 ## <img src="./assets/play.svg" width="18" alt="Play Audio Action" /> Play Audio
 
-Like the default _play audio_ action, but with more options and hype! The Play Audio action lets you play a list of audio files in the order you want, on the audio device you want. The action also lets you control how clips are played, via the `Action` option.
+Like the default _play audio_ action, but with more options and hype! The Play Audio action lets you play a list of audio files in the order you want, on the audio device you want. The action also lets you control how clips are played, via the **Action** option.
 
 | Option | Description |
 --- | ---
@@ -47,7 +47,7 @@ Files | The playlist of audio files to play. Files can be added by selecting `Ad
 
 ## <img src="./assets/record.svg" width="20" alt="Record Audio Action" /> Record Audio
 
-The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the `Output Path` as an MP3/WAV file.
+The Record Audio action lets you record an audio device for any duration of time. Press once to start recording, press again to stop recording, easy! After recording, audio clips are saved to the **Output Path** as an MP3/WAV file.
 
 | Option | Description |
 --- | ---
