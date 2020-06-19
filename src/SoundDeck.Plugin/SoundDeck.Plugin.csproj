@@ -67,16 +67,10 @@
     <None Update="Images\SamplerClear\Key0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SamplerClear\Unsupported\Key1@2x.gif">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Images\SamplerClear\Key1%402x.png">
+    <None Update="Images\SamplerClear\Key1@2x.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SamplerClear\Unsupported\Key1.gif">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Images\SamplerClear\Key1.png">
+    <None Update="Images\SamplerClear\Key1.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\Sampler\Action%402x.png">
