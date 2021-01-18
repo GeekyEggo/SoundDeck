@@ -1,7 +1,6 @@
 namespace SoundDeck.Plugin.Extensions
 {
     using System;
-    using System.Threading.Tasks;
     using SharpDeck.Enums;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Contracts;
@@ -17,8 +16,7 @@ namespace SoundDeck.Plugin.Extensions
         /// </summary>
         /// <param name="action">This instance.</param>
         /// <param name="settings">The settings.</param>
-        /// <param name="setTitleAsync">The delegate used to set the title of the action asynchronously.</param>
-        public static void SetPlayerSettings(this IPlayAudioAction action, IPlayAudioSettings settings, Func<string, TargetType, Task> setTitleAsync)
+        public static void SetPlayerSettings(this IPlayAudioAction action, IPlayAudioSettings settings)
         {
             action.SetPlaylist(settings);
             action.SetPlayer(settings);
@@ -56,7 +54,7 @@ namespace SoundDeck.Plugin.Extensions
             {
                 action.Player?.Dispose();
                 action.Player = action.AudioService.GetPlaylistPlayer(deviceId, settings.Action, action.Playlist);
-                action.Player.TimeChanged += GetTimeChangedHandler(action);
+                action.AddTimeChangedHandler();
             }
         }
 
@@ -64,10 +62,9 @@ namespace SoundDeck.Plugin.Extensions
         /// Constructs an event handler for <see cref="IAudioPlayer.TimeChanged"/>.
         /// </summary>
         /// <param name="action">The action.</param>
-        /// <returns>The event handler.</returns>
-        private static EventHandler<PlaybackTimeEventArgs> GetTimeChangedHandler(IPlayAudioAction action)
+        private static void AddTimeChangedHandler(this IPlayAudioAction action)
         {
-            return async (obj, e) =>
+            async void handler(object obj, PlaybackTimeEventArgs e)
             {
                 string title = null;
                 if (e.Current != TimeSpan.Zero)
@@ -76,8 +73,18 @@ namespace SoundDeck.Plugin.Extensions
                     title = remaining.TotalSeconds > 0.1f ? remaining.ToString("mm':'ss") : null;
                 }
 
-                await action.SetTitleAsync(title, TargetType.Both);
-            };
+                try
+                {
+                    await action.SetTitleAsync(title, TargetType.Both);
+                }
+                catch (ObjectDisposedException)
+                {
+                    action.Player.TimeChanged -= handler;
+                }
+            }
+
+            action.Player.Disposed += (_, __) => action.Player.TimeChanged -= handler;
+            action.Player.TimeChanged += handler;
         }
     }
 }

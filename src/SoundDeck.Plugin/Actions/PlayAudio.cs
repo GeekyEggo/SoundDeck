@@ -63,7 +63,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of updating the state of the object based on the settings.</returns>
         protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, PlayAudioSettings settings)
         {
-            this.SetPlayerSettings(settings, this.SetTitleAsync);
+            this.SetPlayerSettings(settings);
             return base.OnDidReceiveSettings(args, settings);
         }
 
@@ -75,7 +75,7 @@ namespace SoundDeck.Plugin.Actions
         protected override void OnInit(ActionEventArgs<AppearancePayload> args, PlayAudioSettings settings)
         {
             base.OnInit(args, settings);
-            this.SetPlayerSettings(settings, this.SetTitleAsync);
+            this.SetPlayerSettings(settings);
         }
 
         /// <summary>
