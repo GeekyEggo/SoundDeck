@@ -4,11 +4,17 @@ import arrayMove from "array-move";
 import { connect } from "react-sharpdeck";
 
 // a component wrapper of a sortable container, in the form of an ordered list
-const SortableList = sortableContainer(({ className, enableSort, items, onDelete }) => {
+const FileList = sortableContainer(({ className, enableSort, items, onDelete }) => {
     return (
         <ol className={className}>
             {items.map((value, index) => (
-                <SortableItem key={`item-${index}`} index={index} value={value} onDelete={onDelete} enableSort={enableSort} />
+                <FileItem
+                    key={`item-${index}`}
+                    index={index}
+                    fileIndex={index}
+                    value={value}
+                    onDelete={onDelete}
+                    enableSort={enableSort} />
             ))}
         </ol>
     );
@@ -22,7 +28,7 @@ const DragHandle = sortableHandle(() => {
 });
 
 // a component wrapper of a sortable element, in the form of a list item
-const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) => {
+const FileItem = sortableElement(({ enableSort, fileIndex, onDelete, value }) => {
     const [showOptions, setShowOptions] = useState(false);
     const [volume, setVolume] = useState(100);
 
@@ -31,7 +37,7 @@ const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) =>
      */
     function handleDelete() {
         setShowOptions(false);
-        onDelete(index);
+        onDelete(fileIndex);
     }
 
     return (
@@ -144,7 +150,7 @@ class FilesPicker extends React.Component {
 
                 <div type="list" className="sdpi-item list">
                     <div className="sdpi-item-label opacity-zero">&nbsp;</div>
-                    <SortableList className="sdpi-item-value files-list"
+                    <FileList className="sdpi-item-value files-list"
                         enableSort={this.props.enableSort}
                         items={this.state.value.map(file => file.path.replace(/^.*[\\\/]/, ''))}
                         lockAxis="y"
