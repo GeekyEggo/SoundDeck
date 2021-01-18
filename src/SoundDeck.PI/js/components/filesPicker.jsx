@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { sortableContainer, sortableElement, sortableHandle } from "react-sortable-hoc";
 import arrayMove from "array-move";
 import { connect } from "react-sharpdeck";
@@ -14,23 +14,60 @@ const SortableList = sortableContainer(({ className, enableSort, items, onDelete
     );
 });
 
-// a component wrapper of a sortable element, in the form of a list item
-const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) => {
-    return (
-        <li className="sortable">
-            {enableSort && <DragHandle /> }
-            <span className="sortable_value">{value}</span>
-            <span className="delete-handle sortable_icon flex-right" title="Remove" onClick={() => onDelete(index)}></span>
-        </li>
-    );
-});
-
 // a component wrapper of a sortable handle, used to move items within the list
 const DragHandle = sortableHandle(() => {
     return (
         <span className="drag-handle sortable_icon">&nbsp;</span>
     )
 });
+
+// a component wrapper of a sortable element, in the form of a list item
+const SortableItem = sortableElement(({ enableSort, index, onDelete, value }) => {
+    const [showOptions, setShowOptions] = useState(false);
+    const [volume, setVolume] = useState(100);
+
+    /*
+     * Bubbles the deletion after reseting the options; this prevents subsequent item options from showing.
+     */
+    function handleDelete() {
+        setShowOptions(false);
+        onDelete(index);
+    }
+
+    return (
+        <li className="sortable">
+            {showOptions
+                ? <ClipOptions onDelete={handleDelete} volume={volume} onVolumeChange={ev => setVolume(ev.target.value)} />
+                : <ClipInfo enableSort={enableSort} value={value} />
+            }
+            <span className="cog-handle icon sortable_icon flex-right can-click" title="Options" onClick={() => setShowOptions(!showOptions)}></span>
+        </li>
+    );
+});
+
+// shows the clip info, including the drag handle if available
+function ClipInfo({ enableSort, value }) {
+    return (
+        <React.Fragment>
+            {enableSort && <DragHandle /> }
+            <span className="sortable_value">{value}</span>
+        </React.Fragment>
+    );
+}
+
+// shows the clip options
+function ClipOptions({ onDelete, onVolumeChange, volume }) {
+    return (
+        <React.Fragment>
+            <span className="volume-icon icon sortable_icon"></span>
+            <span className="sortable_value">
+                <input type="range" min="50" max="125" value={volume} onChange={onVolumeChange} />
+            </span>
+            <span className="sortable_icon">{volume}</span>
+            <span className="delete-handle icon sortable_icon flex-right can-click" title="Remove" onClick={onDelete}></span>
+        </React.Fragment>
+    )
+}
 
 class FilesPicker extends React.Component {
     constructor(props) {

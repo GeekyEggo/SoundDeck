@@ -73,6 +73,7 @@ li.sortable {
     flex-direction: row;
     list-style-type: none;
     margin-bottom: 1px;
+    padding-right: 3px;
 }
 
     li.sortable:hover,
@@ -82,6 +83,14 @@ li.sortable {
 
 li.sortable span {
     padding: 8px 2px;
+}
+
+li.sortable span.icon {
+    padding: 0 2px;
+}
+
+li.sortable span.can-click:hover {
+    filter: brightness(2);
 }
 
 .sortable_icon {
@@ -95,14 +104,22 @@ li.sortable span {
     background-image: url(../imgs/drag.svg);
 }
 
-.delete-handle {
+.cog-handle {
     cursor: pointer;
-    background-image: url(../imgs/cross.svg);
+    background-image: url(../imgs/cog.svg);
+    background-size: 16px;
 }
 
-    .delete-handle:hover {
-        background-image: url(../imgs/cross-active.svg);
-    }
+.delete-handle {
+    cursor: pointer;
+    background-image: url(../imgs/trash.svg);
+    background-size: 14px;
+}
+
+.volume-icon {
+    background-image: url(../imgs/volume.svg);
+    background-size: 16px;
+}
 
 .sortable_value {
     white-space: nowrap;
@@ -116,4 +133,9 @@ li.sortable span:first-child.sortable_value {
 
 .flex-right {
     margin-left: auto;
+}
+
+input[type="range"] {
+    margin-top: 0 !important;
+    width: 100% !important;
 }
