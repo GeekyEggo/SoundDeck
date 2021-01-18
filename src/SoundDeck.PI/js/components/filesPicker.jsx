@@ -4,16 +4,17 @@ import arrayMove from "array-move";
 import { connect } from "react-sharpdeck";
 
 // a component wrapper of a sortable container, in the form of an ordered list
-const FileList = sortableContainer(({ className, enableSort, items, onDelete }) => {
+const FileList = sortableContainer(({ className, enableSort, items, onDelete, onVolumeChanged }) => {
     return (
         <ol className={className}>
-            {items.map((value, index) => (
+            {items.map((item, index) => (
                 <FileItem
                     key={`item-${index}`}
                     index={index}
                     fileIndex={index}
-                    value={value}
+                    item={item}
                     onDelete={onDelete}
+                    onVolumeChanged={onVolumeChanged}
                     enableSort={enableSort} />
             ))}
         </ol>
@@ -28,9 +29,9 @@ const DragHandle = sortableHandle(() => {
 });
 
 // a component wrapper of a sortable element, in the form of a list item
-const FileItem = sortableElement(({ enableSort, fileIndex, onDelete, value }) => {
+const FileItem = sortableElement(({ enableSort, fileIndex, item, onDelete, onVolumeChanged }) => {
     const [showOptions, setShowOptions] = useState(false);
-    const [volume, setVolume] = useState(100);
+    const [volume, setVolume] = useState(item.volume || 100);
 
     /*
      * Bubbles the deletion after reseting the options; this prevents subsequent item options from showing.
@@ -43,8 +44,8 @@ const FileItem = sortableElement(({ enableSort, fileIndex, onDelete, value }) =>
     return (
         <li className="sortable">
             {showOptions
-                ? <ClipOptions onDelete={handleDelete} volume={volume} onVolumeChange={ev => setVolume(ev.target.value)} />
-                : <ClipInfo enableSort={enableSort} value={value} />
+                ? <ClipOptions onDelete={handleDelete} volume={volume} onVolumeChange={ev => setVolume(ev.target.value)} onVolumeChanged={() => onVolumeChanged(fileIndex, volume)} />
+                : <ClipInfo enableSort={enableSort} fileName={item.path.replace(/^.*[\\\/]/, '')} />
             }
             <span className="cog-handle icon sortable_icon flex-right can-click" title="Options" onClick={() => setShowOptions(!showOptions)}></span>
         </li>
@@ -52,22 +53,22 @@ const FileItem = sortableElement(({ enableSort, fileIndex, onDelete, value }) =>
 });
 
 // shows the clip info, including the drag handle if available
-function ClipInfo({ enableSort, value }) {
+function ClipInfo({ enableSort, fileName }) {
     return (
         <React.Fragment>
             {enableSort && <DragHandle /> }
-            <span className="sortable_value">{value}</span>
+            <span className="sortable_value">{fileName}</span>
         </React.Fragment>
     );
 }
 
 // shows the clip options
-function ClipOptions({ onDelete, onVolumeChange, volume }) {
+function ClipOptions({ onDelete, onVolumeChange, onVolumeChanged, volume }) {
     return (
         <React.Fragment>
             <span className="volume-icon icon sortable_icon"></span>
             <span className="sortable_value">
-                <input type="range" min="50" max="125" value={volume} onChange={onVolumeChange} />
+                <input type="range" min="50" max="125" value={volume} onChange={onVolumeChange} onMouseUp={onVolumeChanged} />
             </span>
             <span className="sortable_icon">{volume}</span>
             <span className="delete-handle icon sortable_icon flex-right can-click" title="Remove" onClick={onDelete}></span>
@@ -84,6 +85,7 @@ class FilesPicker extends React.Component {
         this.handleDelete = this.handleDelete.bind(this);
         this.handleFileChange = this.handleFileChange.bind(this);
         this.handleSortEnd = this.handleSortEnd.bind(this);
+        this.handleVolumeChanged = this.handleVolumeChanged.bind(this);
     }
 
     /**
@@ -135,6 +137,18 @@ class FilesPicker extends React.Component {
         this.handleChange(value => arrayMove(value, oldIndex, newIndex));
     }
 
+    /**
+     * Handles an items volume changing.
+     * @param {Number} index The index of the item being changed.
+     * @param {Number} volume The new desired volume.
+     */
+    handleVolumeChanged(index, volume) {
+        this.handleChange(value => {
+            value[index].volume = volume;
+            return value;
+        })
+    }
+
     render() {
         const id = this.props.id || this.props.valuePath;
 
@@ -152,10 +166,11 @@ class FilesPicker extends React.Component {
                     <div className="sdpi-item-label opacity-zero">&nbsp;</div>
                     <FileList className="sdpi-item-value files-list"
                         enableSort={this.props.enableSort}
-                        items={this.state.value.map(file => file.path.replace(/^.*[\\\/]/, ''))}
+                        items={this.state.value}
                         lockAxis="y"
                         onDelete={this.handleDelete}
                         onSortEnd={this.handleSortEnd}
+                        onVolumeChanged={this.handleVolumeChanged}
                         useDragHandle={true} />
                 </div>
             </div>
