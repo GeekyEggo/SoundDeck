@@ -178,7 +178,6 @@ class FilesPicker extends React.Component {
      * @param {Number} volume The new desired volume.
      */
     handleVolumeChanged(file) {
-        console.log(file);
         streamDeckClient.sendToPlugin({
             event: "SetTestVolume",
             ...file
@@ -186,7 +185,6 @@ class FilesPicker extends React.Component {
 
         this.handleChange(value => {
             value[file.index].volume = file.volume;
-            console.log(value);
             return value;
         });
     }
