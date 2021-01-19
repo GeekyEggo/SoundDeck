@@ -8,7 +8,7 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets the audio files to play.
         /// </summary>
-        PlaylistFile[] Files { get; }
+        AudioFileInfo[] Files { get; }
 
         /// <summary>
         /// Gets the playback order.

@@ -10,11 +10,6 @@ namespace SoundDeck.Core.Playback.Players
     public abstract class PlaylistPlayer : IPlaylistPlayer
     {
         /// <summary>
-        /// The maximum gain.
-        /// </summary>
-        private const float MAX_GAIN = 0.35f;
-
-        /// <summary>
         /// The synchronization root object.
         /// </summary>
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
@@ -30,7 +25,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="options">The options.</param>
         public PlaylistPlayer(PlaylistPlayerOptions options)
         {
-            this.Player = new AudioPlayer(options.DeviceId, options.NormalizationProvider);
+            this.Player = new AudioPlayer(options.DeviceId);
             this.Playlist = options.Playlist;
         }
 
@@ -59,9 +54,23 @@ namespace SoundDeck.Core.Playback.Players
         public string DeviceId => this.Player.DeviceId;
 
         /// <summary>
+        /// Gets the name of the file being played.
+        /// </summary>
+        public string FileName => this.Player?.FileName;
+
+        /// <summary>
         /// Gets the state.
         /// </summary>
         public PlaybackStateType State { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
+        /// </summary>
+        public float Volume
+        {
+            get => this.Player.Volume;
+            set => this.Player.Volume = value;
+        }
 
         /// <summary>
         /// Gets the internal player responsible for playing clips within the <see cref="Playlist"/>.
@@ -204,7 +213,7 @@ namespace SoundDeck.Core.Playback.Players
                     break;
                 }
 
-                await this.Player.PlayAsync(this.Playlist.Current.Path, MAX_GAIN);
+                await this.Player.PlayAsync(this.Playlist.Current);
             }
             while (this.CanContinuePlaying(cancellationToken));
 

@@ -5,7 +5,7 @@ namespace SoundDeck.Core.Playback
     /// <summary>
     /// Provides a playlist of files.
     /// </summary>
-    public interface IPlaylist : IEnumerator<PlaylistFile>
+    public interface IPlaylist : IEnumerator<AudioFileInfo>
     {
         /// <summary>
         /// Gets the number of items within the playlist.

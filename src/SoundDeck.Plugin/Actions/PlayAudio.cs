@@ -5,6 +5,7 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
+    using SharpDeck.PropertyInspectors;
     using SoundDeck.Core;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Contracts;
@@ -16,8 +17,13 @@ namespace SoundDeck.Plugin.Actions
     /// </summary>
     [StreamDeckAction("Play Audio", UUID, "Images/PlayAudio/Action", Tooltip = "Play an audio clip, or three... or more, in the order your heart desires.")]
     [StreamDeckActionState("Images/PlayAudio/Key")]
-    public class PlayAudio  : ActionBase<PlayAudioSettings>, IPlayAudioAction
+    public class PlayAudio : ActionBase<PlayAudioSettings>, IPlayAudioAction
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private static readonly object _syncRoot = new object();
+
         /// <summary>
         /// The unique identifier for the action.
         /// </summary>
@@ -44,11 +50,54 @@ namespace SoundDeck.Plugin.Actions
         public Playlist Playlist { get; set; }
 
         /// <summary>
+        /// Gets or sets the player used to test the volume.
+        /// </summary>
+        private IAudioFilePlayer VolumeTestPlayer { get; set; }
+
+        /// <summary>
+        /// Sets the volume of the audio clip whos volume is being tested.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        [PropertyInspectorMethod]
+        public void SetTestVolume(AudioFileInfo file)
+        {
+            lock (_syncRoot)
+            {
+                if (this.Player?.FileName == file.Path)
+                {
+                    this.Player.Volume = file.Volume;
+                }
+
+                if (this.VolumeTestPlayer?.FileName == file.Path)
+                {
+                    this.VolumeTestPlayer.Volume = file.Volume;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tests the volume of the specified audio file by playing it.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        [PropertyInspectorMethod]
+        public void TestVolume(AudioFileInfo file)
+        {
+            lock (_syncRoot)
+            {
+                this.VolumeTestPlayer?.Dispose();
+
+                this.VolumeTestPlayer = this.AudioService.GetAudioPlayer(this.Player.DeviceId);
+                _ = this.VolumeTestPlayer.PlayAsync(file);
+            }
+        }
+
+        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
+            this.VolumeTestPlayer?.Dispose();
             this.Player?.Dispose();
             this.SetTitleAsync();
 

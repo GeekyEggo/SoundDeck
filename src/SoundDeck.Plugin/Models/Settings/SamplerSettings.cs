@@ -44,13 +44,13 @@ namespace SoundDeck.Plugin.Models.Settings
         /// Gets the audio files to play.
         /// </summary>
         [JsonIgnore]
-        public PlaylistFile[] Files
+        public AudioFileInfo[] Files
         {
             get
             {
                 return string.IsNullOrWhiteSpace(this.FilePath)
-                    ? new PlaylistFile[0]
-                    : new[] { new PlaylistFile { Path = this.FilePath } };
+                    ? new AudioFileInfo[0]
+                    : new[] { new AudioFileInfo { Path = this.FilePath } };
             }
         }
 

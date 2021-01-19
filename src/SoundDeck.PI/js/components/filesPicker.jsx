@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { sortableContainer, sortableElement, sortableHandle } from "react-sortable-hoc";
 import arrayMove from "array-move";
-import { connect } from "react-sharpdeck";
+import { connect, streamDeckClient } from "react-sharpdeck";
+
+const DEFAULT_VOLUME = 0.75;
 
 // a component wrapper of a sortable container, in the form of an ordered list
 const FileList = sortableContainer(({ className, enableSort, items, onDelete, onVolumeChanged }) => {
@@ -40,10 +42,21 @@ const FileItem = sortableElement(({ enableSort, fileIndex, item, onDelete, onVol
         onDelete(fileIndex);
     }
 
+    /**
+     * Sends a request to the plug-in to play the audio clip.
+     */
+    function handlePlay() {
+        streamDeckClient.sendToPlugin({
+            event: "TestVolume",
+            path: item.path,
+            volume: item.volume || DEFAULT_VOLUME
+        })
+    }
+
     return (
         <li className="sortable">
             {showOptions
-                ? <ClipOptions onDelete={handleDelete} volume={item.volume} onVolumeChanged={volume => onVolumeChanged(fileIndex, volume)} />
+                ? <ClipOptions handlePlay={handlePlay} onDelete={handleDelete} onVolumeChanged={volume => onVolumeChanged({ index: fileIndex, path: item.path, volume})} volume={item.volume} />
                 : <ClipInfo enableSort={enableSort} fileName={item.path.replace(/^.*[\\\/]/, '')} />
             }
             <span className="cog-handle icon sortable_icon flex-right can-click" title="Options" onClick={() => setShowOptions(!showOptions)}></span>
@@ -62,8 +75,8 @@ function ClipInfo({ enableSort, fileName }) {
 }
 
 // shows the clip options
-function ClipOptions({ onDelete, onVolumeChanged, volume }) {
-    const [internalVolume, setVolume] = useState(volume || 100);
+function ClipOptions({ handlePlay, onDelete, onVolumeChanged, volume }) {
+    const [rangeVolume, setVolume] = useState(Math.round((volume || DEFAULT_VOLUME) * 100));
 
     /**
      * Handles the volume changing; this can occur when the mouse is moving the slider, or when a key press changes the value.
@@ -75,24 +88,24 @@ function ClipOptions({ onDelete, onVolumeChanged, volume }) {
         // when a change occurred via a key, invoke changed
         const keyCode = ev.nativeEvent.keyCode;
         if (keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40) {
-            onVolumeChanged(internalVolume);
+            onVolumeChanged(rangeVolume / 100);
         }
     }
 
     return (
         <React.Fragment>
-            <span className="volume-icon icon sortable_icon"></span>
+            <span className="volume-icon icon sortable_icon can-click" onClick={handlePlay}></span>
             <span className="sortable_value">
                 <input
                     type="range"
-                    min="50"
-                    max="125"
-                    value={internalVolume}
+                    min="0"
+                    max="100"
+                    value={rangeVolume}
                     onChange={handleVolumeChange}
                     onKeyUp={handleVolumeChange}
-                    onMouseUp={() => onVolumeChanged(internalVolume)} />
+                    onMouseUp={() => onVolumeChanged(rangeVolume / 100)} />
             </span>
-            <span className="sortable_icon">{internalVolume}</span>
+            <span className="sortable_icon">{rangeVolume}</span>
             <span className="delete-handle icon sortable_icon flex-right can-click" title="Remove" onClick={onDelete}></span>
         </React.Fragment>
     )
@@ -164,11 +177,18 @@ class FilesPicker extends React.Component {
      * @param {Number} index The index of the item being changed.
      * @param {Number} volume The new desired volume.
      */
-    handleVolumeChanged(index, volume) {
-        this.handleChange(value => {
-            value[index].volume = volume;
-            return value;
+    handleVolumeChanged(file) {
+        console.log(file);
+        streamDeckClient.sendToPlugin({
+            event: "SetTestVolume",
+            ...file
         })
+
+        this.handleChange(value => {
+            value[file.index].volume = file.volume;
+            console.log(value);
+            return value;
+        });
     }
 
     render() {

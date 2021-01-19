@@ -90,6 +90,7 @@ li.sortable span.icon {
 }
 
 li.sortable span.can-click:hover {
+    cursor: pointer;
     filter: brightness(2);
 }
 
@@ -105,13 +106,11 @@ li.sortable span.can-click:hover {
 }
 
 .cog-handle {
-    cursor: pointer;
     background-image: url(../imgs/cog.svg);
     background-size: 16px;
 }
 
 .delete-handle {
-    cursor: pointer;
     background-image: url(../imgs/trash.svg);
     background-size: 14px;
 }

@@ -20,6 +20,11 @@ namespace SoundDeck.Core.Playback
         private readonly object _syncRoot = new object();
 
         /// <summary>
+        /// Private member field for <see cref="OriginalItems"/>.
+        /// </summary>
+        private AudioFileInfo[] _originalItems = new AudioFileInfo[0];
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Playlist"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
@@ -31,7 +36,7 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
         /// </summary>
-        public PlaylistFile Current => this.OrderedItems[this.CurrentIndex];
+        public AudioFileInfo Current => this.OrderedItems[this.CurrentIndex];
 
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
@@ -70,12 +75,54 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Gets or sets the items; these are the ordered <see cref="OriginalItems"/>.
         /// </summary>
-        private PlaylistFile[] OrderedItems { get; set; }
+        private AudioFileInfo[] OrderedItems { get; set; }
 
         /// <summary>
         /// Gets or sets the original items.
         /// </summary>
-        private PlaylistFile[] OriginalItems { get; set; }
+        private AudioFileInfo[] OriginalItems
+        {
+            get => this._originalItems;
+            set
+            {
+                void SetOriginalItems()
+                {
+                    this._originalItems = value;
+                    this.RefreshOrder();
+                    this.Reset();
+                }
+
+                lock (this._syncRoot)
+                {
+                    // When both values are null, do nothing.
+                    if (this._originalItems == null
+                        && value == null)
+                    {
+                        return;
+                    }
+
+                    // When the collection lengths differ, set the items again.
+                    if (this._originalItems?.Length != value?.Length)
+                    {
+                        SetOriginalItems();
+                        return;
+                    }
+
+                    // Whilst the items are sequentially the same, set their volumes; otherwise simply reset the items.
+                    for (var i = 0; i < this._originalItems.Length; i++)
+                    {
+                        if (this._originalItems[i].Path == value[i].Path)
+                        {
+                            this._originalItems[i].Volume = value[i].Volume;
+                        }
+                        else
+                        {
+                            SetOriginalItems();
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -118,10 +165,7 @@ namespace SoundDeck.Core.Playback
             lock (this._syncRoot)
             {
                 // set the files
-                if (this.TrySetFiles(options.Files))
-                {
-                    this.Reset();
-                }
+                this.OriginalItems = options.Files;
 
                 // refresh the order if its changed
                 if (options.Order != this.Order)
@@ -158,25 +202,6 @@ namespace SoundDeck.Core.Playback
             {
                 this.OrderedItems = this.OriginalItems;
             }
-        }
-
-        /// <summary>
-        /// Tries to set <see cref="OriginalItems"/>, based on the equality of <paramref name="newFiles"/>.
-        /// </summary>
-        /// <param name="newFiles">The new files.</param>
-        /// <returns><c>true</c> when the files were updated; otherwise <c>false</c>.</returns>
-        private bool TrySetFiles(PlaylistFile[] newFiles)
-        {
-            newFiles = newFiles ?? new PlaylistFile[0];
-            if (this.OriginalItems?.SequenceEqual(newFiles, new PlaylistFilePathComparer()) == true)
-            {
-                return false;
-            }
-
-            this.OriginalItems = newFiles;
-            this.RefreshOrder();
-
-            return true;
         }
     }
 }

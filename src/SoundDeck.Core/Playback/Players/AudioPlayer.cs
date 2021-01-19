@@ -16,13 +16,17 @@ namespace SoundDeck.Core.Playback.Players
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
+        /// Private member field for <see cref="Volume"/>.
+        /// </summary>
+        private float _volume = 1;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
-        internal AudioPlayer(string deviceId, INormalizationProvider normalizationProvider)
+        internal AudioPlayer(string deviceId)
         {
             this.DeviceId = deviceId;
-            this.NormalizationProvider = normalizationProvider;
 
             this.IsLooped = false;
             this.State = PlaybackStateType.Stopped;
@@ -39,9 +43,19 @@ namespace SoundDeck.Core.Playback.Players
         public event EventHandler<PlaybackTimeEventArgs> TimeChanged;
 
         /// <summary>
+        /// Occurs when the volume of the audio player changes.
+        /// </summary>
+        public event EventHandler VolumeChanged;
+
+        /// <summary>
         /// Gets the audio device identifier.
         /// </summary>
         public string DeviceId { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the file being played.
+        /// </summary>
+        public string FileName { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is looped.
@@ -54,9 +68,20 @@ namespace SoundDeck.Core.Playback.Players
         public PlaybackStateType State { get; private set; }
 
         /// <summary>
-        /// Gets the normalization provider.
+        /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
         /// </summary>
-        private INormalizationProvider NormalizationProvider { get; }
+        public float Volume
+        {
+            get => this._volume;
+            set
+            {
+                if (this._volume != value)
+                {
+                    this._volume = value;
+                    this.VolumeChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is disposed.
@@ -88,10 +113,9 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Plays the audio file asynchronously.
         /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
+        /// <param name="file">The file to play.</param>
         /// <returns>The task of the audio file being played.</returns>
-        public Task PlayAsync(string file, float? maxGain = null)
+        public Task PlayAsync(AudioFileInfo file)
         {
             if (this.IsDisposed)
             {
@@ -105,7 +129,7 @@ namespace SoundDeck.Core.Playback.Players
                     await this._syncRoot.WaitAsync();
 
                     this.InternalCancellationTokenSource = new CancellationTokenSource();
-                    await this.InternalPlayAsync(file, maxGain);
+                    await this.InternalPlayAsync(file);
                     this.InternalCancellationTokenSource = null;
                 }
                 finally
@@ -156,21 +180,22 @@ namespace SoundDeck.Core.Playback.Players
         /// Plays the audio file.
         /// </summary>
         /// <param name="file">The file.</param>
-        /// <param name="maxGain">The optional maximum gain; when null, the default volume is used.</param>
-        private async Task InternalPlayAsync(string file, float? maxGain = null)
+        /// <returns>The task of playing the audio file.</returns>
+        private async Task InternalPlayAsync(AudioFileInfo file)
         {
-            using (var player = new AsyncWasapiOut(this.GetDevice(), file))
+            this.FileName = file.Path;
+            this.Volume = file.Volume;
+
+            using (var player = new AsyncWasapiOut(this.GetDevice(), file.Path))
             {
+                void SynchronizeVolume(object sender, EventArgs e) => player.Volume = this.Volume;
+
                 // prepare the player
                 player.TimeChanged += this.TimeChanged;
-                if (maxGain != null)
-                {
-                    player.Init(maxGain.Value, this.NormalizationProvider);
-                }
-                else
-                {
-                    player.Init();
-                }
+                this.VolumeChanged += SynchronizeVolume;
+
+                player.Init();
+                SynchronizeVolume(this, EventArgs.Empty);
 
                 do
                 {
@@ -181,7 +206,10 @@ namespace SoundDeck.Core.Playback.Players
                 } while (this.IsLooped && this.IsPlayableState);
 
                 this.TimeChanged?.Invoke(this, new PlaybackTimeEventArgs(TimeSpan.Zero, TimeSpan.Zero));
+                this.VolumeChanged -= SynchronizeVolume;
             }
+
+            this.FileName = string.Empty;
         }
     }
 }

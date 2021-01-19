@@ -22,7 +22,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the audio files to play.
         /// </summary>
-        public PlaylistFile[] Files { get; set; }
+        public AudioFileInfo[] Files { get; set; }
 
         /// <summary>
         /// Gets or sets the playback order.

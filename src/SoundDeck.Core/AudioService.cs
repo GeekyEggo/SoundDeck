@@ -24,7 +24,6 @@ namespace SoundDeck.Core
         public AudioService(ILogger<AudioService> logger)
         {
             this.Devices = new AudioDeviceCollection();
-            this.NormalizationProvider = new CachedNormalizationProvider();
             this.SharedAudioBufferManager = new SharedAudioBufferManager(logger);
         }
 
@@ -32,11 +31,6 @@ namespace SoundDeck.Core
         /// Gets the audio devices.
         /// </summary>
         public IAudioDeviceCollection Devices { get; }
-
-        /// <summary>
-        /// Gets or sets the normalization provider.
-        /// </summary>
-        public INormalizationProvider NormalizationProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the players.
@@ -92,7 +86,7 @@ namespace SoundDeck.Core
         /// <returns>The audio player.</returns>
         public IAudioFilePlayer GetAudioPlayer(string deviceId)
         {
-            var player = new AudioPlayer(deviceId, this.NormalizationProvider);
+            var player = new AudioPlayer(deviceId);
             this.Players.Add(player);
 
             return player;
@@ -131,7 +125,6 @@ namespace SoundDeck.Core
             var options = new PlaylistPlayerOptions
             {
                 DeviceId = deviceId,
-                NormalizationProvider = this.NormalizationProvider,
                 Playlist = playlist
             };
 
