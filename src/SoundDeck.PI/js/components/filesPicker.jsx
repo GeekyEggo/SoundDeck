@@ -31,7 +31,6 @@ const DragHandle = sortableHandle(() => {
 // a component wrapper of a sortable element, in the form of a list item
 const FileItem = sortableElement(({ enableSort, fileIndex, item, onDelete, onVolumeChanged }) => {
     const [showOptions, setShowOptions] = useState(false);
-    const [volume, setVolume] = useState(item.volume || 100);
 
     /*
      * Bubbles the deletion after reseting the options; this prevents subsequent item options from showing.
@@ -44,7 +43,7 @@ const FileItem = sortableElement(({ enableSort, fileIndex, item, onDelete, onVol
     return (
         <li className="sortable">
             {showOptions
-                ? <ClipOptions onDelete={handleDelete} volume={volume} onVolumeChange={ev => setVolume(ev.target.value)} onVolumeChanged={() => onVolumeChanged(fileIndex, volume)} />
+                ? <ClipOptions onDelete={handleDelete} volume={item.volume} onVolumeChanged={volume => onVolumeChanged(fileIndex, volume)} />
                 : <ClipInfo enableSort={enableSort} fileName={item.path.replace(/^.*[\\\/]/, '')} />
             }
             <span className="cog-handle icon sortable_icon flex-right can-click" title="Options" onClick={() => setShowOptions(!showOptions)}></span>
@@ -63,14 +62,37 @@ function ClipInfo({ enableSort, fileName }) {
 }
 
 // shows the clip options
-function ClipOptions({ onDelete, onVolumeChange, onVolumeChanged, volume }) {
+function ClipOptions({ onDelete, onVolumeChanged, volume }) {
+    const [internalVolume, setVolume] = useState(volume || 100);
+
+    /**
+     * Handles the volume changing; this can occur when the mouse is moving the slider, or when a key press changes the value.
+     * @param {Event} ev The event that triggered the volume change.
+     */
+    function handleVolumeChange(ev) {
+        setVolume(ev.target.value);
+
+        // when a change occurred via a key, invoke changed
+        const keyCode = ev.nativeEvent.keyCode;
+        if (keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40) {
+            onVolumeChanged(internalVolume);
+        }
+    }
+
     return (
         <React.Fragment>
             <span className="volume-icon icon sortable_icon"></span>
             <span className="sortable_value">
-                <input type="range" min="50" max="125" value={volume} onChange={onVolumeChange} onMouseUp={onVolumeChanged} />
+                <input
+                    type="range"
+                    min="50"
+                    max="125"
+                    value={internalVolume}
+                    onChange={handleVolumeChange}
+                    onKeyUp={handleVolumeChange}
+                    onMouseUp={() => onVolumeChanged(internalVolume)} />
             </span>
-            <span className="sortable_icon">{volume}</span>
+            <span className="sortable_icon">{internalVolume}</span>
             <span className="delete-handle icon sortable_icon flex-right can-click" title="Remove" onClick={onDelete}></span>
         </React.Fragment>
     )
