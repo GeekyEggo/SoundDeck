@@ -43,6 +43,13 @@ namespace SoundDeck.Core
         IAudioRecorder GetAudioRecorder(string deviceId);
 
         /// <summary>
+        /// Gets the audio player for the specified <paramref name="deviceId"/>.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <returns>The audio player.</returns>
+        IAudioFilePlayer GetAudioPlayer(string deviceId);
+
+        /// <summary>
         /// Gets the playlist player for the associated playlist player action type.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
