@@ -188,7 +188,7 @@ namespace SoundDeck.Core.Playback.Players
 
             using (var player = new AsyncWasapiOut(this.GetDevice(), file.Path))
             {
-                void SynchronizeVolume(object sender, EventArgs e) => player.Volume = this.Volume;
+                void SynchronizeVolume(object sender, EventArgs e) => player.FileVolume = this.Volume;
 
                 // prepare the player
                 player.TimeChanged += this.TimeChanged;

@@ -45,6 +45,21 @@ namespace SoundDeck.Core.Playback
         public event EventHandler<PlaybackTimeEventArgs> TimeChanged;
 
         /// <summary>
+        /// Gets or sets volume.
+        /// </summary>
+        public float FileVolume
+        {
+            get => this.Reader.Volume;
+            set
+            {
+                if (!this.IsDisposed)
+                {
+                    this.Reader.Volume = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the current and total time of the audio being played.
         /// </summary>
         public PlaybackTimeEventArgs Time
