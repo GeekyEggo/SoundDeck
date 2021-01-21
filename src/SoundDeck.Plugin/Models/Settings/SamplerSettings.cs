@@ -18,7 +18,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets a value indicating whether to encode the audio buffer to an MP3.
         /// </summary>
-        public bool EncodeToMP3 { get; set; } = true;
+        public bool EncodeToMP3 { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the output path.
