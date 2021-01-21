@@ -28,7 +28,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets a value indicating whether to normalize the volume of the buffer.
         /// </summary>
-        public bool NormalizeVolume { get; set; } = false;
+        public bool NormalizeVolume { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the audio device identifier to playback the audio.
