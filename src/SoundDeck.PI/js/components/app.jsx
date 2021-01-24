@@ -2,6 +2,7 @@ import React from "react";
 import CaptureAudioSettings from "./captureAudioSettings";
 import PlayAudioSettings from "./playAudioSettings";
 import SamplerSettings from "./samplerSettings";
+import SetAppAudioSettings from "./setAppAudioSettings"
 
 class App extends React.Component {
     render() {
@@ -19,6 +20,9 @@ class App extends React.Component {
 
             case "com.geekyeggo.sounddeck.sampler":
                 return <SamplerSettings />;
+
+            case "com.geekyeggo.sounddeck.setappaudio":
+                return <SetAppAudioSettings />
 
             default:
                 return <div />
