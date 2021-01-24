@@ -12,12 +12,12 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 
 ## ⚡ Actions
 
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/clip.svg" width="13" /> [Clip Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Clip-Audio)
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/play.svg" width="13" /> [Play Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Play-Audio)
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/record.svg" width="13" /> [Record Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Record-Audio)
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/sampler.svg" width="13" /> [Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Sampler)
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/clear-sampler.svg" width="13" /> [Clear Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Clear-Sampler)
-- <img src="https://raw.githubusercontent.com/GeekyEggo/SoundDeck/master/assets/stop.svg" width="13" /> [Stop Audio (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Stop-Audio)
+- [Clip Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Clip-Audio)
+- [Play Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Play-Audio)
+- [Record Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Record-Audio)
+- [Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Sampler)
+- [Clear Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Clear-Sampler)
+- [Stop Audio (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Stop-Audio)
 
 ## :rotating_light: Frequently Asked Questions
 
