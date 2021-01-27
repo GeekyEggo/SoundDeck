@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Serialization
+namespace SoundDeck.Core.Serialization
 {
     using Newtonsoft.Json;
     using System;
@@ -39,6 +39,6 @@
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, TimeSpan value, JsonSerializer serializer)
-            => writer.WriteValue(value.Seconds);
+            => writer.WriteValue(value.TotalSeconds);
     }
 }
