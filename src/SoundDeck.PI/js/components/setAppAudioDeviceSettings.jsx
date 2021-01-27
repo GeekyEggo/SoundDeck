@@ -1,7 +1,7 @@
 import React from "react";
 import { PropertyInspectorWrapper, Select, store, TextField } from "react-sharpdeck";
 
-class SetAppAudioSettings extends React.Component {
+class SetAppAudioDeviceSettings extends React.Component {
     constructor(props) {
         super(props);
 
@@ -32,4 +32,4 @@ class SetAppAudioSettings extends React.Component {
     }
 }
 
-export default SetAppAudioSettings
+export default SetAppAudioDeviceSettings

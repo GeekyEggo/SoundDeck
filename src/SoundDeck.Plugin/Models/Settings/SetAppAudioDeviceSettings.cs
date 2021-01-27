@@ -4,9 +4,9 @@ namespace SoundDeck.Plugin.Models.Settings
     using SoundDeck.Plugin.Actions;
 
     /// <summary>
-    /// Provides settings for the <see cref="SetAppAudio"/> action.
+    /// Provides settings for the <see cref="SetAppAudioDevice"/> action.
     /// </summary>
-    public class SetAppAudioSettings
+    public class SetAppAudioDeviceSettings
     {
         /// <summary>
         /// Gets or sets the audio device identifier.

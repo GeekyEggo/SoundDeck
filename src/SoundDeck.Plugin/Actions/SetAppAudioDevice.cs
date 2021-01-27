@@ -12,16 +12,16 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an action for setting the default audio device for a process.
     /// </summary>
-    [StreamDeckAction("Set App Output", "com.geekyeggo.sounddeck.setappaudio", "Images/SetAppAudio/Action", Tooltip = "Set the default audio device for an application.")]
-    [StreamDeckActionState("Images/SetAppAudio/Key")]
-    public class SetAppAudio : ActionBase<SetAppAudioSettings>
+    [StreamDeckAction("Set App Audio Device", "com.geekyeggo.sounddeck.setappaudiodevice", "Images/SetAppAudio/Action", Tooltip = "Set the default audio device for an application.")]
+    [StreamDeckActionState("Images/SetAppAudioDevice/Key")]
+    public class SetAppAudioDevice : ActionBase<SetAppAudioDeviceSettings>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SetAppAudio" /> class.
+        /// Initializes a new instance of the <see cref="SetAppAudioDevice" /> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
         /// <param name="appAudioService">The application audio service.</param>
-        public SetAppAudio(IAudioService audioService, IAppAudioService appAudioService)
+        public SetAppAudioDevice(IAudioService audioService, IAppAudioService appAudioService)
             : base(audioService)
         {
             this.AppAudioService = appAudioService;
@@ -43,7 +43,7 @@ namespace SoundDeck.Plugin.Actions
 
             try
             {
-                var settings = args.Payload.GetSettings<SetAppAudioSettings>();
+                var settings = args.Payload.GetSettings<SetAppAudioDeviceSettings>();
 
                 // Ensure we have an audio device.
                 if (string.IsNullOrWhiteSpace(settings.AudioDeviceId))

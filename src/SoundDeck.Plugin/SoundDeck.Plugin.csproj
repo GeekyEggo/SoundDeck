@@ -91,16 +91,16 @@
     <None Update="Images\Sampler\Key1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SetAppAudio\Action%402x.png">
+    <None Update="Images\SetAppAudioDevice\Action@2x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SetAppAudio\Action.png">
+    <None Update="Images\SetAppAudioDevice\Action.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SetAppAudio\Key%402x.png">
+    <None Update="Images\SetAppAudioDevice\Key@2x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Images\SetAppAudio\Key.png">
+    <None Update="Images\SetAppAudioDevice\Key.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Images\SoundDeck\Category%402x.png">
@@ -130,7 +130,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\SetAppAudio\" />
+    <Folder Include="Images\SetAppAudioDevice\" />
   </ItemGroup>
 
 </Project>

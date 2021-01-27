@@ -2,12 +2,10 @@ import React from "react";
 import CaptureAudioSettings from "./captureAudioSettings";
 import PlayAudioSettings from "./playAudioSettings";
 import SamplerSettings from "./samplerSettings";
-import SetAppAudioSettings from "./setAppAudioSettings"
+import SetAppAudioDeviceSettings from "./setAppAudioDeviceSettings"
 
 class App extends React.Component {
     render() {
-        console.log(this.props.uuid);
-
         switch (this.props.uuid) {
             case "com.geekyeggo.sounddeck.clipaudio":
                 return <CaptureAudioSettings showDuration={true} />;
@@ -21,8 +19,8 @@ class App extends React.Component {
             case "com.geekyeggo.sounddeck.sampler":
                 return <SamplerSettings />;
 
-            case "com.geekyeggo.sounddeck.setappaudio":
-                return <SetAppAudioSettings />
+            case "com.geekyeggo.sounddeck.setappaudiodevice":
+                return <SetAppAudioDeviceSettings />
 
             default:
                 return <div />
