@@ -1,0 +1,105 @@
+{
+    "$schema": "https://gist.githubusercontent.com/GeekyEggo/607881f1133ee2973b0140871023c9b8/raw/4d96b5d8b2bbca1bf88f836b8e5c1d527a77961c/esdsdk-schema.json",
+    "Author": "GeekyEggo",
+    "Description": "With advanced audio device support; Sound Deck lets you play, record, and clip from any device!\r\n\r\n- Multiple clip support, with custom Play-Action.\r\n- Start/stop recording from any device.\r\n- Clip-it recording... to record the last x seconds!",
+    "Name": "Sound Deck",
+    "Version": "1.2.0",
+    "SDKVersion": 2,
+    "Category": "Sound Deck",
+    "CategoryIcon": "Images/SoundDeck/Category",
+    "CodePath": "SoundDeck.exe",
+    "Icon": "Images/SoundDeck/Icon",
+    "PropertyInspectorPath": "PI/index.html",
+    "URL": "https://github.com/GeekyEggo/SoundDeck",
+    "Actions": [
+        {
+            "Icon": "Images/ClipAudio/Action",
+            "Name": "Clip Audio",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Clip those last precious seconds of audio; you'll never miss a funny moment again.",
+            "UUID": "com.geekyeggo.sounddeck.clipaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/ClipAudio/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/PlayAudio/Action",
+            "Name": "Play Audio",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Play an audio clip, or three... or more, in the order your heart desires.",
+            "UUID": "com.geekyeggo.sounddeck.playaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/PlayAudio/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/RecordAudio/Action",
+            "Name": "Record Audio",
+            "SupportedInMultiActions": false,
+            "Tooltip": "Record Audio",
+            "UUID": "com.geekyeggo.sounddeck.recordaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/RecordAudio/Key0" },
+                { "Image": "Images/RecordAudio/Key1" }
+            ]
+        },
+        {
+            "Icon": "Images/Sampler/Action",
+            "Name": "Sampler",
+            "SupportedInMultiActions": false,
+            "Tooltip": "Record and playback samples!",
+            "UUID": "com.geekyeggo.sounddeck.sampler",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/Sampler/Key0" },
+                { "Image": "Images/Sampler/Key1" }
+            ]
+        },
+        {
+            "Icon": "Images/SamplerClear/Action",
+            "Name": "Clear Sampler",
+            "SupportedInMultiActions": false,
+            "Tooltip": "Activate sampler clearing.",
+            "UUID": "com.geekyeggo.sounddeck.clearsample",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/SamplerClear/Key0" },
+                { "Image": "Images/SamplerClear/Key1" }
+            ]
+        },
+        {
+            "Icon": "Images/SetAppAudioDevice/Action",
+            "Name": "Set App Audio Device",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Set the default audio device for an application.",
+            "UUID": "com.geekyeggo.sounddeck.setappaudiodevice",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/SetAppAudioDevice/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/StopAudio/Action",
+            "Name": "Stop Audio",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Stops all audio being played through Sound Deck.",
+            "UUID": "com.geekyeggo.sounddeck.stopaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/StopAudio/Key" }
+            ]
+        }
+    ],
+    "OS": [
+        {
+            "Platform": "windows",
+            "MinimumVersion": "10"
+        }
+    ],
+    "Software": {
+        "MinimumVersion": "4.3"
+    }
+}

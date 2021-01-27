@@ -14,16 +14,11 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an action for recording audio via start/stop.
     /// </summary>
-    [StreamDeckAction("Record Audio", UUID, "Images/RecordAudio/Action", Tooltip = "Record Audio", SupportedInMultiActions = false)]
+    [StreamDeckAction("com.geekyeggo.sounddeck.recordaudio")]
     [StreamDeckActionState("Images/RecordAudio/Key0")]
     [StreamDeckActionState("Images/RecordAudio/Key1")]
     public class RecordAudio : CaptureActionBase<RecordAudioSettings, IAudioRecorder>
     {
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.recordaudio";
-
         /// <summary>
         /// The synchronization root.
         /// </summary>

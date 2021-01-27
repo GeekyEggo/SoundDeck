@@ -15,16 +15,11 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides a sampler action used to record audio, and then play it back.
     /// </summary>
-    [StreamDeckAction("Sampler", UUID, "Images/Sampler/Action", Tooltip = "Record and playback samples!")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.sampler")]
     [StreamDeckActionState("Images/Sampler/Key0")]
     [StreamDeckActionState("Images/Sampler/Key1")]
     public class Sampler : CaptureActionBase<SamplerSettings, IAudioRecorder>, IPlayAudioAction
     {
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.sampler";
-
         /// <summary>
         /// Represents the state at which the action will record a sample.
         /// </summary>

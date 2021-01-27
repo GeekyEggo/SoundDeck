@@ -20,18 +20,11 @@ namespace SoundDeck.Plugin.Windows
         /// <param name="e">The <see cref="StartupEventArgs"/> instance containing the event data.</param>
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (ManifestWriter.TryWrite(e.Args, out int result))
-            {
-                Application.Current.Shutdown();
-            }
-            else
-            {
 #if DEBUG
-                Debugger.Launch();
+            Debugger.Launch();
 #endif
 
-                _ = SoundDeckPlugin.RunAsync(this.GetServiceProvider());
-            }
+            _ = SoundDeckPlugin.RunAsync(this.GetServiceProvider());
         }
 
         /// <summary>

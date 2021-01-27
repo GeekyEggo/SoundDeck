@@ -1,20 +1,3 @@
-using SharpDeck.Manifest;
-[assembly: StreamDeckPlugin(
-    Name = "Sound Deck",
-    Category = "Sound Deck",
-    CategoryIcon = "Images/SoundDeck/Category",
-    Description = @"With advanced audio device support; Sound Deck lets you play, record, and clip from any device!
-
-- Multiple clip support, with custom Play-Action.
-- Start/stop recording from any device.
-- Clip-it recording... to record the last x seconds!",
-    CodePath = "SoundDeck.exe",
-    Icon = "Images/SoundDeck/Icon",
-    PropertyInspectorPath = "PI/index.html",
-    Author = "GeekyEggo",
-    URL = "https://github.com/GeekyEggo/SoundDeck",
-    WindowsMinimumVersion = "10")]
-
 namespace SoundDeck.Plugin
 {
     using System;

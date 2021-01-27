@@ -10,15 +10,10 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an action that can stop all audio currently being output by Sound Deck.
     /// </summary>
-    [StreamDeckAction("Stop Audio", UUID, "Images/StopAudio/Action", Tooltip = "Stops all audio being played through Sound Deck.")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.stopaudio")]
     [StreamDeckActionState("Images/StopAudio/Key")]
     public class StopAudio : StreamDeckAction
     {
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.stopaudio";
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StopAudio"/> class.
         /// </summary>

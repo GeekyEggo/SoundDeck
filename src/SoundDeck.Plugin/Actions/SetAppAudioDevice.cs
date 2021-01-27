@@ -12,7 +12,7 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an action for setting the default audio device for a process.
     /// </summary>
-    [StreamDeckAction("Set App Audio Device", "com.geekyeggo.sounddeck.setappaudiodevice", "Images/SetAppAudio/Action", Tooltip = "Set the default audio device for an application.")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.setappaudiodevice")]
     [StreamDeckActionState("Images/SetAppAudioDevice/Key")]
     public class SetAppAudioDevice : ActionBase<SetAppAudioDeviceSettings>
     {

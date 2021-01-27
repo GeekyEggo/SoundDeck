@@ -11,7 +11,7 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an action that enables clearing of samples.
     /// </summary>
-    [StreamDeckAction("Clear Sampler", UUID, "Images/SamplerClear/Action", Tooltip = "Activate sampler clearing.")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.clearsample")]
     [StreamDeckActionState("Images/SamplerClear/Key0")]
     [StreamDeckActionState("Images/SamplerClear/Key1")]
     public class SamplerClearer : StreamDeckAction
@@ -20,11 +20,6 @@ namespace SoundDeck.Plugin.Actions
         /// The synchronization root.
         /// </summary>
         private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
-
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.clearsample";
 
         /// <summary>
         /// The active state.

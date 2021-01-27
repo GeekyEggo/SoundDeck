@@ -13,15 +13,10 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides capturing of an audio buffer, similar to an instat replay.
     /// </summary>
-    [StreamDeckAction("Clip Audio", UUID, "Images/ClipAudio/Action", Tooltip = "Clip those last precious seconds of audio; you'll never miss a funny moment again.")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.clipaudio")]
     [StreamDeckActionState("Images/ClipAudio/Key")]
     public class ClipAudio : CaptureActionBase<ClipAudioSettings, IAudioBuffer>
     {
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.clipaudio";
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ClipAudio"/> class.
         /// </summary>

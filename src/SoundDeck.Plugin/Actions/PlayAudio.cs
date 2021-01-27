@@ -15,7 +15,7 @@ namespace SoundDeck.Plugin.Actions
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
     /// </summary>
-    [StreamDeckAction("Play Audio", UUID, "Images/PlayAudio/Action", Tooltip = "Play an audio clip, or three... or more, in the order your heart desires.")]
+    [StreamDeckAction("com.geekyeggo.sounddeck.playaudio")]
     [StreamDeckActionState("Images/PlayAudio/Key")]
     public class PlayAudio : ActionBase<PlayAudioSettings>, IPlayAudioAction
     {
@@ -23,11 +23,6 @@ namespace SoundDeck.Plugin.Actions
         /// The synchronization root.
         /// </summary>
         private static readonly object _syncRoot = new object();
-
-        /// <summary>
-        /// The unique identifier for the action.
-        /// </summary>
-        public const string UUID = "com.geekyeggo.sounddeck.playaudio";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayAudio"/> class.
