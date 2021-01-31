@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Main": {
+        "commandName": "Executable",
+        "executablePath": "c:\\windows\\system32\\cmd.exe",
+        "commandLineArgs": "/S /C \"start \"title\" /B \"%ProgramW6432%\\Elgato\\StreamDeck\\StreamDeck.exe\" \""
+    }
+  }
+}
