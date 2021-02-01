@@ -5,7 +5,6 @@ namespace SoundDeck.Core
     using System.Diagnostics;
     using System.Linq;
     using NAudio.CoreAudioApi;
-    using SoundDeck.Core.Enums;
     using SoundDeck.Core.Interop;
 
     /// <summary>

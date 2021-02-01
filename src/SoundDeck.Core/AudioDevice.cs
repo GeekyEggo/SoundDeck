@@ -1,7 +1,7 @@
 namespace SoundDeck.Core
 {
     using NAudio.CoreAudioApi;
-    using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Interop;
 
     /// <summary>
     /// Provides information about a audio device.

@@ -41,14 +41,9 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
-        /// Gets or sets the player.
+        /// Gets the playlist controller.
         /// </summary>
-        public IPlaylistPlayer Player { get; set; }
-
-        /// <summary>
-        /// Gets or sets the playlist.
-        /// </summary>
-        public Playlist Playlist { get; set; }
+        public IPlaylistController PlaybackController { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is initialized.
@@ -73,7 +68,7 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            this.Player?.Dispose();
+            this.PlaybackController?.Dispose();
             this.SetTitleAsync();
 
             base.Dispose(disposing);
@@ -129,7 +124,7 @@ namespace SoundDeck.Plugin.Actions
             // determine if clearing is active
             if (SamplerClearer.IsActive)
             {
-                this.Player.Stop();
+                this.PlaybackController?.AudioPlayer?.Stop();
                 if (!string.IsNullOrWhiteSpace(settings.FilePath))
                 {
                     settings.FilePath = string.Empty;
@@ -142,7 +137,7 @@ namespace SoundDeck.Plugin.Actions
             // when there is a file, play it
             if (!string.IsNullOrWhiteSpace(settings.FilePath))
             {
-                await this.Player.NextAsync();
+                await this.PlaybackController.NextAsync();
                 return;
             }
 
@@ -179,7 +174,7 @@ namespace SoundDeck.Plugin.Actions
                 // save the capture, and settings
                 settings.FilePath = await this.CaptureDevice?.StopAsync();
                 await this.SetSettingsAsync(settings);
-                this.Playlist.SetOptions(settings);
+                this.PlaybackController.Playlist.Files = settings.Files;
 
                 await this.ShowOkAsync();
                 return;

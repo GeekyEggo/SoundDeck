@@ -1,6 +1,7 @@
 namespace SoundDeck.Core.Playback
 {
     using System;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an audio player for an audio device.
@@ -18,14 +19,36 @@ namespace SoundDeck.Core.Playback
         event EventHandler<PlaybackTimeEventArgs> TimeChanged;
 
         /// <summary>
-        /// Gets the device identifier the audio will be played on.
+        /// Gets or sets the audio device identifier.
         /// </summary>
-        string DeviceId { get; }
+        string DeviceId { get; set; }
 
         /// <summary>
-        /// Gets the state.
+        /// Gets the name of the file being played.
         /// </summary>
-        PlaybackStateType State { get; }
+        string FileName { get; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is looped.
+        /// </summary>
+        bool IsLooped { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is playing.
+        /// </summary>
+        bool IsPlaying { get; }
+
+        /// <summary>
+        /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
+        /// </summary>
+        float Volume { get; set; }
+
+        /// <summary>
+        /// Plays the audio file asynchronously.
+        /// </summary>
+        /// <param name="file">The file to play.</param>
+        /// <returns>The task of the audio file being played.</returns>
+        Task PlayAsync(AudioFileInfo file);
 
         /// <summary>
         /// Stops any audio being played on this player.

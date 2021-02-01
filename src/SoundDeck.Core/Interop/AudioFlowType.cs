@@ -1,4 +1,4 @@
-namespace SoundDeck.Core.Enums
+namespace SoundDeck.Core.Interop
 {
     /// <summary>
     /// An enumeration that defines the flow of audio.

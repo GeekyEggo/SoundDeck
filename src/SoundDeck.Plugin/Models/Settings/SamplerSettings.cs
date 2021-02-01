@@ -38,7 +38,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// <summary>
         /// Gets or sets the type of the action that occurs upon the button being pressed.
         /// </summary>
-        public PlaylistPlayerActionType Action { get; set; } = PlaylistPlayerActionType.PlayNext;
+        public ControllerActionType Action { get; set; } = ControllerActionType.PlayNext;
 
         /// <summary>
         /// Gets the audio files to play.
@@ -58,7 +58,7 @@ namespace SoundDeck.Plugin.Models.Settings
         /// Gets the playback order.
         /// </summary>
         [JsonIgnore]
-        public PlaylistOrderType Order { get; } = PlaylistOrderType.Sequential;
+        public PlaybackOrderType Order { get; } = PlaybackOrderType.Sequential;
 
         /// <summary>
         /// Gets or sets the file path associated with the sampler.

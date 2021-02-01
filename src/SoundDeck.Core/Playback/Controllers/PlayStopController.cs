@@ -1,20 +1,20 @@
-namespace SoundDeck.Core.Playback.Players
+namespace SoundDeck.Core.Playback.Controllers
 {
     using System.Threading.Tasks;
 
     /// <summary>
     /// A playlist player that provides play-stop functionality.
     /// </summary>
-    public class PlayStopPlayer : PlaylistPlayer
+    public class PlayStopController : PlaylistController
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayStopPlayer" /> class.
+        /// Initializes a new instance of the <see cref="PlayStopController" /> class.
         /// </summary>
-        /// <param name="options">The options.</param>
+        /// <param name="audioPlayer">The audio player.</param>
         /// <param name="actionType">Type of the action.</param>
         /// <param name="playbackType">Type of the playback.</param>
-        public PlayStopPlayer(PlaylistPlayerOptions options, PlaylistPlayerActionType actionType, PlaylistPlaybackType playbackType)
-            : base(options)
+        internal PlayStopController(IAudioPlayer audioPlayer, ControllerActionType actionType, ContinuousPlaybackType playbackType)
+            : base(audioPlayer)
         {
             this.Action = actionType;
             this.PlaybackType = playbackType;
@@ -23,7 +23,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets the underlying action that determines how the player functions.
         /// </summary>
-        public override PlaylistPlayerActionType Action { get; }
+        public override ControllerActionType Action { get; }
 
         /// <summary>
         /// Applies the next action asynchronously.
@@ -31,8 +31,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <returns>The task of running the action.</returns>
         protected override Task ActionAsync()
         {
-            if (this.State == PlaybackStateType.Playing
-                || this.Player.State == PlaybackStateType.Playing)
+            if (this.AudioPlayer.IsPlaying)
             {
                 this.Stop();
                 return Task.CompletedTask;

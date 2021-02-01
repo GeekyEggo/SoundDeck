@@ -1,6 +1,6 @@
 namespace SoundDeck.Plugin.Models.Settings
 {
-    using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Interop;
     using SoundDeck.Plugin.Actions;
 
     /// <summary>

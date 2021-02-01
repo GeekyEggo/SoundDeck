@@ -1,7 +1,5 @@
 namespace SoundDeck.Core.Playback
 {
-    using System;
-
     /// <summary>
     /// Provides information about an audio file.
     /// </summary>

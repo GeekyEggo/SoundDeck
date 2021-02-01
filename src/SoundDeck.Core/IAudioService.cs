@@ -4,6 +4,7 @@ namespace SoundDeck.Core
     using System.Collections.Generic;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Core.Playback.Controllers;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
@@ -20,6 +21,15 @@ namespace SoundDeck.Core
         /// </summary>
         /// <returns><c>true</c> when encoding is possible; otherwise <c>false</c>.</returns>
         bool CanEncodeToMP3();
+
+        /// <summary>
+        /// Creates a playlist controller with an audio player for the specified <paramref name="deviceId"/>.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="action">The action type.</param>
+        /// <param name="playlist">The playlist.</param>
+        /// <returns>The playlist player.</returns>
+        IPlaylistController CreatePlaylistController(string deviceId, ControllerActionType action);
 
         /// <summary>
         /// Gets an audio buffer for the specified device identifier.
@@ -47,16 +57,7 @@ namespace SoundDeck.Core
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio player.</returns>
-        IAudioFilePlayer GetAudioPlayer(string deviceId);
-
-        /// <summary>
-        /// Gets the playlist player for the associated playlist player action type.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="action">The action type.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <returns>The playlist player.</returns>
-        IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist);
+        IAudioPlayer GetAudioPlayer(string deviceId);
 
         /// <summary>
         /// Stops all <see cref="IAudioPlayer"/> associated with this instance.

@@ -6,6 +6,7 @@ namespace SoundDeck.Core.Playback
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
+    using SoundDeck.Core.Volume;
 
     /// <summary>
     /// Provides an asynchronous wrapper for <see cref="WasapiOut"/>.

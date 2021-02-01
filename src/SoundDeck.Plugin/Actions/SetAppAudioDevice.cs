@@ -6,7 +6,7 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck.Events.Received;
     using SharpDeck.Manifest;
     using SoundDeck.Core;
-    using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Interop;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>

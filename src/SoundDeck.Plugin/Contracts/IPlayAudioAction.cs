@@ -16,14 +16,9 @@ namespace SoundDeck.Plugin.Contracts
         IAudioService AudioService { get; }
 
         /// <summary>
-        /// Gets or sets the player.
+        /// Gets or sets the playlist controller.
         /// </summary>
-        IPlaylistPlayer Player { get; set; }
-
-        /// <summary>
-        /// Gets or sets the playlist.
-        /// </summary>
-        Playlist Playlist { get; set; }
+        IPlaylistController PlaybackController { get; set; }
 
         /// <summary>
         /// Dynamically change the title of an instance of an action.

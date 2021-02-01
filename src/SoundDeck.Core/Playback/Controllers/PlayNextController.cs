@@ -1,26 +1,26 @@
-namespace SoundDeck.Core.Playback.Players
+namespace SoundDeck.Core.Playback.Controllers
 {
     using System.Threading.Tasks;
 
     /// <summary>
     /// A playlist player that provides play-next functionality.
     /// </summary>
-    public class PlayNextPlayer : PlaylistPlayer
+    public class PlayNextController : PlaylistController
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayNextPlayer" /> class.
+        /// Initializes a new instance of the <see cref="PlayNextController" /> class.
         /// </summary>
-        /// <param name="options">The options.</param>
-        public PlayNextPlayer(PlaylistPlayerOptions options)
-            : base(options)
+        /// <param name="audioPlayer">The audio player.</param>
+        internal PlayNextController(IAudioPlayer audioPlayer)
+            : base(audioPlayer)
         {
-            this.PlaybackType = PlaylistPlaybackType.Single;
+            this.PlaybackType = ContinuousPlaybackType.Single;
         }
 
         /// <summary>
         /// Gets the underlying action that determines how the player functions.
         /// </summary>
-        public override PlaylistPlayerActionType Action { get; } = PlaylistPlayerActionType.PlayNext;
+        public override ControllerActionType Action { get; } = ControllerActionType.PlayNext;
 
         /// <summary>
         /// Applies the next action asynchronously.

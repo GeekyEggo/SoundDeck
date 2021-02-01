@@ -6,7 +6,7 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
-    using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Interop;
 
     /// <summary>
     /// Provides a base action.

@@ -1,4 +1,4 @@
-namespace SoundDeck.Core.Playback
+namespace SoundDeck.Core.Playback.Players
 {
     using System;
     using System.Collections.Generic;

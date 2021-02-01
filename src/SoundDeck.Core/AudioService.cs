@@ -8,8 +8,8 @@ namespace SoundDeck.Core
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Core.Playback.Controllers;
     using SoundDeck.Core.Playback.Players;
-    using SoundDeck.Core.Playback.Volume;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
@@ -50,6 +50,41 @@ namespace SoundDeck.Core
             => MediaFoundationEncoder.SelectMediaType(AudioSubtypes.MFAudioFormat_MP3, Constants.DefaultWaveFormat, Constants.DesiredBitRate) != null;
 
         /// <summary>
+        /// Creates a playlist controller with an audio player for the specified <paramref name="deviceId"/>.
+        /// </summary>
+        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="action">The action type.</param>
+        /// <param name="playlist">The playlist.</param>
+        /// <returns>The playlist player.</returns>
+        public IPlaylistController CreatePlaylistController(string deviceId, ControllerActionType action)
+        {
+            var audioPlayer = this.GetAudioPlayer(deviceId);
+
+            switch (action)
+            {
+                case ControllerActionType.LoopStop:
+                    return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.SingleLoop);
+
+                case ControllerActionType.LoopAllStop:
+                    return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.ContiunousLoop);
+
+                case ControllerActionType.LoopAllStopReset:
+                    return new PlayStopResetController(audioPlayer, action, ContinuousPlaybackType.ContiunousLoop);
+
+                case ControllerActionType.PlayNext:
+                    return new PlayNextController(audioPlayer);
+
+                case ControllerActionType.PlayStop:
+                    return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.Single);
+
+                case ControllerActionType.PlayAllStop:
+                    return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.Continuous);
+            }
+
+            throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -84,24 +119,9 @@ namespace SoundDeck.Core
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio player.</returns>
-        public IAudioFilePlayer GetAudioPlayer(string deviceId)
+        public IAudioPlayer GetAudioPlayer(string deviceId)
         {
             var player = new AudioPlayer(deviceId);
-            this.Players.Add(player);
-
-            return player;
-        }
-
-        /// <summary>
-        /// Gets the playlist player for the associated playlist player action type.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="action">The action type.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <returns>The playlist player.</returns>
-        public IPlaylistPlayer GetPlaylistPlayer(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist)
-        {
-            var player = this.GetPlaylistPlayerInternal(deviceId, action, playlist);
             this.Players.Add(player);
 
             return player;
@@ -112,44 +132,5 @@ namespace SoundDeck.Core
         /// </summary>
         public void StopAll()
             => this.Players.StopAll();
-
-        /// <summary>
-        /// Gets the playlist player for the associated playlist player action type.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="action">The action type.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <returns>The playlist player.</returns>
-        private IPlaylistPlayer GetPlaylistPlayerInternal(string deviceId, PlaylistPlayerActionType action, IPlaylist playlist)
-        {
-            var options = new PlaylistPlayerOptions
-            {
-                DeviceId = deviceId,
-                Playlist = playlist
-            };
-
-            switch (action)
-            {
-                case PlaylistPlayerActionType.LoopStop:
-                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.SingleLoop);
-
-                case PlaylistPlayerActionType.LoopAllStop:
-                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.ContiunousLoop);
-
-                case PlaylistPlayerActionType.LoopAllStopReset:
-                    return new PlayStopResetPlayer(options, action, PlaylistPlaybackType.ContiunousLoop);
-
-                case PlaylistPlayerActionType.PlayNext:
-                    return new PlayNextPlayer(options);
-
-                case PlaylistPlayerActionType.PlayStop:
-                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.Single);
-
-                case PlaylistPlayerActionType.PlayAllStop:
-                    return new PlayStopPlayer(options, action, PlaylistPlaybackType.Continuous);
-            }
-
-            throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
-        }
     }
 }

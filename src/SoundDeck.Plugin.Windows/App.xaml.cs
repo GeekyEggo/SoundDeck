@@ -4,7 +4,6 @@ namespace SoundDeck.Plugin.Windows
     using System.Diagnostics;
     using System.Windows;
     using Microsoft.Extensions.DependencyInjection;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
 

@@ -1,6 +1,6 @@
 namespace SoundDeck.Core
 {
-    using SoundDeck.Core.Enums;
+    using SoundDeck.Core.Interop;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.

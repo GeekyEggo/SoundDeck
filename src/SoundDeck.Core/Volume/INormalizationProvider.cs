@@ -1,4 +1,4 @@
-namespace SoundDeck.Core.Playback
+namespace SoundDeck.Core.Volume
 {
     using NAudio.Wave;
 

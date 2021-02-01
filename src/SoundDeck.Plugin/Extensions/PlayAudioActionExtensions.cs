@@ -18,44 +18,23 @@ namespace SoundDeck.Plugin.Extensions
         /// <param name="settings">The settings.</param>
         public static void SetPlayerSettings(this IPlayAudioAction action, IPlayAudioSettings settings)
         {
-            action.SetPlaylist(settings);
-            action.SetPlayer(settings);
-        }
-
-        /// <summary>
-        /// Sets the playlist based on its current state.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="setting">The setting.</param>
-        private static void SetPlaylist(this IPlayAudioAction action, IPlayAudioSettings settings)
-        {
-            // update the playlist
-            if (action.Playlist == null)
+            // Ensure we have a playlist controller, and that the device is correct.
+            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
+            if (action.PlaybackController == null
+                || action.PlaybackController.Action != settings.Action)
             {
-                action.Playlist = new Playlist(settings);
+                action.PlaybackController?.Dispose();
+                action.PlaybackController = action.AudioService.CreatePlaylistController(deviceId, settings.Action);
+                action.AddTimeChangedHandler();
             }
             else
             {
-                action.Playlist.SetOptions(settings);
+                action.PlaybackController.AudioPlayer.DeviceId = deviceId;
             }
-        }
 
-        /// <summary>
-        /// Sets the player of the action.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="settings">The settings.</param>
-        private static void SetPlayer(this IPlayAudioAction action, IPlayAudioSettings settings)
-        {
-            // update the player
-            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
-            if (action.Player?.DeviceId != deviceId
-                || action.Player?.Action != settings.Action)
-            {
-                action.Player?.Dispose();
-                action.Player = action.AudioService.GetPlaylistPlayer(deviceId, settings.Action, action.Playlist);
-                action.AddTimeChangedHandler();
-            }
+            // Ensure the order, and the files align.
+            action.PlaybackController.Playlist.Order = settings.Order;
+            action.PlaybackController.Playlist.Files = settings.Files;
         }
 
         /// <summary>
@@ -79,12 +58,12 @@ namespace SoundDeck.Plugin.Extensions
                 }
                 catch (ObjectDisposedException)
                 {
-                    action.Player.TimeChanged -= handler;
+                    action.PlaybackController.AudioPlayer.TimeChanged -= handler;
                 }
             }
 
-            action.Player.Disposed += (_, __) => action.Player.TimeChanged -= handler;
-            action.Player.TimeChanged += handler;
+            action.PlaybackController.AudioPlayer.Disposed += (_, __) => action.PlaybackController.AudioPlayer.TimeChanged -= handler;
+            action.PlaybackController.AudioPlayer.TimeChanged += handler;
         }
     }
 }

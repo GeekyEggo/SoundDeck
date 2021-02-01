@@ -8,7 +8,7 @@ namespace SoundDeck.Core.Playback.Players
     /// <summary>
     /// Provides an audio player for an audio device.
     /// </summary>
-    public class AudioPlayer : IAudioFilePlayer
+    public class AudioPlayer : IAudioPlayer
     {
         /// <summary>
         /// The synchronization root object.
@@ -27,9 +27,6 @@ namespace SoundDeck.Core.Playback.Players
         internal AudioPlayer(string deviceId)
         {
             this.DeviceId = deviceId;
-
-            this.IsLooped = false;
-            this.State = PlaybackStateType.Stopped;
         }
 
         /// <summary>
@@ -48,9 +45,9 @@ namespace SoundDeck.Core.Playback.Players
         public event EventHandler VolumeChanged;
 
         /// <summary>
-        /// Gets the audio device identifier.
+        /// Gets or sets the audio device identifier.
         /// </summary>
-        public string DeviceId { get; private set; }
+        public string DeviceId { get; set; }
 
         /// <summary>
         /// Gets the name of the file being played.
@@ -60,12 +57,12 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets or sets a value indicating whether this instance is looped.
         /// </summary>
-        public bool IsLooped { get; set; }
+        public bool IsLooped { get; set; } = false;
 
         /// <summary>
-        /// Gets the state.
+        /// Gets a value indicating whether this instance is playing.
         /// </summary>
-        public PlaybackStateType State { get; private set; }
+        public bool IsPlaying { get; private set; } = false;
 
         /// <summary>
         /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
@@ -199,10 +196,10 @@ namespace SoundDeck.Core.Playback.Players
 
                 do
                 {
-                    this.State = PlaybackStateType.Playing;
+                    this.IsPlaying = true;
                     await player.PlayAsync(this.InternalCancellationTokenSource.Token);
+                    this.IsPlaying = false;
 
-                    this.State = PlaybackStateType.Stopped;
                 } while (this.IsLooped && this.IsPlayableState);
 
                 this.TimeChanged?.Invoke(this, new PlaybackTimeEventArgs(TimeSpan.Zero, TimeSpan.Zero));

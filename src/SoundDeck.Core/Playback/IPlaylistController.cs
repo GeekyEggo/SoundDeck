@@ -2,26 +2,27 @@ namespace SoundDeck.Core.Playback
 {
     using System;
     using System.Threading.Tasks;
+    using SoundDeck.Core.Playback.Playlists;
 
     /// <summary>
-    /// Provides a player for a <see cref="Playlist"/>.
+    /// Provides information and methods for a playlist controller.
     /// </summary>
-    public interface IPlaylistPlayer : IAudioPlayer, IDisposable
+    public interface IPlaylistController : IDisposable
     {
         /// <summary>
-        /// Gets the underlying action that determines how the player functions.
+        /// Gets the type of the action that occurs upon the button being pressed.
         /// </summary>
-        PlaylistPlayerActionType Action { get; }
+        ControllerActionType Action { get; }
 
         /// <summary>
-        /// Gets the name of the file being played.
+        /// Gets or sets the audio player.
         /// </summary>
-        string FileName { get; }
+        IAudioPlayer AudioPlayer { get; }
 
         /// <summary>
-        /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
+        /// Gets the playlist.
         /// </summary>
-        float Volume { get; set; }
+        IPlaylist Playlist { get; }
 
         /// <summary>
         /// Moves to the next item within the playlist, and plays it asynchronously; this may stop audio depending on the type of player.

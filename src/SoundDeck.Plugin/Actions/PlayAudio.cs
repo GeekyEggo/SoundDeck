@@ -35,19 +35,14 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
-        /// Gets or sets the player.
+        /// Gets or sets the playlist controller.
         /// </summary>
-        public IPlaylistPlayer Player { get; set; }
-
-        /// <summary>
-        /// Gets or sets the playlist.
-        /// </summary>
-        public Playlist Playlist { get; set; }
+        public IPlaylistController PlaybackController { get; set; }
 
         /// <summary>
         /// Gets or sets the player used to test the volume.
         /// </summary>
-        private IAudioFilePlayer VolumeTestPlayer { get; set; }
+        private IAudioPlayer VolumeTestPlayer { get; set; }
 
         /// <summary>
         /// Sets the volume of the audio clip whos volume is being tested.
@@ -58,9 +53,9 @@ namespace SoundDeck.Plugin.Actions
         {
             lock (_syncRoot)
             {
-                if (this.Player?.FileName == file.Path)
+                if (this.PlaybackController?.AudioPlayer?.FileName == file.Path)
                 {
-                    this.Player.Volume = file.Volume;
+                    this.PlaybackController.AudioPlayer.Volume = file.Volume;
                 }
 
                 if (this.VolumeTestPlayer?.FileName == file.Path)
@@ -79,9 +74,13 @@ namespace SoundDeck.Plugin.Actions
         {
             lock (_syncRoot)
             {
-                this.VolumeTestPlayer?.Dispose();
+                var deviceId = this.PlaybackController.AudioPlayer.DeviceId;
+                if (this.VolumeTestPlayer == null)
+                {
+                    this.VolumeTestPlayer = this.AudioService.GetAudioPlayer(deviceId);
+                }
 
-                this.VolumeTestPlayer = this.AudioService.GetAudioPlayer(this.Player.DeviceId);
+                this.VolumeTestPlayer.DeviceId = deviceId;
                 _ = this.VolumeTestPlayer.PlayAsync(file);
             }
         }
@@ -93,7 +92,7 @@ namespace SoundDeck.Plugin.Actions
         protected override void Dispose(bool disposing)
         {
             this.VolumeTestPlayer?.Dispose();
-            this.Player?.Dispose();
+            this.PlaybackController?.Dispose();
             this.SetTitleAsync();
 
             base.Dispose(disposing);
@@ -131,7 +130,7 @@ namespace SoundDeck.Plugin.Actions
             try
             {
                 await base.OnKeyDown(args);
-                await this.Player.NextAsync();
+                await this.PlaybackController.NextAsync();
             }
             catch (Exception e)
             {

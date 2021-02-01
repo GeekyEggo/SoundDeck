@@ -1,9 +1,9 @@
 namespace SoundDeck.Core.Playback
 {
     /// <summary>
-    /// Defines the available types of playback for a playlist player.
+    /// Defines the continuous playback type for a playlist controller.
     /// </summary>
-    public enum PlaylistPlaybackType
+    public enum ContinuousPlaybackType
     {
         /// <summary>
         /// A single audio clip is played.
