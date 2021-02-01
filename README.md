@@ -6,7 +6,7 @@
 
 *"Clip, record, sample, and playback... **on any audio device**!"*
 
-Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control, audio capture, sampling, and audio playback... on any audio device; this makes Sound Deck a fantastic pairing with the Elgato Wave, or any other audio device provider, such as the GoXLR or Voicemeter.
+Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced audio clip control, audio capture, sampling, and audio playback... on any audio device; this makes Sound Deck a fantastic pairing with the Elgato Wave, or any other audio device provider, such as the GoXLR, Wave:1, Wave:3, or Voicemeter.
 
 [<img src="./assets/elgato.svg" width="18" alt="Stream Deck Logo" /> Stream Deck](https://www.elgato.com/en/gaming/stream-deck) + [<img src="./assets/go-xlr.svg" width="18" alt="GoXLR Logo" /> GoXLR](https://www.tc-helicon.com/series.html?category=R-TCHELICON-GOXLRSERIES) + <img src="./assets/sound-deck.svg" width="18" alt="Sound Deck Logo" /> Sound Deck = :heart:
 
