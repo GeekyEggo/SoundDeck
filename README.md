@@ -15,10 +15,10 @@ Sound Deck is a plugin for the Elgato Stream Deck designed to provide advanced a
 - [Clip Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Clip-Audio)
 - [Play Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Play-Audio)
 - [Record Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Record-Audio)
-- [Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Sampler)
-- [Clear Sampler (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Clear-Sampler)
-- [Set App Audio Device (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Set-App-Audio-Device)
-- [Stop Audio (Coming soon)](https://github.com/GeekyEggo/SoundDeck/wiki/Stop-Audio)
+- [Sampler](https://github.com/GeekyEggo/SoundDeck/wiki/Sampler)
+- [Clear Sampler](https://github.com/GeekyEggo/SoundDeck/wiki/Clear-Sampler)
+- [Set App Audio Device](https://github.com/GeekyEggo/SoundDeck/wiki/Set-App-Audio-Device)
+- [Stop Audio](https://github.com/GeekyEggo/SoundDeck/wiki/Stop-Audio)
 
 ## :rotating_light: Frequently Asked Questions
 
