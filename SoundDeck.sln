@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.gitmodules = .gitmodules
-		CHANGELOG.MD = CHANGELOG.MD
+		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
 		package.json = package.json
 		README.md = README.md
@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.PI", "src\SoundDe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{F2324141-149B-44E8-8E10-02A18F025842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundDeck.Plugin.Windows", "src\SoundDeck.Plugin.Windows\SoundDeck.Plugin.Windows.csproj", "{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin.Windows", "src\SoundDeck.Plugin.Windows\SoundDeck.Plugin.Windows.csproj", "{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
