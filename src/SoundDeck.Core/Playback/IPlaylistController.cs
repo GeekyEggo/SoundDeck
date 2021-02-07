@@ -20,9 +20,19 @@ namespace SoundDeck.Core.Playback
         IAudioPlayer AudioPlayer { get; }
 
         /// <summary>
-        /// Gets the playlist.
+        /// Gets the enumerator responsible for iterating over the <see cref="Playlist"/>.
         /// </summary>
-        IPlaylist Playlist { get; }
+        IPlaylistEnumerator Enumerator { get; }
+
+        /// <summary>
+        /// Gets or sets the playback order when reading the playlist.
+        /// </summary>
+        PlaybackOrderType Order { get; set; }
+
+        /// <summary>
+        /// Gets or sets the playlist.
+        /// </summary>
+        IPlaylist Playlist { get; set; }
 
         /// <summary>
         /// Moves to the next item within the playlist, and plays it asynchronously; this may stop audio depending on the type of player.

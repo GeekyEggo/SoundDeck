@@ -16,6 +16,11 @@ namespace SoundDeck.Core.Playback.Controllers
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
+        /// Private member field for <see cref="Order"/>.
+        /// </summary>
+        private PlaybackOrderType _order = PlaybackOrderType.Sequential;
+
+        /// <summary>
         /// Private member field for <see cref="PlaybackType"/>
         /// </summary>
         private ContinuousPlaybackType _playbackType = ContinuousPlaybackType.Single;
@@ -32,7 +37,7 @@ namespace SoundDeck.Core.Playback.Controllers
         internal PlaylistController(IAudioPlayer audioPlayer)
         {
             this.AudioPlayer = audioPlayer;
-            this.Playlist = new UserDefinedPlaylist();
+            this.Playlist = new AudioFileCollection();
         }
 
         /// <summary>
@@ -46,6 +51,46 @@ namespace SoundDeck.Core.Playback.Controllers
         public IAudioPlayer AudioPlayer { get; private set; }
 
         /// <summary>
+        /// Gets the enumerator responsible for iterating over the <see cref="Playlist"/>.
+        /// </summary>
+        public IPlaylistEnumerator Enumerator { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the playback order when reading the playlist.
+        /// </summary>
+        public PlaybackOrderType Order
+        {
+            get => this._order;
+            set
+            {
+                if (this._order != value)
+                {
+                    this.StopThen(() =>
+                    {
+                        this._order = value;
+                        this.SetEnumerator();
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the playlist.
+        /// </summary>
+        public IPlaylist Playlist
+        {
+            get => this._playlist;
+            set
+            {
+                this.StopThen(() =>
+                {
+                    this._playlist = value;
+                    this.SetEnumerator();
+                });
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the type of the playback.
         /// </summary>
         protected ContinuousPlaybackType PlaybackType
@@ -57,34 +102,6 @@ namespace SoundDeck.Core.Playback.Controllers
                 this.AudioPlayer.IsLooped = this._playbackType == ContinuousPlaybackType.SingleLoop;
             }
         }
-
-        /// <summary>
-        /// Gets the playlist.
-        /// </summary>
-        public IPlaylist Playlist
-        {
-            get => this._playlist;
-            private set
-            {
-                this.Stop();
-                try
-                {
-                    this._syncRoot.Wait();
-
-                    this._playlist = value;
-                    this.Enumerator = new PlaylistEnumerator(value);
-                }
-                finally
-                {
-                    this._syncRoot.Release();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the playlist enumerator.
-        /// </summary>
-        protected IPlaylistEnumerator Enumerator { get; private set; }
 
         /// <summary>
         /// Gets or sets the internal cancellation token source; this is used to cancel all audio on the player.
@@ -111,7 +128,7 @@ namespace SoundDeck.Core.Playback.Controllers
         /// <returns>The task of playing the item.</returns>
         public Task NextAsync()
         {
-            if (this.Playlist.Files.Length == 0)
+            if (this.Playlist.Count == 0)
             {
                 return Task.CompletedTask;
             }
@@ -205,6 +222,34 @@ namespace SoundDeck.Core.Playback.Controllers
         {
             return !cancellationToken.IsCancellationRequested
                 && (this.PlaybackType == ContinuousPlaybackType.ContiunousLoop || (this.PlaybackType == ContinuousPlaybackType.Continuous && !enumerator.IsLast));
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Enumerator"/> based on the <see cref="Order"/>.
+        /// </summary>
+        private void SetEnumerator()
+        {
+            this.Enumerator = this.Order == PlaybackOrderType.Random
+                ? new RandomizedPlaylistEnumerator(this.Playlist)
+                : new PlaylistEnumerator(this.Playlist);
+        }
+
+        /// <summary>
+        /// Stops any audio, and then synchronously invokes the action.
+        /// </summary>
+        /// <param name="action">The action to invoke.</param>
+        private void StopThen(Action action)
+        {
+            this.Stop();
+            try
+            {
+                this._syncRoot.Wait();
+                action();
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
         }
     }
 }

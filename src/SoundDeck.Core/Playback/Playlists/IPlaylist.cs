@@ -1,25 +1,23 @@
 namespace SoundDeck.Core.Playback.Playlists
 {
-    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
 
     /// <summary>
     /// Provides information about a playlist.
     /// </summary>
-    public interface IPlaylist
+    public interface IPlaylist : INotifyCollectionChanged, IEnumerable<AudioFileInfo>
     {
         /// <summary>
-        /// Occurs when the playlist has changed.
+        /// Gets the <see cref="AudioFileInfo"/> at the specified index.
         /// </summary>
-        event EventHandler Changed;
+        /// <param name="index">The index.</param>
+        /// <returns>The audio file at the index.</returns>
+        AudioFileInfo this[int index] { get; }
 
         /// <summary>
-        /// Gets or sets the files.
+        /// Gets the count of files.
         /// </summary>
-        AudioFileInfo[] Files { get; set; }
-
-        /// <summary>
-        /// Gets or sets the order.
-        /// </summary>
-        PlaybackOrderType Order { get; set; }
+        int Count { get; }
     }
 }

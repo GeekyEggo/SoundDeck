@@ -7,6 +7,7 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Core.Playback.Playlists;
     using SoundDeck.Plugin.Contracts;
     using SoundDeck.Plugin.Extensions;
     using SoundDeck.Plugin.Models.Settings;
@@ -43,7 +44,7 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// Gets the playlist controller.
         /// </summary>
-        public IPlaylistController PlaybackController { get; set; }
+        public IPlaylistController PlaylistController { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is initialized.
@@ -68,7 +69,7 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            this.PlaybackController?.Dispose();
+            this.PlaylistController?.Dispose();
             this.SetTitleAsync();
 
             base.Dispose(disposing);
@@ -97,19 +98,21 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of updating the state of the object based on the settings.</returns>
         protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, SamplerSettings settings)
         {
-            this.SetPlayerSettings(settings);
+            this.SetPlaylistController(settings);
             return base.OnDidReceiveSettings(args, settings);
         }
 
         /// <summary>
         /// Occurs when this instance is initialized.
         /// </summary>
-        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
+        /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
         /// <param name="settings">The settings.</param>
         protected override void OnInit(ActionEventArgs<AppearancePayload> args, SamplerSettings settings)
         {
             base.OnInit(args, settings);
-            this.SetPlayerSettings(settings);
+
+            this.SetPlaylistController(settings);
+            this.PlaylistController.Playlist = new AudioFileCollection(settings.Files);
         }
 
         /// <summary>
@@ -124,7 +127,7 @@ namespace SoundDeck.Plugin.Actions
             // determine if clearing is active
             if (SamplerClearer.IsActive)
             {
-                this.PlaybackController?.AudioPlayer?.Stop();
+                this.PlaylistController?.AudioPlayer?.Stop();
                 if (!string.IsNullOrWhiteSpace(settings.FilePath))
                 {
                     settings.FilePath = string.Empty;
@@ -137,7 +140,7 @@ namespace SoundDeck.Plugin.Actions
             // when there is a file, play it
             if (!string.IsNullOrWhiteSpace(settings.FilePath))
             {
-                await this.PlaybackController.NextAsync();
+                await this.PlaylistController.NextAsync();
                 return;
             }
 
@@ -174,7 +177,7 @@ namespace SoundDeck.Plugin.Actions
                 // save the capture, and settings
                 settings.FilePath = await this.CaptureDevice?.StopAsync();
                 await this.SetSettingsAsync(settings);
-                this.PlaybackController.Playlist.Files = settings.Files;
+                this.PlaylistController.Playlist = new AudioFileCollection(settings.Files);
 
                 await this.ShowOkAsync();
                 return;

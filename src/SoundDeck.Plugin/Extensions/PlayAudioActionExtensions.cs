@@ -3,6 +3,7 @@ namespace SoundDeck.Plugin.Extensions
     using System;
     using SharpDeck.Enums;
     using SoundDeck.Core.Playback;
+    using SoundDeck.Core.Playback.Playlists;
     using SoundDeck.Plugin.Contracts;
     using SoundDeck.Plugin.Models.Settings;
 
@@ -12,29 +13,33 @@ namespace SoundDeck.Plugin.Extensions
     public static class PlayAudioActionExtensions
     {
         /// <summary>
-        /// Sets the <see cref="IAudioPlayer"/> for this instance.
+        /// Sets the <see cref="IPlaylistController"/> for this instance.
         /// </summary>
         /// <param name="action">This instance.</param>
         /// <param name="settings">The settings.</param>
-        public static void SetPlayerSettings(this IPlayAudioAction action, IPlayAudioSettings settings)
+        public static void SetPlaylistController(this IPlayAudioAction action, IPlayAudioSettings settings)
         {
             // Ensure we have a playlist controller, and that the device is correct.
             var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
-            if (action.PlaybackController == null
-                || action.PlaybackController.Action != settings.Action)
+            if (action.PlaylistController == null
+                || action.PlaylistController.Action != settings.Action)
             {
-                action.PlaybackController?.Dispose();
-                action.PlaybackController = action.AudioService.CreatePlaylistController(deviceId, settings.Action);
+                // Ensure we keep the playlist before disposing.
+                var playlist = action?.PlaylistController?.Playlist ?? new AudioFileCollection();
+                action.PlaylistController?.Dispose();
+
+                // Create the new controller, and assign its playlist
+                action.PlaylistController = action.AudioService.CreatePlaylistController(deviceId, settings.Action);
+                action.PlaylistController.Playlist = playlist;
+
                 action.AddTimeChangedHandler();
             }
             else
             {
-                action.PlaybackController.AudioPlayer.DeviceId = deviceId;
+                action.PlaylistController.AudioPlayer.DeviceId = deviceId;
             }
 
-            // Ensure the order, and the files align.
-            action.PlaybackController.Playlist.Order = settings.Order;
-            action.PlaybackController.Playlist.Files = settings.Files;
+            action.PlaylistController.Order = settings.Order;
         }
 
         /// <summary>
@@ -58,12 +63,12 @@ namespace SoundDeck.Plugin.Extensions
                 }
                 catch (ObjectDisposedException)
                 {
-                    action.PlaybackController.AudioPlayer.TimeChanged -= handler;
+                    action.PlaylistController.AudioPlayer.TimeChanged -= handler;
                 }
             }
 
-            action.PlaybackController.AudioPlayer.Disposed += (_, __) => action.PlaybackController.AudioPlayer.TimeChanged -= handler;
-            action.PlaybackController.AudioPlayer.TimeChanged += handler;
+            action.PlaylistController.AudioPlayer.Disposed += (_, __) => action.PlaylistController.AudioPlayer.TimeChanged -= handler;
+            action.PlaylistController.AudioPlayer.TimeChanged += handler;
         }
     }
 }

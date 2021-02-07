@@ -6,9 +6,19 @@ namespace SoundDeck.Core.Playback.Playlists
     public interface IPlaylistEnumerator
     {
         /// <summary>
+        /// Gets the index of the current item.
+        /// </summary>
+        int CurrentIndex { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the <see cref="IPlaylist.Current" /> is the last item.
         /// </summary>
         bool IsLast { get; }
+
+        /// <summary>
+        /// Sets the enumerator to its initial position, which is before the first element in the collection.
+        /// </summary>
+        void Reset();
 
         /// <summary>
         /// Advances the enumerator to the next element of the collection.
@@ -16,10 +26,5 @@ namespace SoundDeck.Core.Playback.Playlists
         /// <param name="item">The current item when advancing was successful.</param>
         /// <returns><c>true</c> whilst there are items within the collection; <c>false</c> if the collection has no items.</returns>
         bool TryMoveNext(out AudioFileInfo item);
-
-        /// <summary>
-        /// Sets the enumerator to its initial position, which is before the first element in the collection.
-        /// </summary>
-        void Reset();
     }
 }

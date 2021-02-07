@@ -18,7 +18,7 @@ namespace SoundDeck.Plugin.Contracts
         /// <summary>
         /// Gets or sets the playlist controller.
         /// </summary>
-        IPlaylistController PlaybackController { get; set; }
+        IPlaylistController PlaylistController { get; set; }
 
         /// <summary>
         /// Dynamically change the title of an instance of an action.

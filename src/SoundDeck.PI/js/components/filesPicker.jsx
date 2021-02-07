@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { sortableContainer, sortableElement, sortableHandle } from "react-sortable-hoc";
-import arrayMove from "array-move";
 import { connect, streamDeckClient } from "react-sharpdeck";
 
 const DEFAULT_VOLUME = 0.75;
@@ -114,7 +113,6 @@ function ClipOptions({ handlePlay, onDelete, onVolumeChanged, volume }) {
 class FilesPicker extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { value: [...this.props.value || []] };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
@@ -133,7 +131,7 @@ class FilesPicker extends React.Component {
             this.props.onChange({ target: { value: state.value } });
 
             return state;
-        })
+        });
     }
 
     /**
@@ -142,12 +140,9 @@ class FilesPicker extends React.Component {
      */
     handleFileChange(ev) {
         const files = Array.from(ev.target.files);
-
-        this.handleChange(value => {
-            return files.reduce((seed, { name }) => {
-                seed.push({ path: decodeURIComponent(name) });
-                return seed;
-            }, [...value]);
+        streamDeckClient.sendToPlugin({
+            event: "AddFiles",
+            files: files.map(file => decodeURIComponent(file.name))
         });
     }
 
@@ -156,9 +151,9 @@ class FilesPicker extends React.Component {
      * @param {Number} index The index of the path being deleted.
      */
     handleDelete(index) {
-        this.handleChange(value => {
-            value.splice(index, 1)
-            return value;
+        streamDeckClient.sendToPlugin({
+            event: "RemoveFile",
+            index: index
         });
     }
 
@@ -169,7 +164,11 @@ class FilesPicker extends React.Component {
      * @param {Number} obj.newIndex The new index.
      */
     handleSortEnd({ oldIndex, newIndex }) {
-        this.handleChange(value => arrayMove(value, oldIndex, newIndex));
+        streamDeckClient.sendToPlugin({
+            event: "MoveFile",
+            oldIndex: oldIndex,
+            newIndex: newIndex
+        });
     }
 
     /**
@@ -179,13 +178,8 @@ class FilesPicker extends React.Component {
      */
     handleVolumeChanged(file) {
         streamDeckClient.sendToPlugin({
-            event: "SetTestVolume",
+            event: "SetVolume",
             ...file
-        })
-
-        this.handleChange(value => {
-            value[file.index].volume = file.volume;
-            return value;
         });
     }
 
@@ -206,7 +200,7 @@ class FilesPicker extends React.Component {
                     <div className="sdpi-item-label opacity-zero">&nbsp;</div>
                     <FileList className="sdpi-item-value files-list"
                         enableSort={this.props.enableSort}
-                        items={this.state.value}
+                        items={this.props.value || []}
                         lockAxis="y"
                         onDelete={this.handleDelete}
                         onSortEnd={this.handleSortEnd}

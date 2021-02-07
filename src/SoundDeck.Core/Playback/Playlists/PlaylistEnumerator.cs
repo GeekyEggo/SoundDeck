@@ -1,19 +1,13 @@
 namespace SoundDeck.Core.Playback.Playlists
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections.Specialized;
 
     /// <summary>
-    /// Provides an enumerator for a playlist.
+    /// Provides a <see cref="IPlaylistEnumerator"/>.
     /// </summary>
     public class PlaylistEnumerator : IPlaylistEnumerator
     {
-        /// <summary>
-        /// The random seed.
-        /// </summary>
-        private static readonly Random Rnd = new Random();
-
         /// <summary>
         /// The synchronization root.
         /// </summary>
@@ -22,34 +16,48 @@ namespace SoundDeck.Core.Playback.Playlists
         /// <summary>
         /// Initializes a new instance of the <see cref="PlaylistEnumerator"/> class.
         /// </summary>
-        /// <param name="files">The files.</param>
+        /// <param name="playlist">The playlist.</param>
         public PlaylistEnumerator(IPlaylist playlist)
         {
-            this.PlaylistSource = playlist;
-            playlist.Changed += (_, __) => this.Bind();
-
-            this.Bind();
+            this.Playlist = playlist;
+            this.Playlist.CollectionChanged += this.Playlist_CollectionChanged;
         }
+
+        /// <summary>
+        /// Gets the index of the current item.
+        /// </summary>
+        public virtual int CurrentIndex => this.SequenceIndex;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="IPlaylist.Current" /> is the last item.
         /// </summary>
-        public bool IsLast { get; }
+        public bool IsLast => this.SequenceIndex + 1 >= this.Playlist.Count;
 
         /// <summary>
-        /// Gets or sets the index of the current file.
+        /// Gets the current item.
         /// </summary>
-        private int CurrentIndex { get; set; }
+        protected virtual AudioFileInfo Current => this.Playlist[this.SequenceIndex];
 
         /// <summary>
-        /// Gets the files associated with the enumerator.
+        /// Gets the playlist.
         /// </summary>
-        private IReadOnlyList<AudioFileInfo> Files { get; set; }
+        protected IPlaylist Playlist { get; }
 
         /// <summary>
-        /// Gets the playlist source.
+        /// Gets the sequence index.
         /// </summary>
-        private IPlaylist PlaylistSource { get; }
+        protected int SequenceIndex { get; private set; } = -1;
+
+        /// <summary>
+        /// Sets the enumerator to its initial position, which is before the first element in the collection.
+        /// </summary>
+        public virtual void Reset()
+        {
+            lock (this._syncRoot)
+            {
+                this.SequenceIndex = -1;
+            }
+        }
 
         /// <summary>
         /// Advances the enumerator to the next element of the collection.
@@ -60,46 +68,48 @@ namespace SoundDeck.Core.Playback.Playlists
         {
             lock (this._syncRoot)
             {
-                if (this.Files.Count == 0)
+                if (this.Playlist.Count == 0)
                 {
                     item = null;
                     return false;
                 }
 
-                this.CurrentIndex++;
-                if (this.CurrentIndex < 0
-                    || this.CurrentIndex == this.Files.Count)
+                this.SequenceIndex++;
+                if (this.SequenceIndex < 0
+                    || this.SequenceIndex == this.Playlist.Count)
                 {
-                    this.CurrentIndex = 0;
+                    this.Reset();
+                    this.SequenceIndex++;
                 }
 
-                item = this.Files[this.CurrentIndex];
-                return true;
+                try
+                {
+                    item = this.Playlist[this.CurrentIndex];
+                    return true;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    item = null;
+                    return false;
+                }
             }
         }
 
         /// <summary>
-        /// Sets the enumerator to its initial position, which is before the first element in the collection.
+        /// Handles the <see cref="INotifyCollectionChanged.CollectionChanged"/> of the <see cref="Playlist"/>.
         /// </summary>
-        public void Reset()
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
+        protected virtual void Playlist_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             lock (this._syncRoot)
             {
-                this.CurrentIndex = -1;
-            }
-        }
-
-        /// <summary>
-        /// Binds this instance to the <see cref="PlaylistSource"/>.
-        /// </summary>
-        private void Bind()
-        {
-            lock (this._syncRoot)
-            {
-                this.Reset();
-                this.Files = this.PlaylistSource.Order == PlaybackOrderType.Sequential
-                    ? this.Files = this.PlaylistSource.Files
-                    : this.Files = this.PlaylistSource.Files.OrderBy(_ => Rnd.Next()).ToList();
+                // When we were at the last item, and remove an item, we must reset.
+                if (e.Action == NotifyCollectionChangedAction.Remove
+                    && this.SequenceIndex >= this.Playlist.Count)
+                {
+                    this.Reset();
+                }
             }
         }
     }
