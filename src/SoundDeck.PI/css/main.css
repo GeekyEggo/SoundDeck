@@ -138,3 +138,9 @@ input[type="range"] {
     margin-top: 0 !important;
     width: 100% !important;
 }
+
+.sdpi-item-value.select,
+.sdpi-item-value > select {
+    padding-right: 25px !important; /* allows for the drop down icon to be shown */
+    width: 100%;
+}
