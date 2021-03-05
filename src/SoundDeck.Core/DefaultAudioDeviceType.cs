@@ -6,7 +6,7 @@ namespace SoundDeck.Core
     /// Defines an enumeration of possible defaults an audio device can be assigned to.
     /// </summary>
     [Flags]
-    public enum AudioDefaultType
+    public enum DefaultAudioDeviceType
     {
         /// <summary>
         /// The device is not a default.

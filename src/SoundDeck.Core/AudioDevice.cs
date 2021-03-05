@@ -25,7 +25,7 @@ namespace SoundDeck.Core
         /// <param name="flow">The flow of the auudio.</param>
         /// <param name="enabled">Whether the audio device is enabled.</param>
         /// <param name="assignedDefault">The enumeration that represents whether this device is a default audio device.</param>
-        internal AudioDevice(string id, string friendlyName, AudioFlowType flow, bool enabled = true, AudioDefaultType assignedDefault = AudioDefaultType.None)
+        internal AudioDevice(string id, string friendlyName, AudioFlowType flow, bool enabled = true, DefaultAudioDeviceType assignedDefault = DefaultAudioDeviceType.None)
         {
             this.AssignedDefault = assignedDefault;
             this.Enabled = enabled;
@@ -37,7 +37,7 @@ namespace SoundDeck.Core
         /// <summary>
         /// Gets the value indicating whether this instance is a default device.
         /// </summary>
-        public AudioDefaultType AssignedDefault { get; }
+        public DefaultAudioDeviceType AssignedDefault { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="AudioDevice"/> is enabled.

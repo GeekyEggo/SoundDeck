@@ -42,8 +42,8 @@ namespace SoundDeck.Core
             this.Enumerator.RegisterEndpointNotificationCallback(this);
 
             // Add the default playback devices.
-            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT, "Default", AudioFlowType.Playback, assignedDefault: AudioDefaultType.System));
-            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", AudioFlowType.Playback, assignedDefault: AudioDefaultType.Communication));
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT, "Default", AudioFlowType.Playback, assignedDefault: DefaultAudioDeviceType.System));
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", AudioFlowType.Playback, assignedDefault: DefaultAudioDeviceType.Communication));
 
             // Add all other audio devices.
             foreach (var device in this.Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active))

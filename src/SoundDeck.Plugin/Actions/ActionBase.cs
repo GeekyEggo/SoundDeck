@@ -38,7 +38,7 @@ namespace SoundDeck.Plugin.Actions
         public OptionsPayload GetCaptureAudioDevices()
         {
             var options = this.AudioService.Devices
-                .Where(device => device.Enabled && device.AssignedDefault == AudioDefaultType.None)
+                .Where(device => device.Enabled && device.AssignedDefault == DefaultAudioDeviceType.None)
                 .GroupBy(device => device.Flow)
                 .Select(g =>
                 {
@@ -55,7 +55,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public OptionsPayload GetAppAssignableAudioDevices()
-            => this.GetPlaybackAudioDevicesInternal(device => device.AssignedDefault != AudioDefaultType.Communication);
+            => this.GetPlaybackAudioDevicesInternal(device => device.AssignedDefault != DefaultAudioDeviceType.Communication);
 
         /// <summary>
         /// Gets the audio devices capable of playback.
