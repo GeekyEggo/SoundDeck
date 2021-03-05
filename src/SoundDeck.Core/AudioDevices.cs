@@ -42,8 +42,8 @@ namespace SoundDeck.Core
             this.Enumerator.RegisterEndpointNotificationCallback(this);
 
             // Add the default playback devices.
-            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT, "Default", AudioFlowType.Playback));
-            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", AudioFlowType.Playback));
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT, "Default", AudioFlowType.Playback, assignedDefault: AudioDefaultType.System));
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", AudioFlowType.Playback, assignedDefault: AudioDefaultType.Communication));
 
             // Add all other audio devices.
             foreach (var device in this.Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active))
@@ -73,26 +73,31 @@ namespace SoundDeck.Core
         private List<AudioDevice> InternalCollection { get; set; } = new List<AudioDevice>();
 
         /// <summary>
+        /// Determines whether the specified device identifier is the default playback device.
+        /// </summary>
+        /// <param name="id">The deviceidentifier.</param>
+        /// <returns><c>true</c> when the specified <paramref name="id"/> represents the default playback device.</returns>
+        public bool IsDefaultPlaybackDevice(string id)
+            => id == PLAYBACK_DEFAULT || string.IsNullOrEmpty(id);
+
+        /// <summary>
         /// Gets the device with the specified <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The device identifier.</param>
         /// <returns>The device.</returns>
         public MMDevice GetDevice(string id)
         {
-            switch (id)
+            if (this.IsDefaultPlaybackDevice(id))
             {
-                case PLAYBACK_DEFAULT:
-                case "":
-                case null:
-                    return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console)
-                        ?? this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-
-                case PLAYBACK_DEFAULT_COMMUNICATION:
-                    return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
-
-                default:
-                    return this.Enumerator.GetDevice(id);
+                return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+                    ?? this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             }
+            else if (id == PLAYBACK_DEFAULT_COMMUNICATION)
+            {
+                return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
+            }
+
+            return this.Enumerator.GetDevice(id);
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 namespace SoundDeck.Plugin.Actions
 {
+    using System;
     using System.Linq;
-    using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
@@ -31,36 +31,55 @@ namespace SoundDeck.Plugin.Actions
         public IAudioService AudioService { get; }
 
         /// <summary>
-        /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
+        /// Gets the audio devices capable of capturing audio.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
-        public Task<OptionsPayload> GetCaptureAudioDevices()
+        public OptionsPayload GetCaptureAudioDevices()
         {
             var options = this.AudioService.Devices
-                .Where(d => d.Enabled)
-                .GroupBy(d => d.Flow)
+                .Where(device => device.Enabled && device.AssignedDefault == AudioDefaultType.None)
+                .GroupBy(device => device.Flow)
                 .Select(g =>
                 {
                     var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
                     return new Option(g.Key.ToString(), children);
                 });
 
-            return Task.FromResult(new OptionsPayload(options));
+            return new OptionsPayload(options);
         }
 
         /// <summary>
-        /// Provides an entry point for the property inspector, which can be used to get the audio devices available on the system.
+        /// Gets the audio devices capable of having an application assigned to them.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
-        public Task<OptionsPayload> GetPlaybackAudioDevices()
+        public OptionsPayload GetAppAssignableAudioDevices()
+            => this.GetPlaybackAudioDevicesInternal(device => device.AssignedDefault != AudioDefaultType.Communication);
+
+        /// <summary>
+        /// Gets the audio devices capable of playback.
+        /// </summary>
+        /// <returns>The payload containing the audio devices.</returns>
+        [PropertyInspectorMethod]
+        public OptionsPayload GetPlaybackAudioDevices()
+            => this.GetPlaybackAudioDevicesInternal();
+
+        /// <summary>
+        /// Gets the playback audio devices that fulfil the specified <paramref name="filter"/>.
+        /// </summary>
+        /// <param name="filter">The optional filter.</param>
+        /// <returns>The payload containing the audio devices.</returns>
+        private OptionsPayload GetPlaybackAudioDevicesInternal(Func<AudioDevice, bool> filter = null)
         {
+            filter = filter ?? (_ => true);
+
             var options = this.AudioService.Devices
                 .Where(d => d.Enabled && d.Flow == AudioFlowType.Playback)
+                .Where(filter)
                 .Select(d => new Option(d.FriendlyName, d.Id));
 
-            return Task.FromResult(new OptionsPayload(options));
+            return new OptionsPayload(options);
         }
     }
 }

@@ -88,12 +88,15 @@ namespace SoundDeck.Core
             var flow = this.GetDataFlow(audioFlow);
             if (this.TryGetAudioSessionProcessId(processName, flow, out var audioSessionProcessId))
             {
-                // Generate the string used when setting the default audio device.
+                // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
-                if (!string.IsNullOrWhiteSpace(deviceId))
+                if (!AudioDevices.Current.IsDefaultPlaybackDevice(deviceId))
                 {
-                    var str = this.GenerateDeviceId(deviceId);
-                    Combase.WindowsCreateString(str, (uint)str.Length, out hstring);
+                    using (var device = AudioDevices.Current.GetDevice(deviceId))
+                    {
+                        var persistDeviceId = this.GenerateDeviceId(device.ID);
+                        Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
+                    }
                 }
 
                 // Set the audio device for the process.

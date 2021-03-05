@@ -45,15 +45,9 @@ namespace SoundDeck.Plugin.Actions
             {
                 var settings = args.Payload.GetSettings<SetAppAudioDeviceSettings>();
 
-                // Ensure we have an audio device.
-                if (string.IsNullOrWhiteSpace(settings.AudioDeviceId))
-                {
-                    throw new ArgumentNullException($"Cannot set default audio device for app: The audio device has not been specified.");
-                }
-
+                // When the process selection type is by name, validate we have a name and then set the default audio device.
                 if (settings.ProcessSelectionType == ProcessSelectionType.ByName)
                 {
-                    // When the process selection type is by name, validate we have a name and then set the default audio device.
                     if (string.IsNullOrWhiteSpace(settings.ProcessName))
                     {
                         throw new ArgumentNullException($"Cannot set default audio device for app: The process name has not been specified.");
