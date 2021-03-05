@@ -82,17 +82,9 @@ namespace SoundDeck.Plugin.Actions
         {
             lock (_syncRoot)
             {
-                // When the current item is being played, adjust the audio player volume.
-                if (this.PlaylistController?.Enumerator?.CurrentIndex == payload?.Index)
-                {
-                    this.PlaylistController.AudioPlayer.Volume = payload.Volume;
-                }
-
-                // When the volume tester is being played, adjust the audio player volume.
-                if (this.VolumeTester?.Index == payload?.Index)
-                {
-                    this.VolumeTester.Player.Volume = payload.Volume;
-                }
+                // Update the volume of anything playing this file.
+                this.PlaylistController.TrySetVolume(payload);
+                this.VolumeTester.TrySetVolume(payload);
 
                 // Set the volume on the playlist item, and persist it.
                 this.PlaylistController.Playlist[payload.Index].Volume = payload.Volume;
@@ -113,19 +105,10 @@ namespace SoundDeck.Plugin.Actions
                 var deviceId = this.PlaylistController.AudioPlayer.DeviceId;
                 if (this.VolumeTester == null)
                 {
-                    this.VolumeTester = new VolumeTester
-                    {
-                        Player = this.AudioService.GetAudioPlayer(deviceId)
-                    };
+                    this.VolumeTester = new VolumeTester(this.AudioService.GetAudioPlayer(deviceId));
                 }
 
-                // Stop any current volume tests.
-                this.VolumeTester.Player.Stop();
-
-                // Set the current state of the volume tester, and then play the clip at the desired volume.
-                this.VolumeTester.Index = payload.Index;
-                this.VolumeTester.Player.DeviceId = deviceId;
-                _ = this.VolumeTester.Player.PlayAsync(payload);
+                _ = this.VolumeTester.PlayAsync(payload, deviceId);
             }
         }
 
@@ -199,26 +182,11 @@ namespace SoundDeck.Plugin.Actions
             // When an item was removed, ensure we stop any audio players that were playing it.
             if (e?.Action == NotifyCollectionChangedAction.Remove)
             {
-                // The main player.
-                if (e.OldStartingIndex == this.PlaylistController?.Enumerator?.CurrentIndex)
-                {
-                    this.PlaylistController?.AudioPlayer?.Stop();
-                }
-
-                // The volume tester.
-                if (e.OldStartingIndex == this.VolumeTester?.Index)
-                {
-                    this.PlaylistController?.AudioPlayer.Stop();
-                }
+                this.PlaylistController.TryStop(e.OldStartingIndex);
+                this.VolumeTester.TryStop(e.OldStartingIndex);
             }
 
-            // Save the playlist to the action settings.
-            var settings = await this.GetSettingsAsync()
-                .ConfigureAwait(false);
-
-            settings.Files = this.PlaylistController.Playlist.ToArray();
-
-            await this.SetSettingsAsync(settings)
+            await this.UpdateSettingsAsync(s => s.Files = this.PlaylistController.Playlist.ToArray())
                 .ConfigureAwait(false);
         }
 

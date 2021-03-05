@@ -7,22 +7,12 @@ namespace SoundDeck.Core.Playback
     /// <summary>
     /// Provides information and methods for a playlist controller.
     /// </summary>
-    public interface IPlaylistController : IDisposable
+    public interface IPlaylistController : IIndexedAudioPlayer, IDisposable
     {
         /// <summary>
         /// Gets the type of the action that occurs upon the button being pressed.
         /// </summary>
         ControllerActionType Action { get; }
-
-        /// <summary>
-        /// Gets or sets the audio player.
-        /// </summary>
-        IAudioPlayer AudioPlayer { get; }
-
-        /// <summary>
-        /// Gets the enumerator responsible for iterating over the <see cref="Playlist"/>.
-        /// </summary>
-        IPlaylistEnumerator Enumerator { get; }
 
         /// <summary>
         /// Gets or sets the playback order when reading the playlist.

@@ -51,9 +51,9 @@ namespace SoundDeck.Core.Playback.Controllers
         public IAudioPlayer AudioPlayer { get; private set; }
 
         /// <summary>
-        /// Gets the enumerator responsible for iterating over the <see cref="Playlist"/>.
+        /// Gets the index of the current file being played.
         /// </summary>
-        public IPlaylistEnumerator Enumerator { get; private set; }
+        public int Index => this.Enumerator?.CurrentIndex ?? -1;
 
         /// <summary>
         /// Gets or sets the playback order when reading the playlist.
@@ -89,6 +89,11 @@ namespace SoundDeck.Core.Playback.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Gets the enumerator responsible for iterating over the <see cref="Playlist"/>.
+        /// </summary>
+        protected IPlaylistEnumerator Enumerator { get; private set; }
 
         /// <summary>
         /// Gets or sets the type of the playback.
