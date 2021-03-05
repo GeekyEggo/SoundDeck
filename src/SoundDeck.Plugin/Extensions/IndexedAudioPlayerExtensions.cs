@@ -15,7 +15,7 @@ namespace SoundDeck.Plugin.Extensions
         /// <param name="payload">The payload.</param>
         public static void TrySetVolume(this IIndexedAudioPlayer player, AdjustPlaylistFileVolumePayload payload)
         {
-            if (player.Index == payload.Index
+            if (player?.Index == payload.Index
                 && player.AudioPlayer != null)
             {
                 player.AudioPlayer.Volume = payload.Volume;
@@ -29,7 +29,7 @@ namespace SoundDeck.Plugin.Extensions
         /// <param name="index">The index.</param>
         public static void TryStop(this IIndexedAudioPlayer player, int index)
         {
-            if (player.Index == index)
+            if (player?.Index == index)
             {
                 player.AudioPlayer?.Stop();
             }
