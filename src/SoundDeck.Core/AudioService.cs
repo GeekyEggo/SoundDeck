@@ -23,14 +23,13 @@ namespace SoundDeck.Core
         /// <param name="normalizationProvider">The normalization provider.</param>
         public AudioService(ILogger<AudioService> logger)
         {
-            this.Devices = new AudioDeviceCollection();
             this.SharedAudioBufferManager = new SharedAudioBufferManager(logger);
         }
 
         /// <summary>
         /// Gets the audio devices.
         /// </summary>
-        public IAudioDeviceCollection Devices { get; }
+        public IReadOnlyCollection<AudioDevice> Devices => AudioDevices.Current;
 
         /// <summary>
         /// Gets or sets the players.
@@ -83,12 +82,6 @@ namespace SoundDeck.Core
 
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
         }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-            => this.Devices.Dispose();
 
         /// <summary>
         /// Gets an audio buffer for the specified device identifier.

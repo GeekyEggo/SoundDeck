@@ -20,11 +20,6 @@ namespace SoundDeck.Plugin
         private static IAudioService AudioService { get; set; }
 
         /// <summary>
-        /// Gets or sets the connection.
-        /// </summary>
-        private static IStreamDeckConnection Connection { get; set; }
-
-        /// <summary>
         /// Runs the Sound Deck plugin asynchronously.
         /// </summary>
         /// <param name="args">The arguments supplied by the console or entry point.</param>
@@ -36,11 +31,7 @@ namespace SoundDeck.Plugin
 
             return StreamDeckPlugin.Create()
                 .WithServiceProvider(provider)
-                .OnSetup(conn =>
-                {
-                    conn.DeviceDidConnect += Client_DeviceDidConnect;
-                    conn.SystemDidWakeUp += Client_SystemDidWakeUp;
-                })
+                .OnSetup(conn => conn.SystemDidWakeUp += Client_SystemDidWakeUp)
                 .RunAsync(CancellationToken.None);
         }
 
@@ -55,33 +46,6 @@ namespace SoundDeck.Plugin
             {
                 audioBuffer.Restart();
             }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="IStreamDeckConnection.DeviceDidConnect"/> event of the main Stream Deck connection.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DeviceConnectEventArgs"/> instance containing the event data.</param>
-        private static void Client_DeviceDidConnect(object sender, DeviceConnectEventArgs e)
-        {
-            if (sender is IStreamDeckConnection connection)
-            {
-                Connection = connection;
-                connection.DeviceDidConnect -= Client_DeviceDidConnect;
-
-                // set the global settings, and update them if the default playback device changes
-                UpdateGlobalSettings();
-                AudioService.Devices.DefaultPlaybackDeviceChanged += (_, __) => UpdateGlobalSettings();
-            }
-        }
-
-        /// <summary>
-        /// Updates the global settings.
-        /// </summary>
-        private static async void UpdateGlobalSettings()
-        {
-            var settings = new PluginSettings(AudioService.Devices.DefaultPlaybackDevice?.Id);
-            await Connection.SetGlobalSettingsAsync(settings).ConfigureAwait(false);
         }
     }
 }

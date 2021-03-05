@@ -22,11 +22,6 @@ namespace SoundDeck.Core.Capture.Sharing
         }
 
         /// <summary>
-        /// Gets the device enumerator.
-        /// </summary>
-        private MMDeviceEnumerator DeviceEnumerator { get; } = new MMDeviceEnumerator();
-
-        /// <summary>
         /// Gets the audio buffers.
         /// </summary>
         private ConcurrentDictionary<string, SharedAudioBufferCollection> AudioBuffers { get; } = new ConcurrentDictionary<string, SharedAudioBufferCollection>();
@@ -47,7 +42,6 @@ namespace SoundDeck.Core.Capture.Sharing
             }
 
             this.AudioBuffers.Clear();
-            this.DeviceEnumerator.Dispose();
         }
 
         /// <summary>
@@ -104,7 +98,7 @@ namespace SoundDeck.Core.Capture.Sharing
         /// <returns>The audio buffer.</returns>
         private AudioBuffer CreateAudioBuffer(string deviceId, TimeSpan bufferDuration)
         {
-            var device = this.DeviceEnumerator.GetDevice(deviceId);
+            var device = AudioDevices.Current.GetDevice(deviceId);
             if (device == null)
             {
                 throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");

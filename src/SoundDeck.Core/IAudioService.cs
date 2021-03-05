@@ -4,17 +4,16 @@ namespace SoundDeck.Core
     using System.Collections.Generic;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
-    using SoundDeck.Core.Playback.Controllers;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
     /// </summary>
-    public interface IAudioService : IDisposable
+    public interface IAudioService
     {
         /// <summary>
         /// Gets the audio devices.
         /// </summary>
-        IAudioDeviceCollection Devices { get; }
+        IReadOnlyCollection<AudioDevice> Devices { get; }
 
         /// <summary>
         /// Determines whether encoding to MP3 is possible based on the current environment.

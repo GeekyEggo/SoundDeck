@@ -13,11 +13,23 @@ namespace SoundDeck.Core
         /// </summary>
         /// <param name="device">The device.</param>
         internal AudioDevice(MMDevice device)
+            : this(device.ID, device.FriendlyName, device.DataFlow == DataFlow.Capture ? AudioFlowType.Recording : AudioFlowType.Playback, device.State == DeviceState.Active)
         {
-            this.Enabled = device.State == DeviceState.Active;
-            this.Flow = device.DataFlow == DataFlow.Capture ? AudioFlowType.Recording : AudioFlowType.Playback;
-            this.FriendlyName = device.FriendlyName;
-            this.Id = device.ID;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AudioDevice"/> class.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="friendlyName">The friendly name.</param>
+        /// <param name="flow">The flow of the auudio.</param>
+        /// <param name="enabled">Whether the audio device is enabled..</param>
+        internal AudioDevice(string id, string friendlyName, AudioFlowType flow, bool enabled = true)
+        {
+            this.Enabled = enabled;
+            this.Flow = flow;
+            this.FriendlyName = friendlyName;
+            this.Id = id;
         }
 
         /// <summary>
@@ -39,13 +51,5 @@ namespace SoundDeck.Core
         /// Gets the identifier.
         /// </summary>
         public string Id { get; }
-
-        /// <summary>
-        /// Performs an implicit conversion from <see cref="MMDevice"/> to <see cref="AudioDevice"/>.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <returns>The result of the conversion.</returns>
-        public static implicit operator AudioDevice(MMDevice device)
-            => new AudioDevice(device);
     }
 }

@@ -161,19 +161,6 @@ namespace SoundDeck.Core.Playback.Players
         }
 
         /// <summary>
-        /// Gets the audio device this instance is associated with.
-        /// </summary>
-        /// <remarks>Re-selecting the device is required as execution occurs on a separate thread.</remarks>
-        /// <returns>The audio device.</returns>
-        private MMDevice GetDevice()
-        {
-            using (var enumerator = new MMDeviceEnumerator())
-            {
-                return enumerator.GetDevice(this.DeviceId);
-            }
-        }
-
-        /// <summary>
         /// Plays the audio file.
         /// </summary>
         /// <param name="file">The file.</param>
@@ -183,7 +170,8 @@ namespace SoundDeck.Core.Playback.Players
             this.FileName = file.Path;
             this.Volume = file.Volume;
 
-            using (var player = new AsyncWasapiOut(this.GetDevice(), file.Path))
+            using (var device = AudioDevices.Current.GetDevice(this.DeviceId))
+            using (var player = new AsyncWasapiOut(device, file.Path))
             {
                 void SynchronizeVolume(object sender, EventArgs e) => player.FileVolume = this.Volume;
 

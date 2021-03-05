@@ -6,84 +6,61 @@ namespace SoundDeck.Core
     using System.Linq;
     using NAudio.CoreAudioApi;
     using NAudio.CoreAudioApi.Interfaces;
+    using SoundDeck.Core.Interop;
 
     /// <summary>
-    /// Provides a self monitoring collection of <see cref="AudioDevice"/>.
+    /// Provides a singleton responsible for traversing the available <see cref="AudioDevice"/> and selecting <see cref="MMDevice"/>.
     /// </summary>
-    internal sealed class AudioDeviceCollection : IAudioDeviceCollection, IMMNotificationClient
+    internal sealed class AudioDevices : IReadOnlyCollection<AudioDevice>, IMMNotificationClient
     {
+        /// <summary>
+        /// /// The identifier used to determine the default playback device.
+        /// </summary>
+        private const string PLAYBACK_DEFAULT = "PLAYBACK_DEFAULT";
+
+        /// <summary>
+        /// The identifier used to determine the default playback communication device.
+        /// </summary>
+        private const string PLAYBACK_DEFAULT_COMMUNICATION = "PLAYBACK_DEFAULT_COMMUNICATION";
+
+        /// <summary>
+        /// Private member field for <see cref="Current"/>.
+        /// </summary>
+        private static readonly Lazy<AudioDevices> _current = new Lazy<AudioDevices>(() => new AudioDevices(), true);
+
         /// <summary>
         /// The synchronization root.
         /// </summary>
         private static readonly object _syncRoot = new object();
 
         /// <summary>
-        /// The <see cref="DataFlow"/> that defines the default playback device.
+        /// Initializes a new instance of the <see cref="AudioDevices"/> class.
         /// </summary>
-        private const DataFlow PLAYBACK_FLOW = DataFlow.Render;
-
-        /// <summary>
-        /// The <see cref="Role"/> that defines the default playback device.
-        /// </summary>
-        private const Role PLAYBACK_ROLE = Role.Multimedia;
-
-        /// <summary>
-        /// Private member filed for <see cref="DefaultPlaybackDevice"/>.
-        /// </summary>
-        private AudioDevice _defaultPlaybackDevice = null;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AudioDeviceCollection"/> class.
-        /// </summary>
-        public AudioDeviceCollection()
+        private AudioDevices()
         {
             this.Enumerator = new MMDeviceEnumerator();
             this.Enumerator.RegisterEndpointNotificationCallback(this);
 
-            this.SetDefaultPlaybackDevice();
+            // Add the default playback devices.
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT, "Default", AudioFlowType.Playback));
+            this.InternalCollection.Add(new AudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", AudioFlowType.Playback));
+
+            // Add all other audio devices.
             foreach (var device in this.Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active))
             {
-                this.InternalCollection.Add(device);
+                this.InternalCollection.Add(new AudioDevice(device));
             }
         }
 
         /// <summary>
-        /// Occurs when the <see cref="DefaultPlaybackDevice"/> changed.
+        /// Gets the current instance of <see cref="AudioDevices"/>.
         /// </summary>
-        public event EventHandler DefaultPlaybackDeviceChanged;
-
-        /// <summary>
-        /// Gets the <see cref="AudioDevice"/> at the specified index.
-        /// </summary>
-        /// <value>The <see cref="AudioDevice"/>.</value>
-        /// <param name="index">The index.</param>
-        /// <returns>The audio device at the specified index.</returns>
-        public AudioDevice this[int index] => this.InternalCollection[index];
+        public static AudioDevices Current => _current.Value;
 
         /// <summary>
         /// Gets the count.
         /// </summary>
         public int Count => this.InternalCollection.Count;
-
-        /// <summary>
-        /// Gets the default playback device.
-        /// </summary>
-        public AudioDevice DefaultPlaybackDevice
-        {
-            get
-            {
-                return this._defaultPlaybackDevice;
-            }
-
-            private set
-            {
-                if (this._defaultPlaybackDevice != value)
-                {
-                    this._defaultPlaybackDevice = value;
-                    this.DefaultPlaybackDeviceChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
 
         /// <summary>
         /// Gets or sets the internal COM enumerator.
@@ -96,16 +73,26 @@ namespace SoundDeck.Core
         private List<AudioDevice> InternalCollection { get; set; } = new List<AudioDevice>();
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        /// Gets the device with the specified <paramref name="id"/>.
         /// </summary>
-        public void Dispose()
+        /// <param name="id">The device identifier.</param>
+        /// <returns>The device.</returns>
+        public MMDevice GetDevice(string id)
         {
-            this.Enumerator.UnregisterEndpointNotificationCallback(this);
-            this.Enumerator.Dispose();
-            this.Enumerator = null;
-            this.InternalCollection = null;
+            switch (id)
+            {
+                case PLAYBACK_DEFAULT:
+                case "":
+                case null:
+                    return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console)
+                        ?? this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-            GC.SuppressFinalize(this);
+                case PLAYBACK_DEFAULT_COMMUNICATION:
+                    return this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
+
+                default:
+                    return this.Enumerator.GetDevice(id);
+            }
         }
 
         /// <summary>
@@ -126,14 +113,7 @@ namespace SoundDeck.Core
         /// <param name="flow">The data flow.</param>
         /// <param name="role">The role.</param>
         /// <param name="defaultDeviceId">The default device identifier.</param>
-        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
-        {
-            if (flow == PLAYBACK_FLOW
-                && role == PLAYBACK_ROLE)
-            {
-                this.SetDefaultPlaybackDevice();
-            }
-        }
+        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId) { }
 
         /// <summary>
         /// Handles an audio device being added.
@@ -143,7 +123,7 @@ namespace SoundDeck.Core
         {
             lock (_syncRoot)
             {
-                this.InternalCollection.Add(this.Enumerator.GetDevice(pwstrDeviceId));
+                this.InternalCollection.Add(new AudioDevice(this.Enumerator.GetDevice(pwstrDeviceId)));
             }
         }
 
@@ -183,10 +163,7 @@ namespace SoundDeck.Core
         /// </summary>
         /// <param name="pwstrDeviceId">The audio device identifier.</param>
         /// <param name="key">The property key.</param>
-        public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
-        {
-            // do nothing
-        }
+        public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
 
         /// <summary>
         /// Gets the enumerator.
@@ -194,17 +171,5 @@ namespace SoundDeck.Core
         /// <returns>The enumerator of <see cref="AudioDevice"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator()
             => this.GetEnumerator();
-
-        /// <summary>
-        /// Sets the default playback device.
-        /// </summary>
-        private void SetDefaultPlaybackDevice()
-        {
-            var device = this.Enumerator.GetDefaultAudioEndpoint(PLAYBACK_FLOW, PLAYBACK_ROLE);
-            if (device != null)
-            {
-                this.DefaultPlaybackDevice = new AudioDevice(device);
-            }
-        }
     }
 }

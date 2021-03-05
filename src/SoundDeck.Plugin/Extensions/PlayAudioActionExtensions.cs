@@ -20,7 +20,6 @@ namespace SoundDeck.Plugin.Extensions
         public static void SetPlaylistController(this IPlayAudioAction action, IPlayAudioSettings settings)
         {
             // Ensure we have a playlist controller, and that the device is correct.
-            var deviceId = string.IsNullOrWhiteSpace(settings.PlaybackAudioDeviceId) ? action.AudioService.Devices.DefaultPlaybackDevice?.Id : settings.PlaybackAudioDeviceId;
             if (action.PlaylistController == null
                 || action.PlaylistController.Action != settings.Action)
             {
@@ -29,14 +28,14 @@ namespace SoundDeck.Plugin.Extensions
                 action.PlaylistController?.Dispose();
 
                 // Create the new controller, and assign its playlist
-                action.PlaylistController = action.AudioService.CreatePlaylistController(deviceId, settings.Action);
+                action.PlaylistController = action.AudioService.CreatePlaylistController(settings.PlaybackAudioDeviceId, settings.Action);
                 action.PlaylistController.Playlist = playlist;
 
                 action.AddTimeChangedHandler();
             }
             else
             {
-                action.PlaylistController.AudioPlayer.DeviceId = deviceId;
+                action.PlaylistController.AudioPlayer.DeviceId = settings.PlaybackAudioDeviceId;
             }
 
             action.PlaylistController.Order = settings.Order;

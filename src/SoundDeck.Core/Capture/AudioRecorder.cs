@@ -100,7 +100,7 @@ namespace SoundDeck.Core.Capture
                 }
 
                 // set the capture information
-                var device = this.GetDevice();
+                var device = AudioDevices.Current.GetDevice(this.DeviceId);
                 this.Capture = device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
                 this.Capture.DataAvailable += this.Capture_DataAvailable;
                 this.Capture.RecordingStopped += this.Capture_RecordingStopped;
@@ -160,17 +160,5 @@ namespace SoundDeck.Core.Capture
         /// <param name="e">The <see cref="StoppedEventArgs"/> instance containing the event data.</param>
         private void Capture_RecordingStopped(object sender, StoppedEventArgs e)
             => this.Dispose(false);
-
-        /// <summary>
-        /// Gets the device associated with the audio recorder.
-        /// </summary>
-        /// <returns>The device.</returns>
-        private MMDevice GetDevice()
-        {
-            using (var enumerator = new MMDeviceEnumerator())
-            {
-                return enumerator.GetDevice(this.DeviceId);
-            }
-        }
     }
 }
