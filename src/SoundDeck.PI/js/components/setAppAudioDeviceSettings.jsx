@@ -22,7 +22,7 @@ class SetAppAudioDeviceSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Audio Device" dataSourceUri="GetAppAssignableAudioDevices" valuePath="audioDeviceId" />
+                <Select label="Audio Device" dataSourceUri="GetAppAssignableAudioDevices" valuePath="audioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
                 <Select label="Process" options={this.processSelectionOptions} valuePath="processSelectionType" />
                 {this.state.isProcessNameVisible &&
                     <TextField label="Name" valuePath="processName" />
