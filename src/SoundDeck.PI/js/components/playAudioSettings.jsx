@@ -23,9 +23,6 @@ class PlayAudioSettings extends React.Component {
 
         this.state = { enableSort: this.isSortEnabled() };
         store.subscribe(() => this.setState({ enableSort: this.isSortEnabled() }));
-
-        streamDeckClient.getGlobalSettings()
-            .then((ev) => this.setState({ defaultPlaybackDeviceId: ev.payload.settings.defaultPlaybackDeviceId }));
     }
 
     isSortEnabled() {
@@ -36,7 +33,7 @@ class PlayAudioSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Playback Device" dataSourceUri="GetPlaybackAudioDevices" valuePath="audioDeviceId" defaultValue={this.state.defaultPlaybackDeviceId} />
+                <Select label="Playback Device" dataSourceUri="GetPlaybackAudioDevices" valuePath="audioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
                 <Select label="Action" options={this.actionTypes} valuePath="action" defaultValue={PlayActionTypes.PlayNext.value} />
                 <Select label="Order" options={this.orderTypes} valuePath="order" defaultValue="0" />
                 <FilesPicker label="Files" valuePath="files" accept="audio/mpeg,audio/wav" buttonLabel="Add file..." enableSort={this.state.enableSort} />

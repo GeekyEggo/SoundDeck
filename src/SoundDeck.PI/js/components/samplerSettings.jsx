@@ -21,7 +21,7 @@ class SamplerSettings extends React.Component {
                 <Checkbox label="Encode to MP3" valuePath="encodeToMP3" defaultValue={false} id="encodeToMP3" />
                 <Checkbox label="Normalize Volume" valuePath="normalizeVolume" defaultValue={true} id="normalizeVolume" />
                 <hr />
-                <Select label="Playback Device" dataSourceUri="GetPlaybackAudioDevices" valuePath="playbackAudioDeviceId" />
+                <Select label="Playback Device" dataSourceUri="GetPlaybackAudioDevices" valuePath="playbackAudioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
                 <Select label="Action" options={this.actionTypes} valuePath="action" defaultValue={PlayActionTypes.PlayNext.value} />
             </PropertyInspectorWrapper>
         );
