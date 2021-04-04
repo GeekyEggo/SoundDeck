@@ -34,7 +34,8 @@
 - Fixed audio time display.
 - Fixed an issue when moving actions around could cause incorrect playback.
 
-
+#### ♻ Changed
+- Removed drag-handle within Play Audio settings when order was sequential.
 
 ## 1.0.0
 
