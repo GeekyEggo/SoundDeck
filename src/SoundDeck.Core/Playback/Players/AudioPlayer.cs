@@ -3,7 +3,6 @@ namespace SoundDeck.Core.Playback.Players
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using NAudio.CoreAudioApi;
 
     /// <summary>
     /// Provides an audio player for an audio device.

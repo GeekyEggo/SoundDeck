@@ -12,7 +12,7 @@ namespace SoundDeck.Plugin.Windows
         /// <summary>
         /// The singleton instance.
         /// </summary>
-        private static readonly Lazy<StreamDeck> _instance = new Lazy<StreamDeck>(() => new StreamDeck(), true);
+        private static readonly Lazy<StreamDeck> _instance = new(() => new StreamDeck(), true);
 
         /// <summary>
         /// Gets the singleton instance that represents the Stream Deck.

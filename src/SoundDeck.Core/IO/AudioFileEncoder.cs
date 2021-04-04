@@ -3,6 +3,7 @@ namespace SoundDeck.Core.IO
     using System;
     using NAudio.MediaFoundation;
     using NAudio.Wave;
+    using SoundDeck.Core.Playback.Readers;
     using SoundDeck.Core.Volume;
 
     /// <summary>
@@ -14,7 +15,7 @@ namespace SoundDeck.Core.IO
         /// Initializes a new instance of the <see cref="AudioFileEncoder"/> class.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        public AudioFileEncoder(AudioFileReader reader)
+        public AudioFileEncoder(IAudioFileReader reader)
         {
             this.Reader = reader;
         }
@@ -32,7 +33,7 @@ namespace SoundDeck.Core.IO
         /// <summary>
         /// Gets the reader; the main data source of the writer.
         /// </summary>
-        private AudioFileReader Reader { get; }
+        private IAudioFileReader Reader { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

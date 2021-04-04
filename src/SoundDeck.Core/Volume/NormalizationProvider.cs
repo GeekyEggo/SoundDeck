@@ -1,10 +1,11 @@
 namespace SoundDeck.Core.Volume
 {
-    using NAudio.Wave;
     using System;
+    using System.IO;
+    using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
-    /// Provides normalization of a <see cref="AudioFileReader"/>.
+    /// Provides normalization of a <see cref="IAudioFileReader"/>.
     /// </summary>
     public class NormalizationProvider : INormalizationProvider
     {
@@ -13,7 +14,7 @@ namespace SoundDeck.Core.Volume
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <param name="maxGain">The maximum gain.</param>
-        public void ApplyLoudnessNormalization(AudioFileReader reader, float maxGain)
+        public void ApplyLoudnessNormalization(IAudioFileReader reader, float maxGain)
         {
             var peak = this.GetPeak(reader);
             if (peak >= maxGain)
@@ -26,7 +27,7 @@ namespace SoundDeck.Core.Volume
         /// Normalizes the volume of the audio file reader, based on the peak.
         /// </summary>
         /// <param name="reader">The reader.</param>
-        public void ApplyPeakNormalization(AudioFileReader reader)
+        public void ApplyPeakNormalization(IAudioFileReader reader)
         {
             var peak = this.GetPeak(reader);
             reader.Volume = 1.0f / peak;
@@ -37,7 +38,7 @@ namespace SoundDeck.Core.Volume
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The peak byte as an absolute value.</returns>
-        public virtual float GetPeak(AudioFileReader reader)
+        public virtual float GetPeak(IAudioFileReader reader)
         {
             float peak = 0;
 
@@ -56,7 +57,7 @@ namespace SoundDeck.Core.Volume
             } while (read > 0);
 
             // rewind the reader and set the volume
-            reader.Position = 0;
+            reader.Seek(0, SeekOrigin.Begin);
             return peak;
         }
     }

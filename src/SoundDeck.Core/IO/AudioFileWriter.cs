@@ -1,9 +1,10 @@
 namespace SoundDeck.Core.IO
 {
-    using NAudio.Wave;
     using System;
     using System.IO;
     using System.Threading.Tasks;
+    using NAudio.Wave;
+    using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
     /// Provides audio file writing, including encoding and volume normalization.
@@ -117,7 +118,7 @@ namespace SoundDeck.Core.IO
                 File.Move(this.Writer.Filename, this.Writer.Filename + TEMP_EXTENSION);
 
                 // re-write and the file
-                using (var reader = new AudioFileReader(this.Writer.Filename + TEMP_EXTENSION))
+                using (var reader = new AudioFileReaderWrapper(this.Writer.Filename + TEMP_EXTENSION))
                 using (var writer = new AudioFileEncoder(reader))
                 {
                     writer.Settings = this.Settings;

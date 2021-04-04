@@ -1,8 +1,8 @@
 namespace SoundDeck.Core.Volume
 {
-    using NAudio.Wave;
     using System.Collections.Concurrent;
     using System.IO;
+    using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
     /// Provides a static helper class for getting the normalization levels of an audio file based on its full path.
@@ -19,7 +19,7 @@ namespace SoundDeck.Core.Volume
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The peak as an absolute value of the byte.</returns>
-        public override float GetPeak(AudioFileReader reader)
+        public override float GetPeak(IAudioFileReader reader)
         {
             var key = this.GetKey(reader);
             var entry = this.Items.GetOrAdd(key, _ => this.GetNewEntry(key, reader));
@@ -32,7 +32,7 @@ namespace SoundDeck.Core.Volume
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The key.</returns>
-        private string GetKey(AudioFileReader reader)
+        private string GetKey(IAudioFileReader reader)
             => this.GetKey(reader?.FileName);
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SoundDeck.Core.Volume
         /// <param name="key">The key.</param>
         /// <param name="reader">The reader.</param>
         /// <returns>The cache entry.</returns>
-        private CacheEntry GetNewEntry(string key, AudioFileReader reader)
+        private CacheEntry GetNewEntry(string key, IAudioFileReader reader)
         {
             var peak = base.GetPeak(reader);
             var watcher = new FileSystemWatcher

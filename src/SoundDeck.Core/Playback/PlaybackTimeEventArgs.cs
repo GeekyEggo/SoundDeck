@@ -1,7 +1,7 @@
 namespace SoundDeck.Core.Playback
 {
-    using NAudio.Wave;
     using System;
+    using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
     /// Provides event arguments for the time of a <see cref="AudioPlayer"/> changing.
@@ -35,18 +35,18 @@ namespace SoundDeck.Core.Playback
         public TimeSpan Total { get; }
 
         /// <summary>
-        /// Gets the event arguments from a <see cref="AudioFileReader"/>.
+        /// Gets the event arguments from a <see cref="IAudioFileReader"/>.
         /// </summary>
         /// <param name="reader">The reader.</param>
         /// <returns>The event arguments.</returns>
-        internal static PlaybackTimeEventArgs FromReader(AudioFileReader reader)
+        internal static PlaybackTimeEventArgs FromReader(IAudioFileReader reader)
             => new PlaybackTimeEventArgs(reader.CurrentTime, reader.TotalTime);
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// Determines whether the specified <see cref="object" />, is equal to this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
+        /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
             if (obj is PlaybackTimeEventArgs other)

@@ -6,6 +6,7 @@ namespace SoundDeck.Core.Playback
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
+    using SoundDeck.Core.Playback.Readers;
     using SoundDeck.Core.Volume;
 
     /// <summary>
@@ -36,7 +37,7 @@ namespace SoundDeck.Core.Playback
         public AsyncWasapiOut(MMDevice device, string file)
             : base(device, AudioClientShareMode.Shared, false, PLAYBACK_STATE_POLL_DELAY)
         {
-            this.Reader = new AudioFileReader(file);
+            this.Reader = this.GetAudioReader(file);
             this.PlaybackStopped += this.AsyncWasapiOut_PlaybackStopped;
         }
 
@@ -88,9 +89,9 @@ namespace SoundDeck.Core.Playback
         private bool IsDisposed { get; set; }
 
         /// <summary>
-        /// Gets the audio file reader.
+        /// Gets the audio reader.
         /// </summary>
-        private AudioFileReader Reader { get; }
+        private IAudioFileReader Reader { get; }
 
         /// <summary>
         /// Gets or sets cancellation token used to detect when the player has truly finished.
@@ -191,6 +192,21 @@ namespace SoundDeck.Core.Playback
         {
             this.Time = PlaybackTimeEventArgs.Zero;
             this.StopTaskCompletionSource?.TrySetResult(true);
+        }
+
+        /// <summary>
+        /// Gets the audio reader for the specified <paramref name="file"/>.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>The audio reader capable of reading the file.</returns>
+        private IAudioFileReader GetAudioReader(string file)
+        {
+            if (VorbisFileReader.CanRead(file))
+            {
+                return new VorbisFileReader(file);
+            }
+
+            return new AudioFileReaderWrapper(file);
         }
     }
 }

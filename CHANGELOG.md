@@ -1,5 +1,13 @@
 # Change Log
 
+## vNext
+
+#### ⭐ Added
+- Support for OGG audio files.
+
+#### ♻ Changed
+- Updated NAudio dependency to 2.0.0.
+
 ## 2.0.0
 
 #### ⭐ Added
@@ -26,8 +34,7 @@
 - Fixed audio time display.
 - Fixed an issue when moving actions around could cause incorrect playback.
 
-#### ♻ Changed
-- Removed drag-handle within Play Audio settings when order was sequential.
+
 
 ## 1.0.0
 
