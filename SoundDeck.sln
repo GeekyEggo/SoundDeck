@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3
 		.gitmodules = .gitmodules
 		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
+		package-lock.json = package-lock.json
 		package.json = package.json
 		README.md = README.md
 		webpack.config.js = webpack.config.js
