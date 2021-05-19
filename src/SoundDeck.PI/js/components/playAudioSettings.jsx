@@ -1,5 +1,5 @@
 import React from "react";
-import { PropertyInspectorWrapper, Select, store, streamDeckClient } from "react-sharpdeck";
+import { PropertyInspectorWrapper, Select, store } from "react-sharpdeck";
 import FilesPicker from "./filesPicker";
 import PlayActionTypes from "../models/playActionTypes";
 

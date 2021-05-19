@@ -27,8 +27,8 @@
         "stop:streamdeck": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo StreamDeck not running"
     },
     "devDependencies": {
-        "@babel/core": "^7.12.10",
-        "@babel/preset-react": "^7.12.10",
+        "@babel/core": "^7.14.3",
+        "@babel/preset-react": "^7.13.13",
         "babel-loader": "^8.2.2",
         "clean-webpack-plugin": "^3.0.0",
         "copy-webpack-plugin": "^5.1.2",
@@ -38,13 +38,11 @@
         "webpack-cli": "^3.3.12"
     },
     "dependencies": {
-        "array-move": "^2.2.2",
-        "object-path": "^0.11.5",
         "react": "^16.14.0",
         "react-dom": "^16.14.0",
-        "react-redux": "^7.2.2",
+        "react-redux": "^7.2.4",
         "react-sharpdeck": "file:../react-sharpdeck",
         "react-sortable-hoc": "^1.11.0",
-        "redux": "^4.0.5"
+        "redux": "^4.1.0"
     }
 }
