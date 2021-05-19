@@ -3,6 +3,7 @@
 ## vNext
 
 #### ⭐ Added
+- Support for AIFF audio files.
 - Support for OGG audio files.
 
 #### ♻ Changed
