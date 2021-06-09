@@ -114,9 +114,9 @@ class FilesPicker extends React.Component {
     constructor(props) {
         super(props);
 
+        this.handleAddFiles = this.handleAddFiles.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
-        this.handleFileChange = this.handleFileChange.bind(this);
         this.handleSortEnd = this.handleSortEnd.bind(this);
         this.handleVolumeChanged = this.handleVolumeChanged.bind(this);
     }
@@ -135,14 +135,11 @@ class FilesPicker extends React.Component {
     }
 
     /**
-     * Handles the file change event; this mimics a file being selected, and results it in being added to the distinct state of files.
-     * @param {any} ev The event arguments.
+     * Handles the add files button event; this displays a prompt, and allows the the user to select files to be added to the playlist.
      */
-    handleFileChange(ev) {
-        const files = Array.from(ev.target.files);
+    handleAddFiles() {
         streamDeckClient.sendToPlugin({
-            event: "AddFiles",
-            files: files.map(file => decodeURIComponent(file.name))
+            event: "AddFiles"
         });
     }
 
@@ -191,8 +188,7 @@ class FilesPicker extends React.Component {
                 <div className="sdpi-item">
                     <div className="sdpi-item-label">{this.props.label}</div>
                     <div className="sdpi-item-group file">
-                        <input className="sdpi-item-value" type="file" value={""} multiple id={id} accept={this.props.accept} onChange={this.handleFileChange} />
-                        <label className="sdpi-file-label max100 input__margin text-center" htmlFor={id}>{this.props.buttonLabel}</label>
+                        <button className="sdpi-file-button sdpi-item-value max100 input__margin text-center" onClick={this.handleAddFiles}>{this.props.buttonLabel}</button>
                     </div>
                 </div>
 

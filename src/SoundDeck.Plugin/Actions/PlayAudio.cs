@@ -16,6 +16,7 @@ namespace SoundDeck.Plugin.Actions
     using SoundDeck.Plugin.Models;
     using SoundDeck.Plugin.Models.Payloads;
     using SoundDeck.Plugin.Models.Settings;
+    using SoundDeck.Plugin.Models.UI;
 
     /// <summary>
     /// Provides an Elgato Stream Deck action for playing an audio clip.
@@ -30,13 +31,14 @@ namespace SoundDeck.Plugin.Actions
         private static readonly object _syncRoot = new object();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlayAudio"/> class.
+        /// Initializes a new instance of the <see cref="PlayAudio" /> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
-        /// <param name="args">The <see cref="ActionEventArgs{AppearancePayload}"/> instance containing the event data.</param>
-        public PlayAudio(IAudioService audioService)
+        /// <param name="fileDialogProvider">The file dialog provider.</param>
+        public PlayAudio(IAudioService audioService, IFileDialogProvider fileDialogProvider)
             : base(audioService)
         {
+            this.FileDialogProvider = fileDialogProvider;
         }
 
         /// <summary>
@@ -45,17 +47,35 @@ namespace SoundDeck.Plugin.Actions
         public IPlaylistController PlaylistController { get; set; }
 
         /// <summary>
+        /// Gets the file dialog provider.
+        /// </summary>
+        public IFileDialogProvider FileDialogProvider { get; }
+
+        /// <summary>
         /// Gets or sets the volume tester.
         /// </summary>
         private VolumeTester VolumeTester { get; set; }
 
         /// <summary>
-        /// Adds the files to the playlist.
+        /// Prompts the user to add files to the playlist.
         /// </summary>
-        /// <param name="payload">The payload containing the files.</param>
         [PropertyInspectorMethod]
-        public void AddFiles(AddPlaylistFilesPayload payload)
-            => this.WhenUserDefinedPlaylist(p => p.AddRange(payload.Files));
+        public void AddFiles()
+        {
+            var filter =
+                "All audio|*.aiff;*.aif;*.mp3;*.mpga;*.oga;*.ogg;*.opus;*.streamDeckAudio;*.wav|" +
+                "AIFF/Mac audio|*.aiff;*.aif|" +
+                "MP3 audio|*.mp3;*.mpga|" +
+                "Ogg audio|*.oga;*.ogg;*.opus|" +
+                "Stream Deck audio|*.streamDeckAudio|" +
+                "WAV audio|*.wav";
+
+            var files = this.FileDialogProvider.ShowOpenDialog("Add Files to Playlist", filter);
+            if (files.Length > 0)
+            {
+                this.WhenUserDefinedPlaylist(p => p.AddRange(files));
+            }
+        }
 
         /// <summary>
         /// Moves the file within the playlist.
