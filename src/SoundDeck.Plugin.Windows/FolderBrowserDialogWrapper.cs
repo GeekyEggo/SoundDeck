@@ -17,10 +17,10 @@ namespace SoundDeck.Plugin.Windows
         /// <summary>
         /// Shows a folder browser dialog.
         /// </summary>
-        /// <param name="description">The description.</param>
+        /// <param name="title">The title of the dialog.</param>
         /// <param name="selectedPath">The selected path.</param>
         /// <returns>The result of the dialog.</returns>
-        public FolderBrowserDialogResult ShowDialog(string description, string selectedPath)
+        public FolderBrowserDialogResult ShowDialog(string title, string selectedPath)
         {
             return this.Dispatcher.Invoke(() =>
             {
@@ -29,7 +29,7 @@ namespace SoundDeck.Plugin.Windows
                     dialog.EnsurePathExists = true;
                     dialog.InitialDirectory = selectedPath;
                     dialog.IsFolderPicker = true;
-                    dialog.Title = description;
+                    dialog.Title = title;
 
                     return dialog.ShowDialog(StreamDeck.Current.MainWindowHandle) == CommonFileDialogResult.Ok
                         ? new FolderBrowserDialogResult(true, dialog.FileName)

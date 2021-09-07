@@ -10,9 +10,9 @@ namespace SoundDeck.Core.Playback
     using SoundDeck.Core.Volume;
 
     /// <summary>
-    /// Provides an asynchronous wrapper for <see cref="WasapiOut"/>.
+    /// Provides an asynchronous wrapper for <see cref="DisposableWasapiOut"/>.
     /// </summary>
-    public class AsyncWasapiOut : WasapiOut
+    public class AsyncWasapiOut : DisposableWasapiOut
     {
         /// <summary>
         /// The playback state polling delay, in milliseconds.
@@ -101,9 +101,9 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Disposes of this instance.
         /// </summary>
-        public new void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            base.Dispose();
+            base.Dispose(disposing);
 
             if (!this.IsDisposed)
             {
@@ -184,7 +184,7 @@ namespace SoundDeck.Core.Playback
         }
 
         /// <summary>
-        /// Handles the <see cref="WasapiOut.PlaybackStopped"/> of this instance.
+        /// Handles the <see cref="DisposableWasapiOut.PlaybackStopped"/> of this instance.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="StoppedEventArgs"/> instance containing the event data.</param>
@@ -201,9 +201,13 @@ namespace SoundDeck.Core.Playback
         /// <returns>The audio reader capable of reading the file.</returns>
         private IAudioFileReader GetAudioReader(string file)
         {
-            if (VorbisFileReader.CanRead(file))
+            if (VorbisFileReader.CanReadFile(file))
             {
                 return new VorbisFileReader(file);
+            }
+            else if (StreamDeckAudioPlayer.CanReadFile(file))
+            {
+                return new StreamDeckAudioPlayer(file);
             }
 
             return new AudioFileReaderWrapper(file);

@@ -32,6 +32,11 @@
         background-color: #464646;
     }
 
+button.sdpi-file-button {
+    cursor: pointer;
+    margin-right: 0 !important;
+}
+
 input[type="checkbox"] + label span {
     margin: 5px 4px 0 2px !important;
 }

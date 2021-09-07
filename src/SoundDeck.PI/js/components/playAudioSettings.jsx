@@ -36,7 +36,7 @@ class PlayAudioSettings extends React.Component {
                 <Select label="Playback Device" dataSourceUri="GetPlaybackAudioDevices" valuePath="audioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
                 <Select label="Action" options={this.actionTypes} valuePath="action" defaultValue={PlayActionTypes.PlayNext.value} />
                 <Select label="Order" options={this.orderTypes} valuePath="order" defaultValue="0" />
-                <FilesPicker label="Files" valuePath="files" accept="audio/aiff,audio/x-aiff,audio/mpeg,audio/ogg,audio/wav" buttonLabel="Add file..." enableSort={this.state.enableSort} />
+                <FilesPicker label="Files" valuePath="files" buttonLabel="Add files..." enableSort={this.state.enableSort} />
             </PropertyInspectorWrapper>
         );
     }

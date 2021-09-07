@@ -5,6 +5,7 @@
 #### ⭐ Added
 - Support for AIFF audio files.
 - Support for OGG audio files.
+- Support for Stream Deck audio files.
 
 #### ♻ Changed
 - Updated NAudio dependency to 2.0.0.

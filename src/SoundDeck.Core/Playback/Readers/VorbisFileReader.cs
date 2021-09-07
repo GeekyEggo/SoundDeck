@@ -88,7 +88,7 @@ namespace SoundDeck.Core.Playback.Readers
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <returns><c>true</c> if this instance can read the specified file name; otherwise, <c>false</c>.</returns>
-        public static bool CanRead(string fileName)
+        public static bool CanReadFile(string fileName)
         {
             return fileName.EndsWith(".oga", StringComparison.OrdinalIgnoreCase)
                 || fileName.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase)

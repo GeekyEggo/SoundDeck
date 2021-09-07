@@ -36,6 +36,7 @@ namespace SoundDeck.Plugin.Windows
                 .AddLogging()
                 .AddSingleton<IAudioService, AudioService>()
                 .AddSingleton<IAppAudioService, AppAudioService>()
+                .AddSingleton<IFileDialogProvider, FileBrowserDialogWrapper>()
                 .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
                 .BuildServiceProvider();
 
