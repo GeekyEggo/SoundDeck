@@ -8,7 +8,7 @@
 - Support for Stream Deck audio files.
 
 #### ♻ Changed
-- Updated NAudio dependency to 2.0.0.
+- Updated NAudio dependency.
 
 ## 2.0.0
 
