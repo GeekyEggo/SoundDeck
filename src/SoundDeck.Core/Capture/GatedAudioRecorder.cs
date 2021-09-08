@@ -7,14 +7,15 @@ namespace SoundDeck.Core.Capture
     /// <summary>
     /// Provides a gated audio recorder, whereby recording only starts after <see cref="GateThreshold"/> has been met.
     /// </summary>
+    [Obsolete("Requires further testing", true)]
     public class GatedAudioRecorder : AudioRecorder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GatedAudioRecorder"/> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
-        public GatedAudioRecorder(string deviceId)
-            : base(deviceId)
+        private GatedAudioRecorder(string deviceId)
+            : base(deviceId, null)
         {
         }
 

@@ -19,11 +19,12 @@ namespace SoundDeck.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioService"/> class.
         /// </summary>
-        /// <param name="logger">The logger.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="normalizationProvider">The normalization provider.</param>
-        public AudioService(ILogger<AudioService> logger)
+        public AudioService(ILoggerFactory loggerFactory)
         {
-            this.SharedAudioBufferManager = new SharedAudioBufferManager(logger);
+            this.LoggerFactory = loggerFactory;
+            this.SharedAudioBufferManager = new SharedAudioBufferManager(loggerFactory);
         }
 
         /// <summary>
@@ -35,6 +36,11 @@ namespace SoundDeck.Core
         /// Gets or sets the players.
         /// </summary>
         private AudioPlayerCollection Players { get; } = new AudioPlayerCollection();
+
+        /// <summary>
+        /// Sets the logger factory.
+        /// </summary>
+        private ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Gets the audio buffer manager.
@@ -105,7 +111,7 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <returns>The audio recorder.</returns>
         public IAudioRecorder GetAudioRecorder(string deviceId)
-            => new AudioRecorder(deviceId);
+            => new AudioRecorder(deviceId, this.LoggerFactory.CreateLogger<AudioRecorder>());
 
         /// <summary>
         /// Gets the audio player for the specified <paramref name="deviceId"/>.
@@ -114,7 +120,7 @@ namespace SoundDeck.Core
         /// <returns>The audio player.</returns>
         public IAudioPlayer GetAudioPlayer(string deviceId)
         {
-            var player = new AudioPlayer(deviceId);
+            var player = new AudioPlayer(deviceId, this.LoggerFactory.CreateLogger<AudioPlayer>());
             this.Players.Add(player);
 
             return player;

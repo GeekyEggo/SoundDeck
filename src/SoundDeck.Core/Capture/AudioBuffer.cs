@@ -24,10 +24,10 @@ namespace SoundDeck.Core.Capture
         /// <param name="device">The device.</param>
         /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <param name="logger">The logger.</param>
-        public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger logger = null)
+        public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<AudioBuffer> logger)
         {
             this.Device = device;
-            this.Chunks = new ChunkCollection(bufferDuration, logger);
+            this.Chunks = new ChunkCollection(bufferDuration);
             this.Logger = logger;
 
             this.StartRecording();
@@ -38,8 +38,8 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         public TimeSpan BufferDuration
         {
-            get { return this.Chunks.BufferDuration; }
-            set { this.Chunks.BufferDuration = value; }
+            get => this.Chunks.BufferDuration;
+            set => this.Chunks.BufferDuration = value;
         }
 
         /// <summary>
@@ -111,13 +111,13 @@ namespace SoundDeck.Core.Capture
                 var path = settings.GetPath();
                 var chunks = await this.Chunks.GetAsync(settings.Duration);
 
+                this.Logger.LogTrace($"Last {settings.Duration.TotalSeconds} seconds of \"{this.Device.FriendlyName}\" saved to \"{path}\".");
                 using (var writer = new ChunkFileWriter(path, this.Capture.WaveFormat, chunks))
                 {
                     writer.Settings = settings;
                     await writer.SaveAsync();
                 }
 
-                this.Logger?.LogInformation("Audio capture saved: {0}", path);
                 return path;
             }
             finally

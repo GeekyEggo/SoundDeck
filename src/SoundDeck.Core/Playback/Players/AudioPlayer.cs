@@ -3,6 +3,7 @@ namespace SoundDeck.Core.Playback.Players
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Provides an audio player for an audio device.
@@ -23,9 +24,10 @@ namespace SoundDeck.Core.Playback.Players
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
-        internal AudioPlayer(string deviceId)
+        internal AudioPlayer(string deviceId, ILogger<AudioPlayer> logger)
         {
             this.DeviceId = deviceId;
+            this.Logger = logger;
         }
 
         /// <summary>
@@ -92,10 +94,12 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets a value indicating whether this instance is in a playable state.
         /// </summary>
-        private bool IsPlayableState
-        {
-            get { return this.InternalCancellationTokenSource?.IsCancellationRequested == false && !this.IsDisposed; }
-        }
+        private bool IsPlayableState => this.InternalCancellationTokenSource?.IsCancellationRequested == false && !this.IsDisposed;
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        private ILogger Logger { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -172,6 +176,7 @@ namespace SoundDeck.Core.Playback.Players
             using (var device = AudioDevices.Current.GetDevice(this.DeviceId))
             using (var player = new AsyncWasapiOut(device, file.Path))
             {
+                this.Logger.LogTrace($"Playing \"{file.Path}\" on \"{device.FriendlyName}\".");
                 void SynchronizeVolume(object sender, EventArgs e) => player.FileVolume = this.Volume;
 
                 // prepare the player

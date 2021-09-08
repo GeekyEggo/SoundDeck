@@ -15,11 +15,9 @@ namespace SoundDeck.Core.Capture.Sharing
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioBufferManager"/> class.
         /// </summary>
-        /// <param name="logger">The logger.</param>
-        public SharedAudioBufferManager(ILogger logger)
-        {
-            this.Logger = logger;
-        }
+        /// <param name="loggerFactory">The logger factory.</param>
+        public SharedAudioBufferManager(ILoggerFactory loggerFactory)
+            => this.LoggerFactory = loggerFactory;
 
         /// <summary>
         /// Gets the audio buffers.
@@ -27,9 +25,9 @@ namespace SoundDeck.Core.Capture.Sharing
         private ConcurrentDictionary<string, SharedAudioBufferCollection> AudioBuffers { get; } = new ConcurrentDictionary<string, SharedAudioBufferCollection>();
 
         /// <summary>
-        /// Gets the logger.
+        /// Gets the logger factory.
         /// </summary>
-        private ILogger Logger { get; }
+        private ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -109,7 +107,7 @@ namespace SoundDeck.Core.Capture.Sharing
                 throw new InvalidOperationException($"The chosen device is not active: {device.DeviceFriendlyName} ({deviceId})");
             }
 
-            return new AudioBuffer(device, bufferDuration, this.Logger);
+            return new AudioBuffer(device, bufferDuration, this.LoggerFactory.CreateLogger<AudioBuffer>());
         }
     }
 }

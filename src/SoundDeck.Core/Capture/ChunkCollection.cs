@@ -1,6 +1,5 @@
 namespace SoundDeck.Core.Capture
 {
-    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -22,11 +21,9 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <param name="logger">The logger.</param>
-        public ChunkCollection(TimeSpan bufferDuration, ILogger logger = null)
+        public ChunkCollection(TimeSpan bufferDuration)
         {
             this.BufferDuration = bufferDuration;
-            this.Logger = logger;
-
             Task.Run(() => this.FlushAsync());
         }
 
@@ -49,11 +46,6 @@ namespace SoundDeck.Core.Capture
         /// Gets or sets a value indicating whether this instance is disposed.
         /// </summary>
         private bool IsDisposed { get; set; } = false;
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        private ILogger Logger { get; }
 
         /// <summary>
         /// Adds the chunk of data asynchronously.
@@ -138,7 +130,6 @@ namespace SoundDeck.Core.Capture
             while (!this.IsDisposed)
             {
                 await Task.Delay(this.FlushDelay);
-                this.Logger.LogTrace("Flushing Chunk Collection");
 
                 // add an additional buffer of 5 seconds
                 var threshold = DateTime.UtcNow.Subtract(this.BufferDuration).Subtract(TimeSpan.FromSeconds(5));

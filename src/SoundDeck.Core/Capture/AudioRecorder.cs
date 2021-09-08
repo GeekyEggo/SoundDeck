@@ -3,6 +3,7 @@ namespace SoundDeck.Core.Capture
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;
@@ -22,9 +23,11 @@ namespace SoundDeck.Core.Capture
         /// Initializes a new instance of the <see cref="AudioRecorder" /> class.
         /// </summary>
         /// <param name="deviceId">The device identifier.</param>
-        public AudioRecorder(string deviceId)
+        /// <param name="logger">The logger.</param>
+        public AudioRecorder(string deviceId, ILogger<AudioRecorder> logger)
         {
             this.DeviceId = deviceId;
+            this.Logger = logger;
         }
 
         /// <summary>
@@ -51,6 +54,11 @@ namespace SoundDeck.Core.Capture
         /// The capturing completion source containing the location of the file where the audio was saved to.
         /// </summary>
         private TaskCompletionSource<string> CapturingCompletionSource;
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        private ILogger Logger { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -81,6 +89,8 @@ namespace SoundDeck.Core.Capture
 
             this.CapturingCompletionSource?.SetResult(filename);
             this.CapturingCompletionSource = null;
+
+            this.Logger.LogTrace($"Recording of \"{AudioDevices.Current.GetDevice(this.DeviceId)?.FriendlyName}\" saved to \"{filename}\".");
         }
 
         /// <summary>
