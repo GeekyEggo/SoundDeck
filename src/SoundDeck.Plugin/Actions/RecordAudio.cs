@@ -3,8 +3,8 @@ namespace SoundDeck.Plugin.Actions
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models;
@@ -15,8 +15,6 @@ namespace SoundDeck.Plugin.Actions
     /// Provides an action for recording audio via start/stop.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.recordaudio")]
-    [StreamDeckActionState("Images/RecordAudio/Key0")]
-    [StreamDeckActionState("Images/RecordAudio/Key1")]
     public class RecordAudio : CaptureActionBase<RecordAudioSettings, IAudioRecorder>
     {
         /// <summary>

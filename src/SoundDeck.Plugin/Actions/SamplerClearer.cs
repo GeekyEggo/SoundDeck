@@ -5,15 +5,12 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Plugin.Events;
 
     /// <summary>
     /// Provides an action that enables clearing of samples.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.clearsample")]
-    [StreamDeckActionState("Images/SamplerClear/Key0")]
-    [StreamDeckActionState("Images/SamplerClear/Key1")]
     public class SamplerClearer : StreamDeckAction
     {
         /// <summary>

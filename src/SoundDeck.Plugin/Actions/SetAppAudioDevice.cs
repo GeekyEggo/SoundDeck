@@ -4,7 +4,6 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Interop;
     using SoundDeck.Plugin.Models.Settings;
@@ -13,7 +12,6 @@ namespace SoundDeck.Plugin.Actions
     /// Provides an action for setting the default audio device for a process.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.setappaudiodevice")]
-    [StreamDeckActionState("Images/SetAppAudioDevice/Key")]
     public class SetAppAudioDevice : ActionBase<SetAppAudioDeviceSettings>
     {
         /// <summary>

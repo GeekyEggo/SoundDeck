@@ -6,7 +6,6 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SharpDeck.PropertyInspectors;
     using SoundDeck.Core;
     using SoundDeck.Core.Playback;
@@ -22,7 +21,6 @@ namespace SoundDeck.Plugin.Actions
     /// Provides an Elgato Stream Deck action for playing an audio clip.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.playaudio")]
-    [StreamDeckActionState("Images/PlayAudio/Key")]
     public class PlayAudio : ActionBase<PlayAudioSettings>, IPlayAudioAction
     {
         /// <summary>

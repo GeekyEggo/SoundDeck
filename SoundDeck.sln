@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\Sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin.Windows", "src\SoundDeck.Plugin.Windows\SoundDeck.Plugin.Windows.csproj", "{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{9B86A610-720A-49E1-8D9E-ACEB63D464F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DC7E3C9-1CA0-4C22-83B7-D3A24EB6E083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,6 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Plugin.Models.Settings;
@@ -14,7 +13,6 @@ namespace SoundDeck.Plugin.Actions
     /// Provides capturing of an audio buffer, similar to an instat replay.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.clipaudio")]
-    [StreamDeckActionState("Images/ClipAudio/Key")]
     public class ClipAudio : CaptureActionBase<ClipAudioSettings, IAudioBuffer>
     {
         /// <summary>

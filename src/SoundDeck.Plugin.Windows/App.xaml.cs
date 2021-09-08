@@ -2,8 +2,10 @@ namespace SoundDeck.Plugin.Windows
 {
     using System;
     using System.Diagnostics;
+    using System.Reflection;
     using System.Windows;
     using Microsoft.Extensions.DependencyInjection;
+    using SharpDeck.Extensions;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
 
@@ -23,7 +25,8 @@ namespace SoundDeck.Plugin.Windows
             Debugger.Launch();
 #endif
 
-            _ = SoundDeckPlugin.RunAsync(this.GetServiceProvider());
+            _ = ActivatorUtilities.CreateInstance<SoundDeckPlugin>(this.GetServiceProvider())
+                .RunAsync();
         }
 
         /// <summary>
@@ -32,15 +35,14 @@ namespace SoundDeck.Plugin.Windows
         /// <returns>The service provider.</returns>
         private IServiceProvider GetServiceProvider()
         {
-            var provider = new ServiceCollection()
+            return new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<IAudioService, AudioService>()
                 .AddSingleton<IAppAudioService, AppAudioService>()
                 .AddSingleton<IFileDialogProvider, FileBrowserDialogWrapper>()
                 .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
+                .AddStreamDeckPlugin(plugin => plugin.Assembly = Assembly.GetAssembly(typeof(SoundDeckPlugin)))
                 .BuildServiceProvider();
-
-            return provider;
         }
     }
 }

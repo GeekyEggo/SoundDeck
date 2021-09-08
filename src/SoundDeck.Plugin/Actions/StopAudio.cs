@@ -4,14 +4,12 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
 
     /// <summary>
     /// Provides an action that can stop all audio currently being output by Sound Deck.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.stopaudio")]
-    [StreamDeckActionState("Images/StopAudio/Key")]
     public class StopAudio : StreamDeckAction
     {
         /// <summary>

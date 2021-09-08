@@ -3,7 +3,6 @@ namespace SoundDeck.Plugin.Actions
     using System.Threading.Tasks;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Manifest;
     using SoundDeck.Core;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
@@ -17,8 +16,6 @@ namespace SoundDeck.Plugin.Actions
     /// Provides a sampler action used to record audio, and then play it back.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.sampler")]
-    [StreamDeckActionState("Images/Sampler/Key0")]
-    [StreamDeckActionState("Images/Sampler/Key1")]
     public class Sampler : CaptureActionBase<SamplerSettings, IAudioRecorder>, IPlayAudioAction
     {
         /// <summary>
