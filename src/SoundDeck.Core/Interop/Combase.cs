@@ -18,7 +18,7 @@ namespace SoundDeck.Core.Interop
         public static extern void RoGetActivationFactory(
             [MarshalAs(UnmanagedType.HString)] string activatableClassId,
             [In] ref Guid iid,
-            [Out, MarshalAs(UnmanagedType.IInspectable)] out Object factory);
+            [Out, MarshalAs(UnmanagedType.IInspectable)] out object factory);
 
         /// <summary>
         /// Creates a new HSTRING based on the specified source string.

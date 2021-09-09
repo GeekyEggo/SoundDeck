@@ -4,6 +4,7 @@ namespace SoundDeck.Core
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Interop;
 
@@ -28,9 +29,26 @@ namespace SoundDeck.Core
         private const string MMDEVAPI_TOKEN = @"\\?\SWD#MMDEVAPI#";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AppAudioService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        public AppAudioService(ILogger<AppAudioService> logger)
+        {
+            try
+            {
+                this.AudioPolicyConfig = AudioPolicyConfigFactory.CreateFromCombase();
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to instantiate audio policy config factory from combase, falling back to WinRT.");
+                this.AudioPolicyConfig = AudioPolicyConfigFactory.CreateFromWinRT();
+            }
+        }
+
+        /// <summary>
         /// Gets the audio policy configuration facotry.
         /// </summary>
-        private IAudioPolicyConfigFactory AudioPolicyConfig { get; } = AudioPolicyConfigFactory.Create();
+        private IAudioPolicyConfigFactory AudioPolicyConfig { get; }
 
         /// <summary>
         /// Gets the foreground application process identifier.
