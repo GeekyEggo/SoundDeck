@@ -62,7 +62,12 @@ namespace SoundDeck.Plugin.Extensions
                 }
                 catch (ObjectDisposedException)
                 {
-                    action.PlaylistController.AudioPlayer.TimeChanged -= handler;
+                    // Safely handle the audio player changing.
+                    var audioPlayer = action?.PlaylistController?.AudioPlayer;
+                    if (audioPlayer != null)
+                    {
+                        audioPlayer.TimeChanged -= handler;
+                    }
                 }
             }
 
