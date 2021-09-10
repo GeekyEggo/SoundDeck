@@ -3,9 +3,13 @@
 ## vNext
 
 #### ⭐ Added
+- Long-pressing "Play Audio" now resets the current audio to the first item in the playlist.
 - Support for AIFF audio files.
 - Support for OGG audio files.
 - Support for Stream Deck audio files.
+
+#### 🐞 Fixed
+- Fixed an issue whereby "Set App Audio Device" would fail if there was a missing Windows component (added fallback).
 
 #### ♻ Changed
 - Updated NAudio dependency.
