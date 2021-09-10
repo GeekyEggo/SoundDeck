@@ -142,6 +142,12 @@ namespace SoundDeck.Core.Playback.Controllers
         }
 
         /// <summary>
+        /// Resets the playlist to the start.
+        /// </summary>
+        public void Reset()
+            => this.Enumerator?.Reset();
+
+        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>

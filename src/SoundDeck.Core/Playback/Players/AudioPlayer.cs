@@ -129,7 +129,7 @@ namespace SoundDeck.Core.Playback.Players
                     await this._syncRoot.WaitAsync();
 
                     this.InternalCancellationTokenSource = new CancellationTokenSource();
-                    await this.InternalPlayAsync(file);
+                    await this.InternalPlayAsync(file, this.InternalCancellationTokenSource.Token);
                     this.InternalCancellationTokenSource = null;
                 }
                 finally
@@ -167,8 +167,9 @@ namespace SoundDeck.Core.Playback.Players
         /// Plays the audio file.
         /// </summary>
         /// <param name="file">The file.</param>
+        /// <param name="cancellationToken">The cancellation token responsible for stopping playback.</param>
         /// <returns>The task of playing the audio file.</returns>
-        private async Task InternalPlayAsync(AudioFileInfo file)
+        private async Task InternalPlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
         {
             this.FileName = file.Path;
             this.Volume = file.Volume;
@@ -189,7 +190,10 @@ namespace SoundDeck.Core.Playback.Players
                 do
                 {
                     this.IsPlaying = true;
-                    await player.PlayAsync(this.InternalCancellationTokenSource.Token);
+
+                    cancellationToken.Register(() => this.IsPlaying = false);
+                    await player.PlayAsync(cancellationToken);
+
                     this.IsPlaying = false;
 
                 } while (this.IsLooped && this.IsPlayableState);

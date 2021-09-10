@@ -174,14 +174,37 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <summary>
-        /// Occurs when the user presses a key.
+        /// Occurs when <see cref="IStreamDeckConnection.KeyDown"/> is held down for <see cref="StreamDeckAction.LongPressInterval"/>.
         /// </summary>
-        /// <param name="args">The <see cref="T:SharpDeck.Events.Received.ActionEventArgs`1" /> instance containing the event data.</param>
-        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
+        /// <param name="args">The <see cref="ActionEventArgs{KeyPayload}"/> instance containing the event data.</param>
+        /// <returns>The task of handling the event.</returns>
+        protected override async Task OnKeyLongPress(ActionEventArgs<KeyPayload> args)
         {
             try
             {
-                await base.OnKeyDown(args);
+                await base.OnKeyLongPress(args);
+
+                this.PlaylistController.AudioPlayer?.Stop();
+                this.PlaylistController.Reset();
+                await this.PlaylistController.NextAsync();
+            }
+            catch (Exception e)
+            {
+                await this.StreamDeck.LogMessageAsync(e.ToString());
+                await this.ShowAlertAsync();
+            }
+        }
+
+        /// <summary>
+        /// Occurs when <see cref="IStreamDeckConnection.KeyDown" /> is released before <see cref="StreamDeckAction.LongPressInterval" />.
+        /// </summary>
+        /// <param name="args">The <see cref="ActionEventArgs{KeyPayload}" /> instance containing the event data.</param>
+        /// <returns>The task of handling the event.</returns>
+        protected override async Task OnKeyPress(ActionEventArgs<KeyPayload> args)
+        {
+            try
+            {
+                await base.OnKeyPress(args);
                 await this.PlaylistController.NextAsync();
             }
             catch (Exception e)

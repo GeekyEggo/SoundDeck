@@ -29,5 +29,10 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         /// <returns>The task of playing the item.</returns>
         Task NextAsync();
+
+        /// <summary>
+        /// Resets the playlist to the start.
+        /// </summary>
+        void Reset();
     }
 }
