@@ -4,6 +4,7 @@ namespace SoundDeck.Plugin
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using SharpDeck;
+    using SharpDeck.Connectivity;
     using SoundDeck.Core;
 
     /// <summary>
