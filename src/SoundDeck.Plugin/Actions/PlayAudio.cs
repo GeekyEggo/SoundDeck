@@ -190,7 +190,7 @@ namespace SoundDeck.Plugin.Actions
             }
             catch (Exception e)
             {
-                await this.StreamDeck.LogMessageAsync(e.ToString());
+                _ = this.Connection.LogMessageAsync(e.ToString());
                 await this.ShowAlertAsync();
             }
         }
@@ -209,7 +209,7 @@ namespace SoundDeck.Plugin.Actions
             }
             catch (Exception e)
             {
-                await this.StreamDeck.LogMessageAsync(e.ToString());
+                _ = this.Connection.LogMessageAsync(e.ToString());
                 await this.ShowAlertAsync();
             }
         }

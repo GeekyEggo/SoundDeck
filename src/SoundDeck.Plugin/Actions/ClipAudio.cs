@@ -70,13 +70,13 @@ namespace SoundDeck.Plugin.Actions
                 {
                     var path = await this.CaptureDevice.SaveAsync(settings);
 
-                    await this.StreamDeck.LogMessageAsync($"Saved captured from device {settings.CaptureAudioDeviceId} to {path}");
+                    _ = this.Connection.LogMessageAsync($"Saved captured from device {settings.CaptureAudioDeviceId} to {path}");
                     await this.ShowOkAsync();
                 }
             }
             catch (Exception ex)
             {
-                await this.StreamDeck.LogMessageAsync(ex.Message);
+                _ = this.Connection.LogMessageAsync(ex.Message);
                 await this.ShowAlertAsync();
             }
         }

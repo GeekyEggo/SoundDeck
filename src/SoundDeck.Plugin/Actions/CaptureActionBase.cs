@@ -120,7 +120,7 @@ namespace SoundDeck.Plugin.Actions
             }
             catch (Exception ex)
             {
-                _ = this.StreamDeck.LogMessageAsync(ex.Message);
+                _ = this.Connection.LogMessageAsync(ex.Message);
                 _ = this.ShowAlertAsync();
             }
 

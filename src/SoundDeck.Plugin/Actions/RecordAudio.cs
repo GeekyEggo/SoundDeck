@@ -89,7 +89,7 @@ namespace SoundDeck.Plugin.Actions
             catch (Exception e)
             {
                 // log any errors
-                await this.StreamDeck.LogMessageAsync(e.ToString());
+                _ = this.Connection.LogMessageAsync(e.ToString());
                 await this.ShowAlertAsync();
             }
             finally
