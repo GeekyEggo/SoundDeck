@@ -3,7 +3,7 @@
     "Author": "GeekyEggo",
     "Description": "Take control of your audio! With an array of actions, SoundDeck lets you quickly... route app audio (great for Wave:1 and Wave:3), create audio clips (think Twitch clips, but for audio), save longer recordings with start/stop, play audio files with advanced playlist support, and more!",
     "Name": "Sound Deck",
-    "Version": "2.2.1",
+    "Version": "2.3.0",
     "SDKVersion": 2,
     "Category": "Sound Deck",
     "CategoryIcon": "Images/SoundDeck/Category",

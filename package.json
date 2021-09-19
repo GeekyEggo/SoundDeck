@@ -8,7 +8,7 @@
         "elgato": "Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin",
         "package": "./dist",
         "pi": ".\\src\\SoundDeck.PI",
-        "plugin": ".\\src\\SoundDeck.Plugin.Windows"
+        "plugin": ".\\src\\SoundDeck.Plugin"
     },
     "scripts": {
         "build": "dotnet msbuild %npm_package_paths_plugin% -p:Configuration=Debug -t:Rebuild && npm run build:pi",

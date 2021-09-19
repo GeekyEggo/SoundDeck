@@ -2,7 +2,6 @@ namespace SoundDeck.Plugin.Windows
 {
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
     using System.Windows;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -50,10 +49,7 @@ namespace SoundDeck.Plugin.Windows
                         .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
                         .AddSingleton<IHostedService, AudioBufferRestartService>();
                 })
-                .UseStreamDeck(plugin =>
-                {
-                    plugin.AddAssembly(Assembly.GetAssembly(typeof(SoundDeckPlugin)));
-                })
+                .UseStreamDeck()
                 .StartAsync();
         }
     }
