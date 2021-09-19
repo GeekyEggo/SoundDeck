@@ -1,14 +1,14 @@
 namespace SoundDeck.Plugin.Windows
 {
-    using System;
     using System.Diagnostics;
+    using System.IO;
     using System.Reflection;
     using System.Windows;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using NLog.Extensions.Logging;
-    using SharpDeck.Extensions;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
 
@@ -27,37 +27,34 @@ namespace SoundDeck.Plugin.Windows
 #if DEBUG
             Debugger.Launch();
 #endif
-            _ = ActivatorUtilities.CreateInstance<SoundDeckPlugin>(this.GetServiceProvider())
-                .RunAsync();
-        }
-
-        /// <summary>
-        /// Gets the service provider.
-        /// </summary>
-        /// <returns>The service provider.</returns>
-        private IServiceProvider GetServiceProvider()
-        {
-            // Setup the configuration to read from the App.config file.
-            var config = new ConfigurationBuilder()
-                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .Build();
-
-            // Build the service provider.
-            return new ServiceCollection()
-                .AddScoped<IConfiguration>(_ => config)
-                .AddLogging(loggingBuilder =>
+            _ = new HostBuilder()
+                .ConfigureAppConfiguration(configBuilder =>
                 {
-                    loggingBuilder.ClearProviders()
-                        .AddConfiguration(config.GetSection("Logging"))
-                        .AddNLog(new NLogLoggingConfiguration(config.GetSection("NLog")));
+                    configBuilder
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
                 })
-                .AddSingleton<IAudioService, AudioService>()
-                .AddSingleton<IAppAudioService, AppAudioService>()
-                .AddSingleton<IFileDialogProvider, FileBrowserDialogWrapper>()
-                .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
-                .AddStreamDeckPlugin(plugin => plugin.Assembly = Assembly.GetAssembly(typeof(SoundDeckPlugin)))
-                .BuildServiceProvider();
+                .ConfigureLogging((hostingContext, loggingBuilder) =>
+                {
+                    loggingBuilder
+                        .ClearProviders()
+                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
+                        .AddNLog(new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog")));
+                })
+                .ConfigureServices(services =>
+                {
+                    services
+                        .AddSingleton<IAudioService, AudioService>()
+                        .AddSingleton<IAppAudioService, AppAudioService>()
+                        .AddSingleton<IFileDialogProvider, FileBrowserDialogWrapper>()
+                        .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
+                        .AddSingleton<IHostedService, AudioBufferRestartService>();
+                })
+                .UseStreamDeck(plugin =>
+                {
+                    plugin.AddAssembly(Assembly.GetAssembly(typeof(SoundDeckPlugin)));
+                })
+                .StartAsync();
         }
     }
 }
