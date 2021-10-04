@@ -8,6 +8,7 @@ namespace SoundDeck.Plugin.Windows
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using NLog.Extensions.Logging;
+    using SharpDeck.Extensions.Hosting;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
 
