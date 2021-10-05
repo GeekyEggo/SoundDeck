@@ -6,6 +6,7 @@ namespace SoundDeck.Core
     using System.Linq;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
 
     /// <summary>
@@ -132,10 +133,17 @@ namespace SoundDeck.Core
         /// <returns></returns>
         private bool TryGetAudioSessionProcessId(string processName, DataFlow flow, out uint audioSessionProcessId)
         {
+            const string DEFAULT_PROCESS_EXTENSION = ".exe";
             foreach (var audioSession in this.GetAudioSessions(flow))
             {
                 audioSessionProcessId = audioSession.GetProcessID;
-                if (Process.GetProcessById((int)audioSessionProcessId).ProcessName == processName)
+
+                // Ensure both the process name we're looking for, and the audio session process name, don't end with ".exe".
+                var audioSessionProcessName = Process.GetProcessById((int)audioSessionProcessId).ProcessName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
+                processName = processName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
+
+                // When there is a case insensitive match, we're good!
+                if (audioSessionProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
