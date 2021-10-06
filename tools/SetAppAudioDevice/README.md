@@ -1,6 +1,6 @@
 # Set App Audio Device CLI
 
-The [SetAppAudioDevice.exe](dist/SetAppAudioDevice.exe) is a stand-alone command-line executable for the "Set App Audio Device" Stream Deck action.
+The [SetAppAudioDevice.exe](https://github.com/GeekyEggo/SoundDeck/raw/main/tools/SetAppAudioDevice/dist/SetAppAudioDevice.exe) is a stand-alone command-line executable for the "Set App Audio Device" Stream Deck action.
 
 ## Usage
 ```
