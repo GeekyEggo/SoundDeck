@@ -11,17 +11,17 @@ namespace SoundDeck.Core
     /// <summary>
     /// Provides a singleton responsible for traversing the available <see cref="AudioDevice"/> and selecting <see cref="MMDevice"/>.
     /// </summary>
-    internal sealed class AudioDevices : IReadOnlyCollection<AudioDevice>, IMMNotificationClient
+    public sealed class AudioDevices : IReadOnlyCollection<AudioDevice>, IMMNotificationClient
     {
         /// <summary>
         /// /// The identifier used to determine the default playback device.
         /// </summary>
-        private const string PLAYBACK_DEFAULT = "PLAYBACK_DEFAULT";
+        public const string PLAYBACK_DEFAULT = "PLAYBACK_DEFAULT";
 
         /// <summary>
         /// The identifier used to determine the default playback communication device.
         /// </summary>
-        private const string PLAYBACK_DEFAULT_COMMUNICATION = "PLAYBACK_DEFAULT_COMMUNICATION";
+        public const string PLAYBACK_DEFAULT_COMMUNICATION = "PLAYBACK_DEFAULT_COMMUNICATION";
 
         /// <summary>
         /// Private member field for <see cref="Current"/>.

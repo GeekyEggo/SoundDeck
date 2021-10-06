@@ -8,12 +8,6 @@ namespace SoundDeck.Core
     public interface IAppAudioService
     {
         /// <summary>
-        /// Gets the foreground application process identifier.
-        /// </summary>
-        /// <returns>The process identifier.</returns>
-        uint GetForegroundAppProcessId();
-
-        /// <summary>
         /// Gets the default audio device for the specified process.
         /// </summary>
         /// <param name="processId">The process identifier.</param>
@@ -36,5 +30,12 @@ namespace SoundDeck.Core
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceId">The device identifier.</param>
         void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceId);
+
+        /// <summary>
+        /// Sets the default audio device for the foreground application.
+        /// </summary>
+        /// <param name="flow">The audio flow; either input or output.</param>
+        /// <param name="deviceId">The device identifier.</param>
+        void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceId);
     }
 }

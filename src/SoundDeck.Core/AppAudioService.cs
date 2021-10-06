@@ -52,18 +52,6 @@ namespace SoundDeck.Core
         private IAudioPolicyConfigFactory AudioPolicyConfig { get; }
 
         /// <summary>
-        /// Gets the foreground application process identifier.
-        /// </summary>
-        /// <returns>The process identifier.</returns>
-        public uint GetForegroundAppProcessId()
-        {
-            var hwnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(hwnd, out var pid);
-
-            return pid;
-        }
-
-        /// <summary>
         /// Gets the default audio device for the specified process.
         /// </summary>
         /// <param name="processId">The process identifier.</param>
@@ -100,12 +88,12 @@ namespace SoundDeck.Core
         /// Sets the default audio device for the specified process.
         /// </summary>
         /// <param name="processName">The process name.</param>
-        /// <param name="audioFlow">The audio flow; either input or output.</param>
+        /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceId">The device identifier.</param>
-        public void SetDefaultAudioDevice(string processName, AudioFlowType audioFlow, string deviceId)
+        public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceId)
         {
-            var flow = this.GetDataFlow(audioFlow);
-            if (this.TryGetAudioSessionProcessId(processName, flow, out var audioSessionProcessId))
+            var dataFlow = this.GetDataFlow(flow);
+            if (this.TryGetAudioSessionProcessId(processName, dataFlow, out var audioSessionProcessId))
             {
                 // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
@@ -119,9 +107,22 @@ namespace SoundDeck.Core
                 }
 
                 // Set the audio device for the process.
-                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, flow, Role.Multimedia, hstring);
-                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, flow, Role.Console, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
             }
+        }
+
+        /// <summary>
+        /// Sets the default audio device for the foreground application.
+        /// </summary>
+        /// <param name="flow">The audio flow; either input or output.</param>
+        /// <param name="deviceId">The device identifier.</param>
+        public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceId)
+        {
+            var hwnd = User32.GetForegroundWindow();
+            User32.GetWindowThreadProcessId(hwnd, out var pid);
+
+            this.SetDefaultAudioDevice(pid, flow, deviceId);
         }
 
         /// <summary>

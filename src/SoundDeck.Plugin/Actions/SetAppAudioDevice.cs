@@ -56,8 +56,7 @@ namespace SoundDeck.Plugin.Actions
                 else
                 {
                     // The process selection type is foreground, so select the process id and set the default audio device.
-                    var processId = this.AppAudioService.GetForegroundAppProcessId();
-                    this.AppAudioService.SetDefaultAudioDevice(processId, AudioFlowType.Playback, settings.AudioDeviceId);
+                    this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(AudioFlowType.Playback, settings.AudioDeviceId);
                 }
 
                 await this.ShowOkAsync();
