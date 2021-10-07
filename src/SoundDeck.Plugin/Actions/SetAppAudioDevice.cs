@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -43,27 +44,35 @@ namespace SoundDeck.Plugin.Actions
             {
                 var settings = args.Payload.GetSettings<SetAppAudioDeviceSettings>();
 
-                // When the process selection type is by name, validate we have a name and then set the default audio device.
-                if (settings.ProcessSelectionType == ProcessSelectionType.ByName)
+                try
                 {
-                    if (string.IsNullOrWhiteSpace(settings.ProcessName))
+                    // When the process selection type is by name, validate we have a name and then set the default audio device.
+                    if (settings.ProcessSelectionType == ProcessSelectionType.ByName)
                     {
-                        throw new ArgumentNullException($"Cannot set default audio device for app: The process name has not been specified.");
+                        if (string.IsNullOrWhiteSpace(settings.ProcessName))
+                        {
+                            throw new ArgumentNullException($"Cannot set default audio device for app: The process name has not been specified.");
+                        }
+
+                        this.AppAudioService.SetDefaultAudioDevice(settings.ProcessName, AudioFlowType.Playback, settings.AudioDeviceId);
+                    }
+                    else
+                    {
+                        // The process selection type is foreground, so select the process id and set the default audio device.
+                        this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(AudioFlowType.Playback, settings.AudioDeviceId);
                     }
 
-                    this.AppAudioService.SetDefaultAudioDevice(settings.ProcessName, AudioFlowType.Playback, settings.AudioDeviceId);
+                    await this.ShowOkAsync();
                 }
-                else
+                catch (Exception ex)
                 {
-                    // The process selection type is foreground, so select the process id and set the default audio device.
-                    this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(AudioFlowType.Playback, settings.AudioDeviceId);
+                    this.Logger?.LogError(ex, $"Failed to set app audio device; AudioDeviceId=\"{settings.AudioDeviceId}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
+                    await this.ShowAlertAsync();
                 }
-
-                await this.ShowOkAsync();
             }
             catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(ex.Message);
+                this.Logger?.LogError(ex, $"Failed to read settings.");
                 await this.ShowAlertAsync();
             }
         }
