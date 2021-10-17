@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
     using SoundDeck.Core;
@@ -120,7 +121,7 @@ namespace SoundDeck.Plugin.Actions
             }
             catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(ex.Message);
+                this.Logger.LogError(ex, $"Failed to get capture device \"{settings.CaptureAudioDeviceId}\".");
                 _ = this.ShowAlertAsync();
             }
 

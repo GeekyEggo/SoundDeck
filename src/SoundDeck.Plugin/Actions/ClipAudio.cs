@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -70,13 +71,13 @@ namespace SoundDeck.Plugin.Actions
                 {
                     var path = await this.CaptureDevice.SaveAsync(settings);
 
-                    _ = this.Connection.LogMessageAsync($"Saved captured from device {settings.CaptureAudioDeviceId} to {path}");
+                    this.Logger.LogInformation($"Saved captured from device \"{settings.CaptureAudioDeviceId}\" to \"{path}\".");
                     await this.ShowOkAsync();
                 }
             }
             catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(ex.Message);
+                this.Logger.LogError(ex, $"Failed to capture audio.");
                 await this.ShowAlertAsync();
             }
         }

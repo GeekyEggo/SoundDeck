@@ -2,21 +2,27 @@
 
 ## vNext
 
-#### ⭐ Added
+### ⭐ Added
+
 - Long-pressing "Play Audio" now resets the current audio to the first item in the playlist.
 - Support for AIFF audio files.
 - Support for OGG audio files.
 - Support for Stream Deck audio files.
 
-#### 🐞 Fixed
+### 🐞 Fixed
+
 - Fixed an issue whereby "Set App Audio Device" would fail if there was a missing Windows component (added fallback).
 
-#### ♻ Changed
+### ♻ Changed
+
+- Updated to .NET Framework 4.8.
 - Updated NAudio dependency.
+- Logging moved to `%APPDATA%\Elgato\StreamDeck\Plugins\com.geekyeggo.sounddeck.sdPlugin\logs`.
 
 ## 2.0.0
 
-#### ⭐ Added
+### ⭐ Added
+
 - "Sampler" action.
   - Press-and-hold to record a sample.
   - Press again to playback sample.
@@ -35,17 +41,20 @@
     - Loop All / Stop; loops the playlist from the next track, or stops playback if a track is playing.
     - Loop All / Stop (Reset); loops the playlist from the first track, or stops playback if a track is playing.
 
-#### 🐞 Fixed
+### 🐞 Fixed
+
 - Greatly reduced CPU usage when playing audio files.
 - Fixed audio time display.
 - Fixed an issue when moving actions around could cause incorrect playback.
 
-#### ♻ Changed
+### ♻ Changed
+
 - Removed drag-handle within Play Audio settings when order was sequential.
 
 ## 1.0.0
 
-#### ⭐ Added
+### ⭐ Added
+
 - "Clip Audio" action.
   - Quickly record the last *x* seconds of audio.
   - Supports any audio device (capture and playback).

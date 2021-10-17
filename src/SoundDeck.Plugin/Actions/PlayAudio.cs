@@ -4,6 +4,7 @@ namespace SoundDeck.Plugin.Actions
     using System.Collections.Specialized;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
@@ -188,9 +189,9 @@ namespace SoundDeck.Plugin.Actions
                 this.PlaylistController.Reset();
                 await this.PlaylistController.NextAsync();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(e.ToString());
+                this.Logger.LogError(ex, "Play audio failed on long key press.");
                 await this.ShowAlertAsync();
             }
         }
@@ -207,9 +208,9 @@ namespace SoundDeck.Plugin.Actions
                 await base.OnKeyPress(args);
                 await this.PlaylistController.NextAsync();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(e.ToString());
+                this.Logger.LogError(ex, "Play audio failed on key press.");
                 await this.ShowAlertAsync();
             }
         }

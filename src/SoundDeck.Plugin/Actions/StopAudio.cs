@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -38,9 +39,9 @@ namespace SoundDeck.Plugin.Actions
                 await base.OnKeyDown(args);
                 this.AudioService.StopAll();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _ = this.Connection.LogMessageAsync(e.ToString());
+                this.Logger.LogError(ex, "Stopping audio failed.");
                 await this.ShowAlertAsync();
             }
         }
