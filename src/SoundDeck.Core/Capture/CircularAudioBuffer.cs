@@ -52,6 +52,8 @@ namespace SoundDeck.Core.Capture
                 try
                 {
                     this._syncRoot.Wait();
+
+                    this._bufferDuration = value;
                     this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
                 }
                 finally
