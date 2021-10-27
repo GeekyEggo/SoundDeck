@@ -173,7 +173,7 @@ namespace SoundDeck.Core.Capture
             {
                 _syncRoot.Wait();
 
-                // clear the previous capture
+                // Clear the previous capture.
                 if (this.Capture != null)
                 {
                     this.Capture.DataAvailable -= this.Capture_DataAvailable;
@@ -181,7 +181,7 @@ namespace SoundDeck.Core.Capture
                     this.Capture.Dispose();
                 }
 
-                // start recording
+                // Start recording.
                 this.StartRecording();
             }
             finally
