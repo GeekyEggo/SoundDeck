@@ -94,7 +94,7 @@ namespace SoundDeck.Core.Capture.Sharing
         /// <param name="deviceId">The device identifier.</param>
         /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <returns>The audio buffer.</returns>
-        private AudioBuffer CreateAudioBuffer(string deviceId, TimeSpan bufferDuration)
+        private IAudioBuffer CreateAudioBuffer(string deviceId, TimeSpan bufferDuration)
         {
             var device = AudioDevices.Current.GetDevice(deviceId);
             if (device == null)
@@ -107,7 +107,7 @@ namespace SoundDeck.Core.Capture.Sharing
                 throw new InvalidOperationException($"The chosen device is not active: {device.DeviceFriendlyName} ({deviceId})");
             }
 
-            return new AudioBuffer(device, bufferDuration, this.LoggerFactory.CreateLogger<AudioBuffer>());
+            return new CircularAudioBuffer(device, bufferDuration, this.LoggerFactory.CreateLogger<CircularAudioBuffer>());
         }
     }
 }

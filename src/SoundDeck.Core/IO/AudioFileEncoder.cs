@@ -1,7 +1,7 @@
 namespace SoundDeck.Core.IO
 {
     using System;
-    using NAudio.MediaFoundation;
+    using NAudio.Lame;
     using NAudio.Wave;
     using SoundDeck.Core.Playback.Readers;
     using SoundDeck.Core.Volume;
@@ -11,6 +11,11 @@ namespace SoundDeck.Core.IO
     /// </summary>
     public sealed class AudioFileEncoder : IDisposable
     {
+        /// <summary>
+        /// The MP3 bit rate.
+        /// </summary>
+        private const int MP3_BIT_RATE = 192;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioFileEncoder"/> class.
         /// </summary>
@@ -57,9 +62,16 @@ namespace SoundDeck.Core.IO
             if (this.Settings.EncodeToMP3
                 && this.Reader.Length > 0)
             {
-                MediaFoundationApi.Startup();
-                MediaFoundationEncoder.EncodeToMp3(this.Reader, path);
-                MediaFoundationApi.Shutdown();
+                using (var writer = new LameMP3FileWriter(path, this.Reader.WaveFormat, MP3_BIT_RATE))
+                {
+                    var buffer = new byte[1024 * 4];
+                    var read = 0;
+
+                    while ((read = this.Reader.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        writer.Write(buffer, 0, read);
+                    }
+                }
             }
             else
             {

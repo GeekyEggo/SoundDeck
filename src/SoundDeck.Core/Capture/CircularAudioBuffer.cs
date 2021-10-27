@@ -7,27 +7,35 @@ namespace SoundDeck.Core.Capture
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
     using SoundDeck.Core.Extensions;
+    using SoundDeck.Core.IO;
 
     /// <summary>
-    /// Provides an audio buffer designed to capture and save audio data.
+    /// Provides a <see cref="IAudioBuffer"/> that utilizes a <see cref="CircularBuffer{byte}"/>.
     /// </summary>
-    public sealed class AudioBuffer : IAudioBuffer
+    public sealed class CircularAudioBuffer : IAudioBuffer
     {
         /// <summary>
         /// The synchronization root.
         /// </summary>
-        private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AudioBuffer" /> class.
+        /// Private member field for <see cref="BufferDuration"/>.
         /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="bufferDuration">Duration of the buffer.</param>
+        private TimeSpan _bufferDuration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CircularAudioBuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device to capture.</param>
+        /// <param name="bufferDuration">Initial duration of the buffer.</param>
         /// <param name="logger">The logger.</param>
-        public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<AudioBuffer> logger)
+        public CircularAudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<CircularAudioBuffer> logger)
         {
+            this.Buffer = new CircularBuffer<byte>(1);
+
+            this._bufferDuration = bufferDuration;
             this.Device = device;
-            this.Chunks = new ChunkCollection(bufferDuration);
             this.Logger = logger;
 
             this.StartRecording();
@@ -38,8 +46,21 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         public TimeSpan BufferDuration
         {
-            get => this.Chunks.BufferDuration;
-            set => this.Chunks.BufferDuration = value;
+            get => this._bufferDuration;
+            set
+            {
+                try
+                {
+                    this._syncRoot.Wait();
+
+                    this._bufferDuration = value;
+                    this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
+                }
+                finally
+                {
+                    this._syncRoot.Release();
+                }
+            }
         }
 
         /// <summary>
@@ -48,14 +69,14 @@ namespace SoundDeck.Core.Capture
         public string DeviceId => this.Device.ID;
 
         /// <summary>
+        /// Gets the circular buffer responsible for storing the bytes that represent the audio clip.
+        /// </summary>
+        private CircularBuffer<byte> Buffer { get; }
+
+        /// <summary>
         /// Gets or sets the audio capturer.
         /// </summary>
         private WasapiCapture Capture { get; set; }
-
-        /// <summary>
-        /// Gets the chunks of captured audio data.
-        /// </summary>
-        private IChunkCollection Chunks { get; }
 
         /// <summary>
         /// Gets the underlying audio device.
@@ -70,7 +91,7 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        private ILogger Logger { get; }
+        private ILogger<CircularAudioBuffer> Logger { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -85,7 +106,7 @@ namespace SoundDeck.Core.Capture
 
                     this.Capture?.StopRecording();
                     this.Capture?.Dispose();
-                    this.Chunks?.Dispose();
+                    this.Buffer.SetCapacity(1);
 
                     this.IsDisposed = true;
                 }
@@ -107,21 +128,40 @@ namespace SoundDeck.Core.Capture
             {
                 await _syncRoot.WaitAsync();
 
-                // determine the name
+                // Determine the save location, and log the recording.
                 var path = settings.GetPath();
-                var chunks = await this.Chunks.GetAsync(settings.Duration);
-
                 this.Logger.LogTrace($"Last {settings.Duration.TotalSeconds} seconds of \"{this.Device.FriendlyName}\" saved to \"{path}\".");
-                using (var writer = new ChunkFileWriter(path, this.Capture.WaveFormat, chunks))
+
+                using (var writer = new AudioFileWriter(path, this.Capture.WaveFormat))
                 {
                     writer.Settings = settings;
+
+                    var buffer = new byte[1024 * 4];
+
+                    // Continuously read the bytes from the buffer, and write them to the audio file writer.
+                    var count = this.Capture.WaveFormat.AverageBytesPerSecond * (int)settings.Duration.TotalSeconds;
+                    var read = 0;
+                    var offset = 0;
+
+                    while ((read = this.Buffer.Read(buffer, offset, buffer.Length)) > 0)
+                    {
+                        await writer.WriteAsync(buffer, 0, read);
+                        offset += read;
+                    }
+
                     await writer.SaveAsync();
                 }
 
                 return path;
             }
+            catch (Exception ex)
+            {
+                this.Logger.LogError(ex, "Failed to write clip.");
+                throw;
+            }
             finally
             {
+                GC.Collect(2, GCCollectionMode.Forced);
                 _syncRoot.Release();
             }
         }
@@ -135,7 +175,7 @@ namespace SoundDeck.Core.Capture
             {
                 _syncRoot.Wait();
 
-                // clear the previous capture
+                // Clear the previous capture.
                 if (this.Capture != null)
                 {
                     this.Capture.DataAvailable -= this.Capture_DataAvailable;
@@ -143,7 +183,7 @@ namespace SoundDeck.Core.Capture
                     this.Capture.Dispose();
                 }
 
-                // start recording
+                // Start recording.
                 this.StartRecording();
             }
             finally
@@ -157,11 +197,8 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
-        private async void Capture_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            var chunk = new Chunk(e);
-            await this.Chunks.AddAsync(chunk);
-        }
+        private void Capture_DataAvailable(object sender, WaveInEventArgs e)
+            => this.Buffer.Write(e.Buffer, 0, e.BytesRecorded);
 
         /// <summary>
         /// Sets the <see cref="AudioBuffer.Capture"/> and starts recording.
@@ -169,6 +206,8 @@ namespace SoundDeck.Core.Capture
         private void StartRecording()
         {
             this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+            this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
+
             this.Capture.DataAvailable += this.Capture_DataAvailable;
             this.Capture.StartRecording();
         }
