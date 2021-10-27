@@ -1,76 +1,48 @@
+using System;
+using System.Runtime;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using SoundDeck.Core.Extensions;
+using SoundDeck.Core.IO;
+
 namespace SoundDeck.Core.Capture
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using NAudio.CoreAudioApi;
-    using NAudio.Wave;
-    using SoundDeck.Core.Extensions;
-
-    /// <summary>
-    /// Provides an audio buffer designed to capture and save audio data.
-    /// </summary>
-    public sealed class AudioBuffer : IAudioBuffer
+    public sealed class CircularAudioBuffer : IAudioBuffer
     {
         /// <summary>
         /// The synchronization root.
         /// </summary>
-        private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AudioBuffer" /> class.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="bufferDuration">Duration of the buffer.</param>
-        /// <param name="logger">The logger.</param>
-        public AudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<AudioBuffer> logger)
+        private TimeSpan _bufferDuration;
+
+        public CircularAudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<CircularAudioBuffer> logger)
         {
+            this.Buffer = new CircularBuffer<byte>(1);
+
+            this._bufferDuration = bufferDuration;
             this.Device = device;
-            this.Chunks = new ChunkCollection(bufferDuration);
             this.Logger = logger;
 
             this.StartRecording();
         }
 
-        /// <summary>
-        /// Gets or sets the duration of the buffer.
-        /// </summary>
         public TimeSpan BufferDuration
         {
-            get => this.Chunks.BufferDuration;
-            set => this.Chunks.BufferDuration = value;
+            get => this._bufferDuration;
+            set => this._bufferDuration = value;
         }
 
-        /// <summary>
-        /// Gets the audio device identifier.
-        /// </summary>
         public string DeviceId => this.Device.ID;
 
-        /// <summary>
-        /// Gets or sets the audio capturer.
-        /// </summary>
+        private CircularBuffer<byte> Buffer { get; }
         private WasapiCapture Capture { get; set; }
-
-        /// <summary>
-        /// Gets the chunks of captured audio data.
-        /// </summary>
-        private IChunkCollection Chunks { get; }
-
-        /// <summary>
-        /// Gets the underlying audio device.
-        /// </summary>
         private MMDevice Device { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is disposed.
-        /// </summary>
         private bool IsDisposed { get; set; } = false;
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        private ILogger Logger { get; }
+        private ILogger<CircularAudioBuffer> Logger { get; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -85,7 +57,7 @@ namespace SoundDeck.Core.Capture
 
                     this.Capture?.StopRecording();
                     this.Capture?.Dispose();
-                    this.Chunks?.Dispose();
+                    this.Buffer.SetCapacity(0);
 
                     this.IsDisposed = true;
                 }
@@ -109,19 +81,36 @@ namespace SoundDeck.Core.Capture
 
                 // determine the name
                 var path = settings.GetPath();
-                var chunks = await this.Chunks.GetAsync(settings.Duration);
-
                 this.Logger.LogTrace($"Last {settings.Duration.TotalSeconds} seconds of \"{this.Device.FriendlyName}\" saved to \"{path}\".");
-                using (var writer = new ChunkFileWriter(path, this.Capture.WaveFormat, chunks))
+
+                using (var writer = new AudioFileWriter(path, this.Capture.WaveFormat))
                 {
                     writer.Settings = settings;
+
+                    var count = this.Capture.WaveFormat.AverageBytesPerSecond * 30;
+                    var buffer = new byte[1024 * 4];
+                    var read = 0;
+                    var offset = 0;
+
+                    while ((read = this.Buffer.Read(buffer, offset, buffer.Length)) > 0)
+                    {
+                        await writer.WriteAsync(buffer, 0, read);
+                        offset += read;
+                    }
+
                     await writer.SaveAsync();
                 }
 
                 return path;
             }
+            catch (Exception ex)
+            {
+                this.Logger.LogError(ex, "Failed to write clip.");
+                throw;
+            }
             finally
             {
+                GC.Collect(2, GCCollectionMode.Forced);
                 _syncRoot.Release();
             }
         }
@@ -157,11 +146,8 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
-        private async void Capture_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            var chunk = new Chunk(e);
-            await this.Chunks.AddAsync(chunk);
-        }
+        private void Capture_DataAvailable(object sender, WaveInEventArgs e)
+            => this.Buffer.Write(e.Buffer, 0, e.BytesRecorded);
 
         /// <summary>
         /// Sets the <see cref="AudioBuffer.Capture"/> and starts recording.
@@ -169,6 +155,8 @@ namespace SoundDeck.Core.Capture
         private void StartRecording()
         {
             this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+            this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * 30);
+
             this.Capture.DataAvailable += this.Capture_DataAvailable;
             this.Capture.StartRecording();
         }
