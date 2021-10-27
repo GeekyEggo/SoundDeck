@@ -2,6 +2,10 @@ namespace SoundDeck.Core.Capture
 {
     using System;
 
+    /// <summary>
+    /// Provides a circular buffer capable of storing elements in a fixed sized buffer.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the buffer.</typeparam>
     public class CircularBuffer<T>
     {
         /// <summary>
