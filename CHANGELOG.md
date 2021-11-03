@@ -4,17 +4,22 @@
 
 ### ⭐ Added
 
-- Long-pressing "Play Audio" now resets the current audio to the first item in the playlist.
-- Support for AIFF audio files.
-- Support for OGG audio files.
-- Support for Stream Deck audio files.
+- Added long-press support for "Play Audio" actions; now resets the current audio to the first item in the playlist.
+- Added support for more audio formats:
+  - AIFF.
+  - OGG.
+- Actions now support "Default" device as an audio device option; currently supported by:
+  - "Play Audio".
+  - "Sampler".
+  - "Set App Audio Device".
 
 ### 🐞 Fixed
 
-- Fixed an issue whereby "Set App Audio Device" would fail if there was a missing Windows component (added fallback).
+- Fixed an issue that caused "Set App Audio Device" to fail on some versions of Windows.
 
 ### ♻ Changed
 
+- Reduced memory usage of "Clip Audio" by approx ~80%.
 - Updated to .NET Framework 4.8.
 - Updated NAudio dependency.
 - Logging moved to `%APPDATA%\Elgato\StreamDeck\Plugins\com.geekyeggo.sounddeck.sdPlugin\logs`.
