@@ -9,7 +9,7 @@ namespace SoundDeck.Core.Interop
     /// </summary>
     [Guid("2a59116d-6c4f-45e0-a74f-707e3fef9258")]
     [InterfaceType(ComInterfaceType.InterfaceIsIInspectable)]
-    public interface IAudioPolicyConfigFactory
+    public interface IAudioPolicyConfigFactoryDownlevel
     {
         int __incomplete__add_CtxVolumeChange();
         int __incomplete__remove_CtxVolumeChanged();

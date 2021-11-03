@@ -8,6 +8,7 @@ namespace SoundDeck.Core
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
+    using SoundDeck.Core.Interop.Helpers;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
@@ -37,12 +38,12 @@ namespace SoundDeck.Core
         {
             try
             {
-                this.AudioPolicyConfig = AudioPolicyConfigFactory.CreateFromCombase();
+                this.AudioPolicyConfig = AudioPolicyConfigFactory.Create();
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Failed to instantiate audio policy config factory from combase, falling back to WinRT.");
-                this.AudioPolicyConfig = AudioPolicyConfigFactory.CreateFromWinRT();
+                logger.LogWarning(ex, "Failed to instantiate audio policy config factory.");
+                throw;
             }
         }
 
