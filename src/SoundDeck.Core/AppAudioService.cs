@@ -132,7 +132,7 @@ namespace SoundDeck.Core
         /// <param name="processName">Name of the process.</param>
         /// <param name="flow">The flow.</param>
         /// <param name="audioSessionProcessId">The audio session process identifier.</param>
-        /// <returns></returns>
+        /// <returns><c>true</c> when the audio session was retrieved for the <paramref name="processName"/>; otherwise <c>false</c>.</returns>
         private bool TryGetAudioSessionProcessId(string processName, DataFlow flow, out uint audioSessionProcessId)
         {
             const string DEFAULT_PROCESS_EXTENSION = ".exe";
