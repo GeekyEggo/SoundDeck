@@ -1,9 +1,9 @@
 {
     "$schema": "https://gist.githubusercontent.com/GeekyEggo/607881f1133ee2973b0140871023c9b8/raw/4d96b5d8b2bbca1bf88f836b8e5c1d527a77961c/esdsdk-schema.json",
     "Author": "GeekyEggo",
-    "Description": "Take control of your audio! With an array of actions, SoundDeck lets you quickly... route app audio (great for Wave:1 and Wave:3), create audio clips (think Twitch clips, but for audio), save longer recordings with start/stop, play audio files with advanced playlist support, and more!",
+    "Description": "Take control of your audio! Quickly change the audio device of applications, create samples, clip or record audio from any device, play audio files (with advanced playlists), and more.",
     "Name": "Sound Deck",
-    "Version": "2.6.0",
+    "Version": "3.0.0",
     "SDKVersion": 2,
     "Category": "Sound Deck",
     "CategoryIcon": "Images/SoundDeck/Category",
