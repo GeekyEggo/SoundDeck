@@ -4,24 +4,24 @@
 
 ### ⭐ Added
 
-- Actions now support "Default" device as an audio device option; currently supported by (#28).
+- Actions now support "Default" device as an audio device option; currently supported by ([#28](https://github.com/GeekyEggo/SoundDeck/issues/28)).
   - "Play Audio".
   - "Sampler".
   - "Set App Audio Device".
-- Added long-press support for "Play Audio" actions; now resets the current audio to the first item in the playlist (#30).
-- Added support for more audio formats (#33).
+- Added long-press support for "Play Audio" actions; now resets the current audio to the first item in the playlist ([#30](https://github.com/GeekyEggo/SoundDeck/issues/30)).
+- Added support for more audio formats ([#33](https://github.com/GeekyEggo/SoundDeck/issues/33)).
   - AIFF.
   - OGG.
 
 ### 🐞 Fixed
 
-- Fixed an issue that caused "Set App Audio Device" to fail on Windows 11 (#52).
+- Fixed an issue that caused "Set App Audio Device" to fail on Windows 11 ([#52](https://github.com/GeekyEggo/SoundDeck/issues/52)).
 
 ### ♻ Changed
 
-- Updated NAudio dependency (#27).
-- Logging moved to `%APPDATA%\Elgato\StreamDeck\Plugins\com.geekyeggo.sounddeck.sdPlugin\logs` (#32).
-- Reduced memory usage of "Clip Audio" by approx ~80% (#49).
+- Updated NAudio dependency ([#27](https://github.com/GeekyEggo/SoundDeck/issues/27)).
+- Logging moved to `%APPDATA%\Elgato\StreamDeck\Plugins\com.geekyeggo.sounddeck.sdPlugin\logs` ([#32](https://github.com/GeekyEggo/SoundDeck/issues/32)).
+- Reduced memory usage of "Clip Audio" by approx ~80% ([#49](https://github.com/GeekyEggo/SoundDeck/issues/49)).
 - Updated to .NET Framework 4.8.
 
 ## 2.0.0
