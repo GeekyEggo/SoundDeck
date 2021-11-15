@@ -66,7 +66,7 @@ namespace SoundDeck.Plugin.Actions
                 "AIFF/Mac audio|*.aiff;*.aif|" +
                 "MP3 audio|*.mp3;*.mpga|" +
                 "Ogg audio|*.oga;*.ogg;*.opus|" +
-                "Stream Deck audio|*.streamDeckAudio|" +
+                /*"Stream Deck audio|*.streamDeckAudio|" +*/
                 "WAV audio|*.wav";
 
             var files = this.FileDialogProvider.ShowOpenDialog("Add Files to Playlist", filter);
