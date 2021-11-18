@@ -19,9 +19,9 @@ namespace SoundDeck.Core.Playback
         event EventHandler<PlaybackTimeEventArgs> TimeChanged;
 
         /// <summary>
-        /// Gets or sets the audio device identifier.
+        /// Gets or sets the audio device.
         /// </summary>
-        string DeviceId { get; set; }
+        IAudioDevice Device { get; set; }
 
         /// <summary>
         /// Gets the name of the file being played.

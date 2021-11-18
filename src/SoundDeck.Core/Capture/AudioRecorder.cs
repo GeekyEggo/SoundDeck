@@ -22,18 +22,18 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioRecorder" /> class.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="deviceId">The device.</param>
         /// <param name="logger">The logger.</param>
-        public AudioRecorder(string deviceId, ILogger<AudioRecorder> logger)
+        public AudioRecorder(IAudioDevice device, ILogger<AudioRecorder> logger)
         {
-            this.DeviceId = deviceId;
+            this.Device = device;
             this.Logger = logger;
         }
 
         /// <summary>
-        /// Gets the audio device identifier.
+        /// Gets the audio device.
         /// </summary>
-        public string DeviceId { get; }
+        public IAudioDevice Device { get; }
 
         /// <summary>
         /// Gets or sets the settings.
@@ -90,7 +90,7 @@ namespace SoundDeck.Core.Capture
             this.CapturingCompletionSource?.SetResult(filename);
             this.CapturingCompletionSource = null;
 
-            this.Logger.LogTrace($"Recording of \"{AudioDevices.Current.GetDevice(this.DeviceId)?.FriendlyName}\" saved to \"{filename}\".");
+            this.Logger.LogTrace($"Recording of \"{this.Device.GetMMDevice()?.FriendlyName}\" saved to \"{filename}\".");
         }
 
         /// <summary>
@@ -110,8 +110,7 @@ namespace SoundDeck.Core.Capture
                 }
 
                 // set the capture information
-                var device = AudioDevices.Current.GetDevice(this.DeviceId);
-                this.Capture = device.DataFlow == DataFlow.Capture ? new WasapiCapture(device) : new WasapiLoopbackCapture(device);
+                this.Capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
                 this.Capture.DataAvailable += this.Capture_DataAvailable;
                 this.Capture.RecordingStopped += this.Capture_RecordingStopped;
 

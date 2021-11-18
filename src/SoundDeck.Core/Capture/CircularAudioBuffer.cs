@@ -30,7 +30,7 @@ namespace SoundDeck.Core.Capture
         /// <param name="device">The device to capture.</param>
         /// <param name="bufferDuration">Initial duration of the buffer.</param>
         /// <param name="logger">The logger.</param>
-        public CircularAudioBuffer(MMDevice device, TimeSpan bufferDuration, ILogger<CircularAudioBuffer> logger)
+        public CircularAudioBuffer(IAudioDevice device, TimeSpan bufferDuration, ILogger<CircularAudioBuffer> logger)
         {
             this.Buffer = new CircularBuffer<byte>(1);
 
@@ -64,9 +64,9 @@ namespace SoundDeck.Core.Capture
         }
 
         /// <summary>
-        /// Gets the audio device identifier.
+        /// Gets the audio device.
         /// </summary>
-        public string DeviceId => this.Device.ID;
+        public IAudioDevice Device { get; }
 
         /// <summary>
         /// Gets the circular buffer responsible for storing the bytes that represent the audio clip.
@@ -77,11 +77,6 @@ namespace SoundDeck.Core.Capture
         /// Gets or sets the audio capturer.
         /// </summary>
         private WasapiCapture Capture { get; set; }
-
-        /// <summary>
-        /// Gets the underlying audio device.
-        /// </summary>
-        private MMDevice Device { get; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -205,7 +200,7 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         private void StartRecording()
         {
-            this.Capture = this.Device.DataFlow == DataFlow.Capture ? new WasapiCapture(this.Device) : new WasapiLoopbackCapture(this.Device);
+            this.Capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
             this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
 
             this.Capture.DataAvailable += this.Capture_DataAvailable;

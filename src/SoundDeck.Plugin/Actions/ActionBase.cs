@@ -2,11 +2,11 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Linq;
+    using NAudio.CoreAudioApi;
     using SharpDeck;
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
-    using SoundDeck.Core.Interop;
 
     /// <summary>
     /// Provides a base action.
@@ -21,9 +21,7 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="audioService">The audio service.</param>
         public ActionBase(IAudioService audioService)
-        {
-            this.AudioService = audioService;
-        }
+            => this.AudioService = audioService;
 
         /// <summary>
         /// Gets the audio service.
@@ -38,11 +36,10 @@ namespace SoundDeck.Plugin.Actions
         public OptionsPayload GetCaptureAudioDevices()
         {
             var options = this.AudioService.Devices
-                .Where(device => device.Enabled && device.AssignedDefault == DefaultAudioDeviceType.None)
                 .GroupBy(device => device.Flow)
                 .Select(g =>
                 {
-                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Id)).ToList();
+                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Key)).ToList();
                     return new Option(g.Key.ToString(), children);
                 });
 
@@ -55,7 +52,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public OptionsPayload GetAppAssignableAudioDevices()
-            => this.GetPlaybackAudioDevicesInternal(device => device.AssignedDefault != DefaultAudioDeviceType.Communication);
+            => this.GetPlaybackAudioDevicesInternal(device => device.Role != Role.Communications);
 
         /// <summary>
         /// Gets the audio devices capable of playback.
@@ -70,14 +67,14 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="filter">The optional filter.</param>
         /// <returns>The payload containing the audio devices.</returns>
-        private OptionsPayload GetPlaybackAudioDevicesInternal(Func<AudioDevice, bool> filter = null)
+        private OptionsPayload GetPlaybackAudioDevicesInternal(Func<IAudioDevice, bool> filter = null)
         {
-            filter = filter ?? (_ => true);
+            filter ??= (_ => true);
 
             var options = this.AudioService.Devices
-                .Where(d => d.Enabled && d.Flow == AudioFlowType.Playback)
+                .Where(d => d.Flow == DataFlow.Render)
                 .Where(filter)
-                .Select(d => new Option(d.FriendlyName, d.Id));
+                .Select(d => new Option(d.FriendlyName, d.Key));
 
             return new OptionsPayload(options);
         }

@@ -36,9 +36,7 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="fileDialogProvider">The file dialog provider.</param>
         public PlayAudio(IAudioService audioService, IFileDialogProvider fileDialogProvider)
             : base(audioService)
-        {
-            this.FileDialogProvider = fileDialogProvider;
-        }
+            => this.FileDialogProvider = fileDialogProvider;
 
         /// <summary>
         /// Gets or sets the playback controller.
@@ -121,13 +119,13 @@ namespace SoundDeck.Plugin.Actions
             lock (_syncRoot)
             {
                 // Ensure the volume tester exists and has the correct device identifier.
-                var deviceId = this.PlaylistController.AudioPlayer.DeviceId;
+                var device = this.PlaylistController.AudioPlayer.Device;
                 if (this.VolumeTester == null)
                 {
-                    this.VolumeTester = new VolumeTester(this.AudioService.GetAudioPlayer(deviceId));
+                    this.VolumeTester = new VolumeTester(this.AudioService.GetAudioPlayer(device.Key));
                 }
 
-                _ = this.VolumeTester.PlayAsync(payload, deviceId);
+                _ = this.VolumeTester.PlayAsync(payload, device);
             }
         }
 

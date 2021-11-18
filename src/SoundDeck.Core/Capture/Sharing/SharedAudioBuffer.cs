@@ -45,9 +45,9 @@ namespace SoundDeck.Core.Capture.Sharing
         }
 
         /// <summary>
-        /// Gets the audio device identifier.
+        /// Gets the audio device.
         /// </summary>
-        public string DeviceId => this.AudioBuffer.DeviceId;
+        public IAudioDevice Device => this.AudioBuffer.Device;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is disposed.

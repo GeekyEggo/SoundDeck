@@ -23,10 +23,10 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        internal AudioPlayer(string deviceId, ILogger<AudioPlayer> logger)
+        /// <param name="device">The device.</param>
+        internal AudioPlayer(IAudioDevice device, ILogger<AudioPlayer> logger)
         {
-            this.DeviceId = deviceId;
+            this.Device = device;
             this.Logger = logger;
         }
 
@@ -46,9 +46,9 @@ namespace SoundDeck.Core.Playback.Players
         public event EventHandler VolumeChanged;
 
         /// <summary>
-        /// Gets or sets the audio device identifier.
+        /// Gets or sets the audio device.
         /// </summary>
-        public string DeviceId { get; set; }
+        public IAudioDevice Device { get; set; }
 
         /// <summary>
         /// Gets the name of the file being played.
@@ -174,7 +174,7 @@ namespace SoundDeck.Core.Playback.Players
             this.FileName = file.Path;
             this.Volume = file.Volume;
 
-            using (var device = AudioDevices.Current.GetDevice(this.DeviceId))
+            using (var device = this.Device.GetMMDevice())
             using (var player = new AsyncWasapiOut(device, file.Path))
             {
                 this.Logger.LogTrace($"Playing \"{file.Path}\" on \"{device.FriendlyName}\".");

@@ -26,9 +26,7 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
         public CaptureActionBase(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
             : base(audioService)
-        {
-            this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
-        }
+            => this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
 
         /// <summary>
         /// Gets the folder browser dialog provider.
@@ -85,7 +83,7 @@ namespace SoundDeck.Plugin.Actions
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, TSettings settings)
         {
             await base.OnDidReceiveSettings(args, settings);
-            if (this.CaptureDevice?.DeviceId != settings.CaptureAudioDeviceId)
+            if (this.CaptureDevice?.Device.Key != settings.CaptureAudioDeviceId)
             {
                 this.CaptureDevice?.Dispose();
                 this.CaptureDevice = null;

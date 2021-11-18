@@ -52,18 +52,13 @@ namespace SoundDeck.Core
         /// </summary>
         private IAudioPolicyConfigFactory AudioPolicyConfig { get; }
 
-        /// <summary>
-        /// Gets the default audio device for the specified process.
-        /// </summary>
-        /// <param name="processId">The process identifier.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <returns>The audio device; otherwise <c>null</c>.</returns>
+        /// <inheritdoc/>
         public string GetDefaultAudioDevice(uint processId, AudioFlowType flow)
         {
             try
             {
                 var dataFlow = this.GetDataFlow(flow);
-                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, dataFlow, Role.Multimedia | Role.Console, out string deviceId);
+                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, dataFlow, Role.Multimedia | Role.Console, out var deviceId);
 
                 return this.ParseDeviceId(deviceId);
             }
@@ -73,38 +68,26 @@ namespace SoundDeck.Core
             }
         }
 
-        /// <summary>
-        /// Sets the default audio device for the specified process.
-        /// </summary>
-        /// <param name="processId">The process identifier.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceId">The device identifier.</param>
-        public void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceId)
+        /// <inheritdoc/>
+        public void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceKey)
         {
             var processName = Process.GetProcessById((int)processId).ProcessName;
-            this.SetDefaultAudioDevice(processName, flow, deviceId);
+            this.SetDefaultAudioDevice(processName, flow, deviceKey);
         }
 
-        /// <summary>
-        /// Sets the default audio device for the specified process.
-        /// </summary>
-        /// <param name="processName">The process name.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceId">The device identifier.</param>
-        public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceId)
+        //// <inheritdoc/>
+        public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceKey)
         {
             var dataFlow = this.GetDataFlow(flow);
             if (this.TryGetAudioSessionProcessId(processName, dataFlow, out var audioSessionProcessId))
             {
                 // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
-                if (!AudioDevices.Current.IsDefaultPlaybackDevice(deviceId))
+                var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+                if (device.IsReadOnly)
                 {
-                    using (var device = AudioDevices.Current.GetDevice(deviceId))
-                    {
-                        var persistDeviceId = this.GenerateDeviceId(device.ID);
-                        Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
-                    }
+                    var persistDeviceId = this.GenerateDeviceId(device.Id);
+                    Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
                 }
 
                 // Set the audio device for the process.
@@ -113,17 +96,13 @@ namespace SoundDeck.Core
             }
         }
 
-        /// <summary>
-        /// Sets the default audio device for the foreground application.
-        /// </summary>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceId">The device identifier.</param>
-        public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceId)
+        /// <inheritdoc/>
+        public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey)
         {
             var hwnd = User32.GetForegroundWindow();
             User32.GetWindowThreadProcessId(hwnd, out var pid);
 
-            this.SetDefaultAudioDevice(pid, flow, deviceId);
+            this.SetDefaultAudioDevice(pid, flow, deviceKey);
         }
 
         /// <summary>

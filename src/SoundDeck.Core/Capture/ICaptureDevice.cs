@@ -8,8 +8,8 @@ namespace SoundDeck.Core.Capture
     public interface ICaptureDevice : IDisposable
     {
         /// <summary>
-        /// Gets the audio device identifier.
+        /// Gets the audio device.
         /// </summary>
-        string DeviceId { get; }
+        IAudioDevice Device { get; }
     }
 }

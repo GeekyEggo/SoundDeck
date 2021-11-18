@@ -13,9 +13,9 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// Initializes a new instance of the <see cref="GatedAudioRecorder"/> class.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        private GatedAudioRecorder(string deviceId)
-            : base(deviceId, null)
+        /// <param name="deviceId">The device.</param>
+        private GatedAudioRecorder(IAudioDevice device)
+            : base(device, null)
         {
         }
 

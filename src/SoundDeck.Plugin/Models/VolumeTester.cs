@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Models
 {
     using System;
     using System.Threading.Tasks;
+    using SoundDeck.Core;
     using SoundDeck.Core.Playback;
     using SoundDeck.Plugin.Models.Payloads;
 
@@ -15,9 +16,7 @@ namespace SoundDeck.Plugin.Models
         /// </summary>
         /// <param name="player">The player.</param>
         public VolumeTester(IAudioPlayer player)
-        {
-            this.AudioPlayer = player;
-        }
+            => this.AudioPlayer = player;
 
         /// <summary>
         /// Gets or sets the player responsible for testing the volume.
@@ -44,9 +43,9 @@ namespace SoundDeck.Plugin.Models
         /// Plays the audio file contained within the specified <paramref name="payload"/> asynchronously.
         /// </summary>
         /// <param name="payload">The payload.</param>
-        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="deviceId">The device.</param>
         /// <returns>The task of playing the audio.</returns>
-        public Task PlayAsync(AdjustPlaylistFileVolumePayload payload, string deviceId)
+        public Task PlayAsync(AdjustPlaylistFileVolumePayload payload, IAudioDevice device)
         {
             if (this.AudioPlayer != null)
             {
@@ -54,7 +53,7 @@ namespace SoundDeck.Plugin.Models
                 this.AudioPlayer.Stop();
 
                 this.Index = payload.Index;
-                this.AudioPlayer.DeviceId = deviceId;
+                this.AudioPlayer.Device = device;
 
                 return this.AudioPlayer.PlayAsync(payload);
             }

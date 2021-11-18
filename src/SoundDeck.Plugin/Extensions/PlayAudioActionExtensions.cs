@@ -2,6 +2,7 @@ namespace SoundDeck.Plugin.Extensions
 {
     using System;
     using SharpDeck.Enums;
+    using SoundDeck.Core;
     using SoundDeck.Core.Playback;
     using SoundDeck.Core.Playback.Playlists;
     using SoundDeck.Plugin.Contracts;
@@ -35,7 +36,7 @@ namespace SoundDeck.Plugin.Extensions
             }
             else
             {
-                action.PlaylistController.AudioPlayer.DeviceId = settings.PlaybackAudioDeviceId;
+                action.PlaylistController.AudioPlayer.Device = AudioDevices.Current.GetDeviceByKey(settings.PlaybackAudioDeviceId);
             }
 
             action.PlaylistController.Order = settings.Order;

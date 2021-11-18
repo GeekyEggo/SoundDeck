@@ -18,9 +18,7 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         /// <param name="capacity">The number of elements the <see cref="CircularBuffer{T}"/> can store.</param>
         public CircularBuffer(int capacity)
-        {
-            this.Buffer = new T[capacity];
-        }
+            => this.Buffer = new T[capacity];
 
         /// <summary>
         /// Gets the capacity of the <see cref="CircularBuffer{T}"/>.

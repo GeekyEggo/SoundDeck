@@ -5,7 +5,6 @@ namespace SoundDeck.Core.Capture.Sharing
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using Microsoft.Extensions.Logging;
-    using NAudio.CoreAudioApi;
 
     /// <summary>
     /// Provides a manager for sharing <see cref="IAudioBuffer"/>.
@@ -55,16 +54,16 @@ namespace SoundDeck.Core.Capture.Sharing
         }
 
         /// <summary>
-        /// Gets the or add an audio buffer for the specified device identifier, and buffer duration.
+        /// Gets the or add an audio buffer for the specified device key, and buffer duration.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="deviceKey">The device key.</param>
         /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <returns>The audio buffer.</returns>
-        public IAudioBuffer GetOrAddAudioBuffer(string deviceId, TimeSpan bufferDuration)
+        public IAudioBuffer GetOrAddAudioBuffer(string deviceKey, TimeSpan bufferDuration)
         {
-            var collection = this.AudioBuffers.GetOrAdd(deviceId, _ =>
+            var collection = this.AudioBuffers.GetOrAdd(deviceKey, _ =>
             {
-                var coll = new SharedAudioBufferCollection(this.CreateAudioBuffer(deviceId, bufferDuration));
+                var coll = new SharedAudioBufferCollection(this.CreateAudioBuffer(deviceKey, bufferDuration));
                 coll.CollectionChanged += this.AudioBuffers_CollectionChanged;
 
                 return coll;
@@ -82,29 +81,24 @@ namespace SoundDeck.Core.Capture.Sharing
         {
             // when a child collection has been reset, dispose of the parent
             if (e.Action == NotifyCollectionChangedAction.Reset
-                && this.AudioBuffers.TryRemove(((SharedAudioBufferCollection)sender).Parent.DeviceId, out var removedCollection))
+                && this.AudioBuffers.TryRemove(((SharedAudioBufferCollection)sender).Parent.Device.Key, out var removedCollection))
             {
                 removedCollection.Parent.Dispose();
             }
         }
 
         /// <summary>
-        /// Create an audio buffer for the specified device identifier.
+        /// Create an audio buffer for the specified device key.
         /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
+        /// <param name="deviceKey">The device key.</param>
         /// <param name="bufferDuration">Duration of the buffer.</param>
         /// <returns>The audio buffer.</returns>
-        private IAudioBuffer CreateAudioBuffer(string deviceId, TimeSpan bufferDuration)
+        private IAudioBuffer CreateAudioBuffer(string deviceKey, TimeSpan bufferDuration)
         {
-            var device = AudioDevices.Current.GetDevice(deviceId);
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
             if (device == null)
             {
-                throw new KeyNotFoundException($"Unable to find device for the specified device identifier: {deviceId}");
-            }
-
-            if (device.State != DeviceState.Active)
-            {
-                throw new InvalidOperationException($"The chosen device is not active: {device.DeviceFriendlyName} ({deviceId})");
+                throw new KeyNotFoundException($"Unable to find device for the specified device key: {deviceKey}");
             }
 
             return new CircularAudioBuffer(device, bufferDuration, this.LoggerFactory.CreateLogger<CircularAudioBuffer>());

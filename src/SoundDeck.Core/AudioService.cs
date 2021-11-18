@@ -30,7 +30,7 @@ namespace SoundDeck.Core
         /// <summary>
         /// Gets the audio devices.
         /// </summary>
-        public IReadOnlyCollection<AudioDevice> Devices => AudioDevices.Current;
+        public IReadOnlyCollection<IAudioDevice> Devices => AudioDevices.Current;
 
         /// <summary>
         /// Gets or sets the players.
@@ -54,16 +54,10 @@ namespace SoundDeck.Core
         public bool CanEncodeToMP3()
             => MediaFoundationEncoder.SelectMediaType(AudioSubtypes.MFAudioFormat_MP3, Constants.DefaultWaveFormat, Constants.DesiredBitRate) != null;
 
-        /// <summary>
-        /// Creates a playlist controller with an audio player for the specified <paramref name="deviceId"/>.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="action">The action type.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <returns>The playlist player.</returns>
-        public IPlaylistController CreatePlaylistController(string deviceId, ControllerActionType action)
+        /// <inheritdoc/>
+        public IPlaylistController CreatePlaylistController(string deviceKey, ControllerActionType action)
         {
-            var audioPlayer = this.GetAudioPlayer(deviceId);
+            var audioPlayer = this.GetAudioPlayer(deviceKey);
 
             switch (action)
             {
@@ -89,40 +83,29 @@ namespace SoundDeck.Core
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
         }
 
-        /// <summary>
-        /// Gets an audio buffer for the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <param name="clipDuration">Duration of the clip.</param>
-        /// <returns>The audio buffer.</returns>
-        public IAudioBuffer GetAudioBuffer(string deviceId, TimeSpan clipDuration)
-            => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceId, clipDuration);
+        /// <inheritdoc/>
+        public IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan clipDuration)
+            => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceKey, clipDuration);
 
-        /// <summary>
-        /// Gets all active audio buffers.
-        /// </summary>
-        /// <returns>The audio buffers.</returns>
+        /// <inheritdoc/>
         public IEnumerable<IAudioBuffer> GetAudioBuffers()
             => this.SharedAudioBufferManager.GetAudioBuffers();
 
-        /// <summary>
-        /// Gets an audio recorder, capable of capturing the audio from the specified device identifier.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio recorder.</returns>
-        public IAudioRecorder GetAudioRecorder(string deviceId)
-            => new AudioRecorder(deviceId, this.LoggerFactory.CreateLogger<AudioRecorder>());
-
-        /// <summary>
-        /// Gets the audio player for the specified <paramref name="deviceId"/>.
-        /// </summary>
-        /// <param name="deviceId">The device identifier.</param>
-        /// <returns>The audio player.</returns>
-        public IAudioPlayer GetAudioPlayer(string deviceId)
+        /// <inheritdoc/>
+        public IAudioRecorder GetAudioRecorder(string deviceKey)
         {
-            var player = new AudioPlayer(deviceId, this.LoggerFactory.CreateLogger<AudioPlayer>());
-            this.Players.Add(player);
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            return new AudioRecorder(device, this.LoggerFactory.CreateLogger<AudioRecorder>());
+        }
 
+        /// <inheritdoc/>
+        public IAudioPlayer GetAudioPlayer(string deviceKey)
+        {
+            var player = new AudioPlayer(
+                AudioDevices.Current.GetDeviceByKey(deviceKey),
+                this.LoggerFactory.CreateLogger<AudioPlayer>());
+
+            this.Players.Add(player);
             return player;
         }
 
