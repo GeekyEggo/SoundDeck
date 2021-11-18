@@ -66,6 +66,11 @@ namespace SoundDeck.Core.Capture
         {
             lock (this._syncRoot)
             {
+                if (this.Capacity == 0)
+                {
+                    return 0;
+                }
+
                 // Determine how many items can be read, and where they should be read from; this is relative to whether this instance's position has overflowed.
                 count = Math.Min(count, this.Length - offset);
                 offset = this.Length < this.Buffer.Length ? offset : this.Position + offset;
@@ -126,6 +131,11 @@ namespace SoundDeck.Core.Capture
         {
             lock (this._syncRoot)
             {
+                if (this.Capacity == 0)
+                {
+                    return;
+                }
+
                 // When the number of items to write exceeds the capacity, reduce to prevent unncessary writes.
                 count = Math.Min(count, source.Length - offset);
                 if (count >= this.Buffer.Length)
