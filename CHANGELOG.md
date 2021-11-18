@@ -2,6 +2,12 @@
 
 ## vNext
 
+### 🐞 Fixed
+
+- Fixed an issue where initial setup of "Clip Action" would result in an exception. ([#55](https://github.com/GeekyEggo/SoundDeck/issues/55)).
+
+## v3.0.0
+
 ### ⭐ Added
 
 - Actions now support "Default" device as an audio device option; currently supported by ([#28](https://github.com/GeekyEggo/SoundDeck/issues/28)).
