@@ -4,7 +4,7 @@
 
 ### 🐞 Fixed
 
-- Fixed an issue where initial setup of "Clip Action" would result in an exception. ([#55](https://github.com/GeekyEggo/SoundDeck/issues/55)).
+- Fixed an error that could be encountered during initial setup of "Clip Audio" actions. ([#55](https://github.com/GeekyEggo/SoundDeck/issues/55)).
 
 ## v3.0.0
 
