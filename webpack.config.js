@@ -1,13 +1,12 @@
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin")
-const package = require("./package.json");
 
 module.exports = (env, argv) => {
-    const source = path.resolve(__dirname, package.paths.pi);
+    const source = path.resolve(__dirname, "src/SoundDeck.PI");
     const dest = argv.dist
-        ? path.resolve(__dirname, package.paths.dist, "PI")
-        : path.resolve(process.env["APPDATA"], package.paths.elgato, "PI");
+        ? path.resolve(__dirname, "dist/com.geekyeggo.sounddeck.sdPlugin/PI")
+        : path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI");
 
     let config = {
         entry: {

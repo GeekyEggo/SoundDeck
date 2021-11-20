@@ -14,6 +14,10 @@
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <OutputPath>$(APPDATA)\Elgato\StreamDeck\Plugins\com.geekyeggo.sounddeck.sdPlugin</OutputPath>
+    </PropertyGroup>
+
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <OutputPath>..\..\dist\com.geekyeggo.sounddeck.sdPlugin</OutputPath>
     </PropertyGroup>
@@ -50,10 +54,6 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <Exec Command="cd ../..&#xD;&#xA;npm run debug:plugin" />
-    </Target>
-
-    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="cd ../..&#xD;&#xA;npm stop" />
+      <Exec Command="taskkill -im StreamDeck.exe -f -t -fi &quot;memusage gt 0&quot;&#xD;&#xA;taskkill -im SoundDeck.exe -f -t -fi &quot;memusage gt 0&quot;" />
     </Target>
 </Project>

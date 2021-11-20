@@ -2,29 +2,13 @@
     "name": "sounddeck",
     "author": "GeekyEggo",
     "license": "MIT",
-    "paths": {
-        "debug": "bin\\Debug",
-        "dist": "./dist/com.geekyeggo.sounddeck.sdPlugin",
-        "elgato": "Elgato\\StreamDeck\\Plugins\\com.geekyeggo.sounddeck.sdPlugin",
-        "package": "./dist",
-        "pi": ".\\src\\SoundDeck.PI",
-        "plugin": ".\\src\\SoundDeck.Plugin"
-    },
     "scripts": {
-        "build": "dotnet msbuild %npm_package_paths_plugin% -p:Configuration=Debug -t:Rebuild && npm run build:pi",
-        "build:pi": "npx webpack",
-        "dist": "npm i && npm run restore && npm run dist:clean && npm run dist:plugin && npm run dist:pi && npm run dist:prepare && npm run dist:package",
-        "dist:clean": "rm -rf %npm_package_paths_package%/*",
-        "dist:package": "cd tools && DistributionTool -b -i ../%npm_package_paths_dist% -o ../%npm_package_paths_package% || exit 0",
-        "dist:pi": "npx webpack --dist",
-        "dist:plugin": "dotnet msbuild %npm_package_paths_plugin% -p:Configuration=Release -t:Rebuild",
-        "dist:prepare": "rm -rf %npm_package_paths_package%/**/*.pdb",
+        "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack",
         "debug:pi": "npx webpack --mode development --watch",
-        "debug:plugin": "xcopy /e /i /y %npm_package_paths_plugin%\\%npm_package_paths_debug% %APPDATA%\\%npm_package_paths_elgato%",
-        "restore": "dotnet restore",
-        "stop": "npm run stop:streamdeck && npm run stop:plugin",
-        "stop:plugin": "tasklist | findstr \"SoundDeck.exe\" && taskkill -im SoundDeck.exe -f -t || echo SoundDeck not running",
-        "stop:streamdeck": "tasklist | findstr \"StreamDeck.exe\" && taskkill -im StreamDeck.exe -f -t || echo StreamDeck not running"
+        "dist": "npm i && npm run dist:clean && npm run dist:build && npm run dist:package",
+        "dist:clean": "rm -rf ./dist",
+        "dist:build": "dotnet build ./Src/SoundDeck.Plugin/ -c Release && npx webpack --dist",
+        "dist:package": "cd ./tools && ./DistributionTool.exe -b -i ../dist/com.geekyeggo.sounddeck.sdPlugin -o ../dist || exit 0"
     },
     "devDependencies": {
         "@babel/core": "^7.14.3",
