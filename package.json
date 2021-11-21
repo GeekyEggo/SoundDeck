@@ -3,7 +3,7 @@
     "author": "GeekyEggo",
     "license": "MIT",
     "scripts": {
-        "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack",
+        "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack --mode development",
         "debug:pi": "npx webpack --mode development --watch",
         "dist": "npm i && npm run dist:clean && npm run dist:build && npm run dist:package",
         "dist:clean": "rm -rf ./dist",
@@ -11,15 +11,15 @@
         "dist:package": "cd ./tools && ./DistributionTool.exe -b -i ../dist/com.geekyeggo.sounddeck.sdPlugin -o ../dist || exit 0"
     },
     "devDependencies": {
-        "@babel/core": "^7.14.3",
-        "@babel/preset-react": "^7.13.13",
-        "babel-loader": "^8.2.2",
-        "clean-webpack-plugin": "^3.0.0",
-        "copy-webpack-plugin": "^5.1.2",
-        "file-loader": "^4.3.0",
-        "style-loader": "^0.23.1",
-        "webpack": "^4.46.0",
-        "webpack-cli": "^3.3.12"
+        "@babel/core": "^7.16.0",
+        "@babel/preset-react": "^7.16.0",
+        "babel-loader": "^8.2.3",
+        "clean-webpack-plugin": "^4.0.0",
+        "copy-webpack-plugin": "^10.0.0",
+        "file-loader": "^6.2.0",
+        "style-loader": "^3.3.1",
+        "webpack": "^5.64.2",
+        "webpack-cli": "^4.9.1"
     },
     "dependencies": {
         "react": "^16.14.0",

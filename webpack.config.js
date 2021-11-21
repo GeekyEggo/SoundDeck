@@ -36,7 +36,6 @@ module.exports = (env, argv) => {
             }]
         },
         output: {
-            chunkFilename: "./js/[name].bundle.js",
             filename: "./js/[name].js",
             path: dest
         },
@@ -44,12 +43,25 @@ module.exports = (env, argv) => {
             new CleanWebpackPlugin({
                 cleanAfterEveryBuildPatterns: ["!*.html", "!css/**/*.*", "!imgs/**/*.*"],
             }),
-            new CopyPlugin([{
-                from: source,
-                to: dest,
-                context: source,
-                ignore: [".babelrc", "*.csproj", "*.csproj*", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
-            }])
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: source,
+                        to: dest,
+                        context: source,
+                        globOptions: {
+                            ignore: [
+                                "**/bin",
+                                "**/obj",
+                                "**/.babelrc",
+                                "**/*.csproj",
+                                "**/*.csproj*",
+                                "**/*.jsx"
+                            ]
+                        }
+                    }
+                ]
+            })
         ],
         resolve: {
             extensions: [".js", ".jsx"],
