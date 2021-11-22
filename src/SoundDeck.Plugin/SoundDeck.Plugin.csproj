@@ -53,7 +53,7 @@
         </None>
     </ItemGroup>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-      <Exec Command="taskkill -im StreamDeck.exe -f -t -fi &quot;memusage gt 0&quot;&#xD;&#xA;taskkill -im SoundDeck.exe -f -t -fi &quot;memusage gt 0&quot;" />
+    <Target Name="PreBuild" AfterTargets="PreBuildEvent" Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <Exec Command="taskkill -im StreamDeck.exe -f -t -fi &quot;memusage gt 0&quot;&#xD;&#xA;taskkill -im SoundDeck.exe -f -t -fi &quot;memusage gt 0&quot;" />
     </Target>
 </Project>

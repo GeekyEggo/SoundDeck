@@ -4,11 +4,11 @@
     "license": "MIT",
     "scripts": {
         "clean": "rm -rf ./node_modules && npm run dist:clean",
-        "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack --mode development",
-        "debug:pi": "npx webpack --mode development --watch",
+        "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack",
+        "debug:pi": "npx webpack --watch",
         "dist": "npm i && npm run dist:clean && npm run dist:build && npm run dist:package",
         "dist:clean": "rm -rf ./dist",
-        "dist:build": "dotnet build ./Src/SoundDeck.Plugin/ -c Release && npx webpack",
+        "dist:build": "dotnet build ./Src/SoundDeck.Plugin/ -c Release && npx webpack --env dist",
         "dist:package": "cd ./tools && ./DistributionTool.exe -b -i ../dist/com.geekyeggo.sounddeck.sdPlugin -o ../dist || exit 0"
     },
     "devDependencies": {

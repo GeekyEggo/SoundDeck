@@ -1,5 +1,11 @@
 # Change Log
 
+## v3.0.2
+
+### 🐞 Fixed
+
+- Fixed an error that prevented users from opening the folder picker.
+
 ## v3.0.1
 
 ### 🐞 Fixed

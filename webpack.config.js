@@ -2,11 +2,11 @@ const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin")
 
-module.exports = (env, argv) => {
+module.exports = (env, _) => {
     const source = path.resolve(__dirname, "src/SoundDeck.PI");
-    const dest = argv.mode === "development"
-        ? path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI")
-        : path.resolve(__dirname, "dist/com.geekyeggo.sounddeck.sdPlugin/PI");
+    const dest = env.dist
+        ? path.resolve(__dirname, "dist/com.geekyeggo.sounddeck.sdPlugin/PI")
+        : path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI");
 
     let config = {
         entry: {
@@ -87,7 +87,7 @@ module.exports = (env, argv) => {
     };
 
     // set the dev tool
-    if (argv.mode === "development") {
+    if (!env.dist) {
         config.devtool = "inline-source-map";
     }
 
