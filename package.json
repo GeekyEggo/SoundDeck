@@ -3,11 +3,12 @@
     "author": "GeekyEggo",
     "license": "MIT",
     "scripts": {
+        "clean": "rm -rf ./node_modules && npm run dist:clean",
         "build": "dotnet build ./src/SoundDeck.Plugin/ -c Debug && npx webpack --mode development",
         "debug:pi": "npx webpack --mode development --watch",
         "dist": "npm i && npm run dist:clean && npm run dist:build && npm run dist:package",
         "dist:clean": "rm -rf ./dist",
-        "dist:build": "dotnet build ./Src/SoundDeck.Plugin/ -c Release && npx webpack --dist",
+        "dist:build": "dotnet build ./Src/SoundDeck.Plugin/ -c Release && npx webpack",
         "dist:package": "cd ./tools && ./DistributionTool.exe -b -i ../dist/com.geekyeggo.sounddeck.sdPlugin -o ../dist || exit 0"
     },
     "devDependencies": {
@@ -25,7 +26,7 @@
         "react": "^16.14.0",
         "react-dom": "^16.14.0",
         "react-redux": "^7.2.4",
-        "react-sharpdeck": "file:../react-sharpdeck",
+        "react-sharpdeck": "file:./libs/react-sharpdeck",
         "react-sortable-hoc": "^1.11.0",
         "redux": "^4.1.0"
     }

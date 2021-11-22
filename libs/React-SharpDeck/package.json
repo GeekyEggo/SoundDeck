@@ -1,0 +1,24 @@
+{
+    "name": "react-sharpdeck",
+    "main": "./dist/react-sharpdeck.js",
+    "dependencies": {
+        "event-target-shim": "^6.0.2",
+        "object-path": "^0.11.8",
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
+        "react-redux": "^7.2.4",
+        "redux": "^4.1.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.16.0",
+        "@babel/core": "^7.16.0",
+        "@babel/preset-react": "^7.16.0",
+        "babel-loader": "^8.2.3",
+        "rollup": "^2.60.1",
+        "rollup-plugin-babel": "^4.4.0",
+        "rollup-plugin-postcss": "^4.0.2",
+        "rollup-plugin-typescript2": "^0.31.0",
+        "rollup-watch": "^3.2.2",
+        "typescript": "^4.5.2"
+    }
+}
