@@ -1,6 +1,6 @@
 # Change Log
 
-## vNext
+## v3.0.1
 
 ### 🐞 Fixed
 
