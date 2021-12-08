@@ -39,6 +39,7 @@ namespace SoundDeck.Core.Capture
             this.Logger = logger;
 
             this.StartRecording();
+            this.Device.IdChanged += (_, __) => this.Restart();
         }
 
         /// <summary>
@@ -173,9 +174,9 @@ namespace SoundDeck.Core.Capture
                 // Clear the previous capture.
                 if (this.Capture != null)
                 {
+                    // Disposing of the capture would result in a COM exception; possibly related https://github.com/naudio/NAudio/issues/562.
                     this.Capture.DataAvailable -= this.Capture_DataAvailable;
                     this.Capture.StopRecording();
-                    this.Capture.Dispose();
                 }
 
                 // Start recording.
