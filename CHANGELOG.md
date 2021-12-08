@@ -1,5 +1,11 @@
 # Change Log
 
+## vNext
+
+### ⭐ Added
+
+- Added option to select default audio device for recording actions! ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
+
 ## v3.0.2
 
 ### 🐞 Fixed

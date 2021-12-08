@@ -26,6 +26,8 @@ namespace SoundDeck.Core.Capture
         /// <param name="logger">The logger.</param>
         public AudioRecorder(IAudioDevice device, ILogger<AudioRecorder> logger)
         {
+            device.IdChanged += (_, __) => this.OnCaptureDeviceChanged();
+
             this.Device = device;
             this.Logger = logger;
         }
@@ -53,7 +55,12 @@ namespace SoundDeck.Core.Capture
         /// <summary>
         /// The capturing completion source containing the location of the file where the audio was saved to.
         /// </summary>
-        private TaskCompletionSource<string> CapturingCompletionSource;
+        private TaskCompletionSource<string> SavedFilePath;
+
+        /// <summary>
+        /// Gets a value indicating whether the audio recorder is active.
+        /// </summary>
+        private bool IsRecording { get; set; }
 
         /// <summary>
         /// Gets the logger.
@@ -79,18 +86,20 @@ namespace SoundDeck.Core.Capture
             {
                 Task.WaitAll(this.StopAsync());
             }
+            else
+            {
+                this.Capture?.StopRecording();
+                this.Capture = null;
 
-            this.Capture?.Dispose();
-            this.Capture = null;
+                var filename = this.FileWriter?.Filename;
+                this.FileWriter?.Dispose();
+                this.FileWriter = null;
 
-            var filename = this.FileWriter?.Filename;
-            this.FileWriter?.Dispose();
-            this.FileWriter = null;
+                this.SavedFilePath?.SetResult(filename);
+                this.SavedFilePath = null;
 
-            this.CapturingCompletionSource?.SetResult(filename);
-            this.CapturingCompletionSource = null;
-
-            this.Logger.LogTrace($"Recording of \"{this.Device.GetMMDevice()?.FriendlyName}\" saved to \"{filename}\".");
+                this.Logger.LogTrace($"Recording of \"{this.Device.GetMMDevice()?.FriendlyName}\" saved to \"{filename}\".");
+            }
         }
 
         /// <summary>
@@ -103,25 +112,22 @@ namespace SoundDeck.Core.Capture
             {
                 await this._syncRoot.WaitAsync();
 
-                // when there is already a completion source, we assume we are already capturing
-                if (this.CapturingCompletionSource != null)
+                if (!this.IsRecording
+                    && this.SavedFilePath == null)
                 {
-                    return;
+                    // Initialize the capture and file writer.
+                    this.Capture = this.GetCapture();
+                    this.FileWriter = new AudioFileWriter(this.Settings.GetPath(), this.Capture.WaveFormat)
+                    {
+                        Settings = this.Settings
+                    };
+
+                    // Start recording.
+                    this.SavedFilePath = new TaskCompletionSource<string>();
+
+                    this.IsRecording = true;
+                    this.Capture.StartRecording();
                 }
-
-                // set the capture information
-                this.Capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
-                this.Capture.DataAvailable += this.Capture_DataAvailable;
-                this.Capture.RecordingStopped += this.Capture_RecordingStopped;
-
-                // initialize the writer, and start recording
-                this.FileWriter = new AudioFileWriter(this.Settings.GetPath(), this.Capture.WaveFormat)
-                {
-                    Settings = this.Settings
-                };
-
-                this.CapturingCompletionSource = new TaskCompletionSource<string>();
-                this.Capture.StartRecording();
             }
             finally
             {
@@ -137,16 +143,19 @@ namespace SoundDeck.Core.Capture
         {
             try
             {
-                // when there is no capturing completion source, assume we arent recording
+                // When there is no capturing completion source, assume we arent recording.
                 this._syncRoot.Wait();
-                if (this.CapturingCompletionSource == null)
+                if (!this.IsRecording)
                 {
                     return Task.FromResult(string.Empty);
                 }
 
-                // stop recording, and awaiting actual stop
+                // Stop recording, and await actual stop.
+                this.Capture.RecordingStopped += (_, __) => this.Dispose(false);
                 this.Capture.StopRecording();
-                return this.CapturingCompletionSource.Task;
+                this.IsRecording = false;
+
+                return this.SavedFilePath.Task;
             }
             finally
             {
@@ -163,11 +172,48 @@ namespace SoundDeck.Core.Capture
             => Task.WaitAll(this.FileWriter.WriteAsync(e.Buffer, 0, e.BytesRecorded));
 
         /// <summary>
-        /// Handles the <see cref="WasapiCapture.RecordingStopped"/> event of the <see cref="Capture"/>
+        /// Updates the active <see cref="Capture"/> device.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="StoppedEventArgs"/> instance containing the event data.</param>
-        private void Capture_RecordingStopped(object sender, StoppedEventArgs e)
-            => this.Dispose(false);
+        private void OnCaptureDeviceChanged()
+        {
+            try
+            {
+                this._syncRoot.Wait();
+
+                // We should only update the capture when there is an active recording.
+                if (this.IsRecording)
+                {
+                    if (this.Capture != null)
+                    {
+                        this.Capture.DataAvailable -= this.Capture_DataAvailable;
+                        this.Capture.StopRecording();
+                    }
+
+                    this.Capture = this.GetCapture();
+                    this.Capture.StartRecording();
+                }
+            }
+            finally
+            {
+                this._syncRoot.Release();
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="WasapiCapture"/> associated with the <see cref="Device"/>.
+        /// </summary>
+        /// <returns>The <see cref="WasapiCapture"/>.</returns>
+        private WasapiCapture GetCapture()
+        {
+            var capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
+            capture.DataAvailable += this.Capture_DataAvailable;
+            capture.RecordingStopped += (_, __) =>
+            {
+                capture.DataAvailable -= this.Capture_DataAvailable;
+                capture.Dispose();
+            };
+
+            return capture;
+        }
     }
 }
