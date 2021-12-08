@@ -101,7 +101,6 @@ namespace SoundDeck.Core.Capture
                     _syncRoot.Wait();
 
                     this.Capture?.StopRecording();
-                    this.Capture?.Dispose();
                     this.Buffer.SetCapacity(1);
 
                     this.IsDisposed = true;
@@ -171,15 +170,7 @@ namespace SoundDeck.Core.Capture
             {
                 _syncRoot.Wait();
 
-                // Clear the previous capture.
-                if (this.Capture != null)
-                {
-                    // Disposing of the capture would result in a COM exception; possibly related https://github.com/naudio/NAudio/issues/562.
-                    this.Capture.DataAvailable -= this.Capture_DataAvailable;
-                    this.Capture.StopRecording();
-                }
-
-                // Start recording.
+                this.Capture?.StopRecording();
                 this.StartRecording();
             }
             finally
@@ -201,11 +192,18 @@ namespace SoundDeck.Core.Capture
         /// </summary>
         private void StartRecording()
         {
-            this.Capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
-            this.Buffer.SetCapacity(this.Capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
+            var capture = this.Device.Flow == DataFlow.Capture ? new WasapiCapture(this.Device.GetMMDevice()) : new WasapiLoopbackCapture(this.Device.GetMMDevice());
+            this.Buffer.SetCapacity(capture.WaveFormat.AverageBytesPerSecond * (int)this._bufferDuration.TotalSeconds);
 
-            this.Capture.DataAvailable += this.Capture_DataAvailable;
-            this.Capture.StartRecording();
+            capture.DataAvailable += this.Capture_DataAvailable;
+            capture.RecordingStopped += (_, __) =>
+            {
+                capture.DataAvailable -= this.Capture_DataAvailable;
+                capture.Dispose();
+            };
+
+            capture.StartRecording();
+            this.Capture = capture;
         }
     }
 }
