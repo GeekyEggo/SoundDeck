@@ -1,13 +1,12 @@
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin")
-const package = require("./package.json");
 
-module.exports = (env, argv) => {
-    const source = path.resolve(__dirname, package.paths.pi);
-    const dest = argv.dist
-        ? path.resolve(__dirname, package.paths.dist, "PI")
-        : path.resolve(process.env["APPDATA"], package.paths.elgato, "PI");
+module.exports = (env, _) => {
+    const source = path.resolve(__dirname, "src/SoundDeck.PI");
+    const dest = env.dist
+        ? path.resolve(__dirname, "dist/com.geekyeggo.sounddeck.sdPlugin/PI")
+        : path.resolve(process.env["APPDATA"], "Elgato/StreamDeck/Plugins/com.geekyeggo.sounddeck.sdPlugin/PI");
 
     let config = {
         entry: {
@@ -37,7 +36,6 @@ module.exports = (env, argv) => {
             }]
         },
         output: {
-            chunkFilename: "./js/[name].bundle.js",
             filename: "./js/[name].js",
             path: dest
         },
@@ -45,12 +43,25 @@ module.exports = (env, argv) => {
             new CleanWebpackPlugin({
                 cleanAfterEveryBuildPatterns: ["!*.html", "!css/**/*.*", "!imgs/**/*.*"],
             }),
-            new CopyPlugin([{
-                from: source,
-                to: dest,
-                context: source,
-                ignore: [".babelrc", "*.csproj", "*.csproj*", "*.js", "*.jsx", "bin/**/*.*", "obj/**/*.*"]
-            }])
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: source,
+                        to: dest,
+                        context: source,
+                        globOptions: {
+                            ignore: [
+                                "**/bin",
+                                "**/obj",
+                                "**/.babelrc",
+                                "**/*.csproj",
+                                "**/*.csproj*",
+                                "**/*.jsx"
+                            ]
+                        }
+                    }
+                ]
+            })
         ],
         resolve: {
             extensions: [".js", ".jsx"],
@@ -76,7 +87,7 @@ module.exports = (env, argv) => {
     };
 
     // set the dev tool
-    if (argv.mode === "development") {
+    if (!env.dist) {
         config.devtool = "inline-source-map";
     }
 

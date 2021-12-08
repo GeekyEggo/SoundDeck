@@ -51,7 +51,7 @@
      id="surface21678067"
      transform="matrix(1.35,0,0,1.3333333,-9.4500003,-5.3333338)">
     <path
-       style="fill:#353535;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="fill:#373737;fill-opacity:1;fill-rule:nonzero;stroke:none"
        d="M 15,4 C 14.476562,4 13.941406,4.183594 13.5625,4.5625 13.183594,4.941406 13,5.476562 13,6 V 7 H 7 v 2 h 1 v 16 c 0,1.644531 1.355469,3 3,3 h 12 c 1.644531,0 3,-1.355469 3,-3 V 9 h 1 V 7 H 21 V 6 C 21,5.476562 20.816406,4.941406 20.4375,4.5625 20.058594,4.183594 19.523438,4 19,4 Z m 0,2 h 4 v 1 h -4 z m -5,3 h 14 v 16 c 0,0.554688 -0.445312,1 -1,1 H 11 c -0.554688,0 -1,-0.445312 -1,-1 z m 2,3 v 11 h 2 V 12 Z m 4,0 v 11 h 2 V 12 Z m 4,0 v 11 h 2 V 12 Z m 0,0"
        id="path2"
        inkscape:connector-curvature="0" />
