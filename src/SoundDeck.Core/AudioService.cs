@@ -6,7 +6,6 @@ namespace SoundDeck.Core
     using NAudio.MediaFoundation;
     using NAudio.Wave;
     using SoundDeck.Core.Capture;
-    using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
     using SoundDeck.Core.Playback.Controllers;
     using SoundDeck.Core.Playback.Players;
@@ -20,11 +19,9 @@ namespace SoundDeck.Core
         /// Initializes a new instance of the <see cref="AudioService"/> class.
         /// </summary>
         /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="normalizationProvider">The normalization provider.</param>
         public AudioService(ILoggerFactory loggerFactory)
         {
             this.LoggerFactory = loggerFactory;
-            this.SharedAudioBufferManager = new SharedAudioBufferManager(loggerFactory);
         }
 
         /// <summary>
@@ -41,11 +38,6 @@ namespace SoundDeck.Core
         /// Sets the logger factory.
         /// </summary>
         private ILoggerFactory LoggerFactory { get; }
-
-        /// <summary>
-        /// Gets the audio buffer manager.
-        /// </summary>
-        private SharedAudioBufferManager SharedAudioBufferManager { get; }
 
         /// <summary>
         /// Determines whether encoding to MP3 is possible based on the current environment.
@@ -82,14 +74,6 @@ namespace SoundDeck.Core
 
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
         }
-
-        /// <inheritdoc/>
-        public IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan clipDuration)
-            => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceKey, clipDuration);
-
-        /// <inheritdoc/>
-        public IEnumerable<IAudioBuffer> GetAudioBuffers()
-            => this.SharedAudioBufferManager.GetAudioBuffers();
 
         /// <inheritdoc/>
         public IAudioRecorder GetAudioRecorder(string deviceKey)

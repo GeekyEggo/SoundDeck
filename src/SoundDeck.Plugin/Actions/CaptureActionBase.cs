@@ -26,7 +26,9 @@ namespace SoundDeck.Plugin.Actions
         /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
         public CaptureActionBase(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
             : base(audioService)
-            => this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
+        {
+            this.FolderBrowserDialogProvider = folderBrowserDialogProvider;
+        }
 
         /// <summary>
         /// Gets the folder browser dialog provider.

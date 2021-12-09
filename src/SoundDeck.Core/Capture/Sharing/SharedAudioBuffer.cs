@@ -1,84 +1,107 @@
-namespace SoundDeck.Core.Capture.Sharing
+﻿namespace SoundDeck.Core.Capture.Sharing
 {
     using System;
-    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
-    /// Provides a wrapper for a shared <see cref="IAudioBuffer"/>.
+    /// Provides information and methods for controlling a shared instance of <see cref="IAudioBuffer"/>.
     /// </summary>
-    public sealed class SharedAudioBuffer : IAudioBuffer
+    public class SharedAudioBuffer
     {
         /// <summary>
-        /// Private field for <see cref="BufferDuration"/>.
+        /// The synchrinization root.
         /// </summary>
-        private TimeSpan _bufferDuration;
+        private readonly object _syncRoot = new object();
 
         /// <summary>
-        /// Occurs when the buffer duration has changed.
+        /// Initializes a new instance of class <see cref="SharedAudioBuffer"/>.
         /// </summary>
-        public event EventHandler BufferDurationChanged;
-
-        /// <summary>
-        /// Occurs when this instance is disposed.
-        /// </summary>
-        public event EventHandler Disposed;
-
-        /// <summary>
-        /// Gets or sets the audio buffer.
-        /// </summary>
-        public IAudioBuffer AudioBuffer { get; set; }
-
-        /// <summary>
-        /// Gets or sets the duration of the buffer.
-        /// </summary>
-        public TimeSpan BufferDuration
+        /// <param name="deviceKey">The device key of the audio device.</param>
+        /// <param name="bufferDuration">The initial buffer duration.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        public SharedAudioBuffer(string deviceKey, TimeSpan bufferDuration, ILoggerFactory loggerFactory)
         {
-            get => this._bufferDuration;
-            set
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            if (device == null)
             {
-                if (this._bufferDuration != value)
+                throw new KeyNotFoundException($"Unable to find device for the specified device key: {deviceKey}");
+            }
+
+            this.AudioBuffer = new CircularAudioBuffer(device, bufferDuration, loggerFactory.CreateLogger<CircularAudioBuffer>());
+        }
+
+        /// <summary>
+        /// Gets the underlying audio buffer.
+        /// </summary>
+        public CircularAudioBuffer AudioBuffer { get; }
+
+        /// <summary>
+        /// Gets the consumers currently consuming the audio buffer.
+        /// </summary>
+        private List<SharedAudioBufferConsumer> Consumers { get; } = new List<SharedAudioBufferConsumer>();
+
+        /// <summary>
+        /// Registers a new consumer with the required duration.
+        /// </summary>
+        /// <param name="bufferDuration">The required buffer duration.</param>
+        /// <returns>The audio buffer for the consumer to manage.</returns>
+        public IAudioBuffer Register(TimeSpan bufferDuration)
+        {
+            lock (this._syncRoot)
+            {
+                var consumer = new SharedAudioBufferConsumer(this.AudioBuffer, bufferDuration);
+                consumer.BufferDurationChanged += this.Consumer_BufferDurationChanged;
+                consumer.Disposed += this.Consumer_Disposed;
+                this.Consumers.Add(consumer);
+
+                this.SetBufferDuration();
+                return consumer;
+            }
+        }
+
+        /// <summary>
+        /// Handles <see cref="SharedAudioBufferConsumer.Disposed"/>; handlers and the consumer is removed from this instance, and the underlying buffer duration is updated.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Consumer_Disposed(object sender, EventArgs e)
+        {
+            lock (this._syncRoot)
+            {
+                if (sender is SharedAudioBufferConsumer consumer)
                 {
-                    this._bufferDuration = value;
-                    this.BufferDurationChanged?.Invoke(this, EventArgs.Empty);
+                    consumer.BufferDurationChanged -= this.Consumer_BufferDurationChanged;
+                    consumer.Disposed -= this.Consumer_Disposed;
+                    this.Consumers.Remove(consumer);
+
+                    this.SetBufferDuration();
                 }
             }
         }
 
         /// <summary>
-        /// Gets the audio device.
+        /// Handles <see cref="SharedAudioBufferConsumer.BufferDurationChanged"/>, updating the underlying buffer duration if required.
         /// </summary>
-        public IAudioDevice Device => this.AudioBuffer.Device;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is disposed.
-        /// </summary>
-        private bool IsDisposed { get; set; }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void Consumer_BufferDurationChanged(object sender, EventArgs e)
         {
-            // as the audio buffer is shared, we dont dispose of it, but instead rely on the manager to dispose if it is no longer in use
-            if (!this.IsDisposed)
+            lock (this._syncRoot)
             {
-                this.Disposed?.Invoke(this, EventArgs.Empty);
-                this.IsDisposed = true;
+                this.SetBufferDuration();
             }
         }
 
         /// <summary>
-        /// Restarts the audio buffer.
+        /// Refreshes the <see cref="IAudioBuffer.BufferDuration"/> of the <see cref="AudioBuffer"/> based on the consumers requirements.
         /// </summary>
-        public void Restart()
-            => this.AudioBuffer.Restart();
-
-        /// <summary>
-        /// Saves an audio file of the current buffer.
-        /// </summary>
-        /// <param name="settings">The settings containing information about how, and where to save the capture.</param>
-        /// <returns>The file path.</returns>
-        public Task<string> SaveAsync(ISaveBufferSettings settings)
-            => this.AudioBuffer.SaveAsync(settings);
+        private void SetBufferDuration()
+        {
+            this.AudioBuffer.BufferDuration = this.Consumers.Count > 0
+                ? this.Consumers.Max(c => c.BufferDuration)
+                : TimeSpan.Zero;
+        }
     }
 }

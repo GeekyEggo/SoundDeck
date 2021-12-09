@@ -15,17 +15,17 @@ namespace SoundDeck.Plugin.Windows
         /// Initializes a new instance of the <see cref="AudioBufferRestartService"/> class.
         /// </summary>
         /// <param name="connection">The connection to the Stream Deck.</param>
-        /// <param name="audioService">The audio service.</param>
-        public AudioBufferRestartService(IStreamDeckConnection connection, IAudioService audioService)
+        /// <param name="audioBufferService">The audio buffer service.</param>
+        public AudioBufferRestartService(IStreamDeckConnection connection, IAudioBufferService audioBufferService)
         {
-            this.AudioService = audioService;
+            this.AudioBufferService = audioBufferService;
             this.Connection = connection;
         }
 
         /// <summary>
-        /// Gets the audio service.
+        /// Gets the audio buffer service.
         /// </summary>
-        private IAudioService AudioService { get; }
+        private IAudioBufferService AudioBufferService { get; }
 
         /// <summary>
         /// Gets the connection to the Stream Deck.
@@ -35,25 +35,12 @@ namespace SoundDeck.Plugin.Windows
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            this.Connection.SystemDidWakeUp += this.Connection_SystemDidWakeUp;
+            this.Connection.SystemDidWakeUp += (_, __) => this.AudioBufferService.Restart();
             return Task.CompletedTask;
         }
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
             => Task.CompletedTask;
-
-        /// <summary>
-        /// Handles the <see cref="IStreamDeckConnection.SystemDidWakeUp"/> event for <see cref="Connection"/>, and restarts all of the audio buffers within <see cref="IAudioService"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="SharpDeck.Events.Received.StreamDeckEventArgs"/> instance containing the event data.</param>
-        private void Connection_SystemDidWakeUp(object sender, SharpDeck.Events.Received.StreamDeckEventArgs e)
-        {
-            foreach (var audioBuffer in this.AudioService.GetAudioBuffers())
-            {
-                audioBuffer.Restart();
-            }
-        }
     }
 }

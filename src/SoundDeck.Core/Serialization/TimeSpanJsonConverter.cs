@@ -39,6 +39,6 @@ namespace SoundDeck.Core.Serialization
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, TimeSpan value, JsonSerializer serializer)
-            => writer.WriteValue(value.TotalSeconds);
+            => writer.WriteValue(value.TotalSeconds.ToString());
     }
 }

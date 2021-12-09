@@ -20,11 +20,18 @@ namespace SoundDeck.Plugin.Actions
         /// Initializes a new instance of the <see cref="ClipAudio"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
+        /// <param name="audioBufferService">The audio buffer service.</param>
         /// <param name="folderBrowserDialogProvider">The folder browser dialog.</param>
-        public ClipAudio(IAudioService audioService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
+        public ClipAudio(IAudioService audioService, IAudioBufferService audioBufferService, IFolderBrowserDialogProvider folderBrowserDialogProvider)
             : base(audioService, folderBrowserDialogProvider)
         {
+            this.AudioBufferService = audioBufferService;
         }
+
+        /// <summary>
+        /// Gets the audio buffer service.
+        /// </summary>
+        public IAudioBufferService AudioBufferService { get; }
 
         /// <summary>
         /// Gets the capture device, for the specified settings.
@@ -34,7 +41,7 @@ namespace SoundDeck.Plugin.Actions
         protected sealed override IAudioBuffer GetCaptureDevice(ClipAudioSettings settings)
         {
             return !string.IsNullOrWhiteSpace(settings?.CaptureAudioDeviceId)
-                ? this.AudioService.GetAudioBuffer(settings.CaptureAudioDeviceId, settings.Duration)
+                ? this.AudioBufferService.GetAudioBuffer(settings.CaptureAudioDeviceId, settings.Duration)
                 : null;
         }
 

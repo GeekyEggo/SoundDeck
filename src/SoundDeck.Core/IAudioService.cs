@@ -31,20 +31,6 @@ namespace SoundDeck.Core
         IPlaylistController CreatePlaylistController(string deviceKey, ControllerActionType action);
 
         /// <summary>
-        /// Gets an audio buffer for the specified device key.
-        /// </summary>
-        /// <param name="deviceId">The device key.</param>
-        /// <param name="clipDuration">Duration of the clip.</param>
-        /// <returns>The audio buffer.</returns>
-        IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan clipDuration);
-
-        /// <summary>
-        /// Gets all active audio buffers.
-        /// </summary>
-        /// <returns>The audio buffers.</returns>
-        IEnumerable<IAudioBuffer> GetAudioBuffers();
-
-        /// <summary>
         /// Gets an audio recorder, capable of capturing the audio from the specified device key.
         /// </summary>
         /// <param name="deviceKey">The device key.</param>
