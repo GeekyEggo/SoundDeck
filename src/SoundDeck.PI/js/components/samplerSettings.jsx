@@ -9,6 +9,7 @@ class SamplerSettings extends React.Component {
         this.actionTypes = [
             PlayActionTypes.PlayNext,
             PlayActionTypes.PlayStop,
+            PlayActionTypes.PlayOverlap,
             PlayActionTypes.LoopStop
         ];
     }

@@ -66,10 +66,7 @@ namespace SoundDeck.Core.Playback
         /// </summary>
         public PlaybackTimeEventArgs Time
         {
-            get
-            {
-                return this._time;
-            }
+            get => this._time;
             private set
             {
                 if (!value.Equals(this._time))
@@ -141,14 +138,19 @@ namespace SoundDeck.Core.Playback
                 await this._syncRoot.WaitAsync();
 
                 this.StopTaskCompletionSource?.TrySetResult(false);
-                this.StopTaskCompletionSource = new TaskCompletionSource<bool>(); ;
+                this.StopTaskCompletionSource = new TaskCompletionSource<bool>();
             }
             finally
             {
                 this._syncRoot.Release();
             }
 
-            // play the audio clip
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // Play the audio clip
             this.Reader.Seek(0, SeekOrigin.Begin);
             this.Play();
 

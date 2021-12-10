@@ -78,6 +78,9 @@ namespace SoundDeck.Core
 
                 case ControllerActionType.PlayAllStop:
                     return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.Continuous);
+
+                case ControllerActionType.PlayOverlap:
+                    return new PlayOverlapController(audioPlayer, () => this.GetAudioPlayer(deviceKey));
             }
 
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");

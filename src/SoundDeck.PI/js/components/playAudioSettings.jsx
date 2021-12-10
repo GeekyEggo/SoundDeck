@@ -11,6 +11,7 @@ class PlayAudioSettings extends React.Component {
             PlayActionTypes.PlayNext,
             PlayActionTypes.PlayStop,
             PlayActionTypes.PlayAllStop,
+            PlayActionTypes.PlayOverlap,
             PlayActionTypes.LoopStop,
             PlayActionTypes.LoopAllStop,
             PlayActionTypes.LoopAllStopReset

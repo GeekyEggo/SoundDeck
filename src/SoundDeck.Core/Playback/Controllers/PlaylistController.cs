@@ -189,7 +189,8 @@ namespace SoundDeck.Core.Playback.Controllers
         /// Applies the next action asynchronously.
         /// </summary>
         /// <returns>The task of running the action.</returns>
-        protected abstract Task ActionAsync();
+        protected virtual Task ActionAsync()
+            => this.PlayAsync();
 
         /// <summary>
         /// Continues playing asynchronously.
@@ -204,7 +205,6 @@ namespace SoundDeck.Core.Playback.Controllers
                 if (this.AudioPlayerCancellationTokenSource == null)
                 {
                     this.AudioPlayerCancellationTokenSource = new CancellationTokenSource();
-                    this.AudioPlayerCancellationTokenSource.Token.Register(() => this.AudioPlayer.Stop());
                 }
 
                 do
@@ -214,13 +214,27 @@ namespace SoundDeck.Core.Playback.Controllers
                         break;
                     }
 
-                    await this.AudioPlayer.PlayAsync(current);
+                    await this.PlayAsync(current, this.AudioPlayerCancellationTokenSource.Token);
                 }
                 while (this.CanContinuePlaying(this.Enumerator, this.AudioPlayerCancellationTokenSource.Token));
             }
             finally
             {
                 this._syncRoot.Release();
+            }
+        }
+
+        /// <summary>
+        /// Plays the specified <paramref name="file"/>.
+        /// </summary>
+        /// <param name="file">The audio file information to play.</param>
+        /// <param name="cancellationToken">The cancellation token responsible for stopping playback.</param>
+        protected virtual async Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                cancellationToken.Register(() => this.AudioPlayer.Stop());
+                await this.AudioPlayer.PlayAsync(file);
             }
         }
 

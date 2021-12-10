@@ -12,6 +12,10 @@ const PlayActionTypes = {
         label: "Play All / Stop",
         value: "5"
     },
+    PlayOverlap: {
+        label: "Play / Overlap",
+        value: "6"
+    },
     LoopStop: {
         label: "Loop / Stop",
         value: "2"
