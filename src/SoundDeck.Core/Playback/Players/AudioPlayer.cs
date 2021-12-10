@@ -13,12 +13,17 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// The synchronization root object.
         /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private readonly object _syncRoot = new object();
 
         /// <summary>
         /// Private member field for <see cref="Volume"/>.
         /// </summary>
         private float _volume = 1;
+
+        /// <summary>
+        /// Private member field that supports <see cref="LiveCancellationToken"/>.
+        /// </summary>
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
@@ -87,19 +92,38 @@ namespace SoundDeck.Core.Playback.Players
         private bool IsDisposed { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the internal cancellation token source; this is used to cancel all audio on the player.
+        /// Gets the active cancellation token.
         /// </summary>
-        private CancellationTokenSource InternalCancellationTokenSource { get; set; }
+        private CancellationToken LiveCancellationToken
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+                    if (this._cancellationTokenSource.IsCancellationRequested
+                        && !this.IsDisposed)
+                    {
+                        this._cancellationTokenSource = new CancellationTokenSource();
+                    }
+
+                    return this._cancellationTokenSource.Token;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is in a playable state.
         /// </summary>
-        private bool IsPlayableState => this.InternalCancellationTokenSource?.IsCancellationRequested == false && !this.IsDisposed;
+        private bool IsPlayableState => !this.IsDisposed;
 
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        private ILogger Logger { get; }
+        private ILogger<AudioPlayer> Logger { get; }
+
+        /// <inheritdoc/>
+        public IAudioPlayer Clone()
+            => new AudioPlayer(this.Device, this.Logger);
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -122,28 +146,19 @@ namespace SoundDeck.Core.Playback.Players
                 throw new ObjectDisposedException("The audio player has been disposed.");
             }
 
-            return Task.Run(async () =>
-            {
-                try
-                {
-                    await this._syncRoot.WaitAsync();
-
-                    this.InternalCancellationTokenSource = new CancellationTokenSource();
-                    await this.InternalPlayAsync(file, this.InternalCancellationTokenSource.Token);
-                    this.InternalCancellationTokenSource = null;
-                }
-                finally
-                {
-                    this._syncRoot.Release();
-                }
-            });
+            return this.InternalPlayAsync(file, this.LiveCancellationToken);
         }
 
         /// <summary>
         /// Stops any audio being played on this player.
         /// </summary>
         public void Stop()
-            => this.InternalCancellationTokenSource?.Cancel();
+        {
+            lock (this._syncRoot)
+            {
+                this._cancellationTokenSource.Cancel();
+            }
+        }
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
@@ -151,15 +166,19 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool dispose)
         {
-            this.InternalCancellationTokenSource?.Cancel();
-            if (dispose)
+            lock (this._syncRoot)
             {
-                if (!this.IsDisposed)
-                {
-                    this.Disposed?.Invoke(this, EventArgs.Empty);
-                }
+                this._cancellationTokenSource.Cancel();
 
-                this.IsDisposed = true;
+                if (dispose)
+                {
+                    if (!this.IsDisposed)
+                    {
+                        this.Disposed?.Invoke(this, EventArgs.Empty);
+                    }
+
+                    this.IsDisposed = true;
+                }
             }
         }
 
