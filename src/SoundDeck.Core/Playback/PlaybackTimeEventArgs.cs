@@ -40,7 +40,16 @@ namespace SoundDeck.Core.Playback
         /// <param name="reader">The reader.</param>
         /// <returns>The event arguments.</returns>
         internal static PlaybackTimeEventArgs FromReader(IAudioFileReader reader)
-            => new PlaybackTimeEventArgs(reader.CurrentTime, reader.TotalTime);
+        {
+            try
+            {
+                return new PlaybackTimeEventArgs(reader.CurrentTime, reader.TotalTime);
+            }
+            catch
+            {
+                return PlaybackTimeEventArgs.Zero;
+            }
+        }
 
         /// <summary>
         /// Determines whether the specified <see cref="object" />, is equal to this instance.

@@ -4,9 +4,9 @@ namespace SoundDeck.Core.Playback.Players
     using System.Collections.Generic;
 
     /// <summary>
-    /// Provides a collection of <see cref="IAudioPlayer"/>; players are removed from the collection when they're disposed.
+    /// Provides a collection of <see cref="IStopper"/> that allows for management of playback from any audio produced by Sound Deck.
     /// </summary>
-    public class AudioPlayerCollection
+    public class AudioPlaybackManager
     {
         /// <summary>
         /// The synchronization root.
@@ -16,13 +16,13 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets the players.
         /// </summary>
-        private List<IAudioPlayer> Players { get; } = new List<IAudioPlayer>();
+        private List<IStopper> Players { get; } = new List<IStopper>();
 
         /// <summary>
         /// Adds the specified player to the collection.
         /// </summary>
         /// <param name="player">The player.</param>
-        public void Add(IAudioPlayer player)
+        public void Add(IStopper player)
         {
             lock (_syncRoot)
             {
@@ -49,7 +49,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Player_Disposed(object sender, EventArgs e)
         {
-            if (sender is IAudioPlayer player)
+            if (sender is IStopper player)
             {
                 lock (_syncRoot)
                 {

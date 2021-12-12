@@ -1,38 +1,31 @@
 ﻿namespace SoundDeck.Core.Playback.Controllers
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Provides a <see cref="PlaylistController"/> that overlaps the next audio track over the current.
+    /// </summary>
     public class PlayOverlapController : PlaylistController
     {
-        public PlayOverlapController(IAudioPlayer audioPlayer, Func<IAudioPlayer> createAudioPlayer)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayOverlapController"/> class.
+        /// </summary>
+        /// <param name="audioPlayer">The audio player.</param>
+        public PlayOverlapController(IAudioPlayer audioPlayer)
             : base(audioPlayer)
         {
-            this.CreateAudioPlayer = createAudioPlayer;
         }
 
+        /// <inheritdoc/>
         public override ControllerActionType Action { get; } = ControllerActionType.PlayOverlap;
-        private Func<IAudioPlayer> CreateAudioPlayer { get; }
 
+        /// <inheritdoc/>
         protected override Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
         {
-            var audioPlayer = this.CreateAudioPlayer();
-            cancellationToken.Register(() => audioPlayer.Stop(), useSynchronizationContext: false);
-
-            _ = Task.Factory.StartNew(async (state) =>
-            {
-                try
-                {
-                    await audioPlayer.PlayAsync((AudioFileInfo)state);
-                }
-                finally
-                {
-                    audioPlayer.Dispose();
-                }
-            },
-            file,
-            TaskCreationOptions.RunContinuationsAsynchronously);
+            _ = this.AudioPlayer
+                .Clone()
+                .PlayAsync(file, cancellationToken);
 
             return Task.CompletedTask;
         }

@@ -1,5 +1,6 @@
 namespace SoundDeck.Core.Playback.Controllers
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -18,14 +19,11 @@ namespace SoundDeck.Core.Playback.Controllers
         {
         }
 
-        /// <summary>
-        /// Continues playing asynchronously.
-        /// </summary>
-        /// <returns>The task of playing.</returns>
-        protected override Task PlayAsync()
+        /// <inheritdoc/>
+        protected override Task PlayAsync(CancellationToken cancellationToken)
         {
             this.Enumerator.Reset();
-            return base.PlayAsync();
+            return base.PlayAsync(cancellationToken);
         }
     }
 }
