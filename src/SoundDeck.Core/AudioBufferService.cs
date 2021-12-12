@@ -28,19 +28,19 @@
         /// <summary>
         /// Gets the shared audio buffers, grouped by device key.
         /// </summary>
-        private ConcurrentDictionary<string, SharedAudioBuffer> SharedAudioBuffers { get; } = new ConcurrentDictionary<string, SharedAudioBuffer>();
+        private ConcurrentDictionary<string, SharedAudioBufferFactory> AudioBufferFactories { get; } = new ConcurrentDictionary<string, SharedAudioBufferFactory>();
 
         /// <inheritdoc/>
         public IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan bufferDuration)
         {
-            var sharedAudioBuffer = this.SharedAudioBuffers.GetOrAdd(deviceKey, _ => new SharedAudioBuffer(deviceKey, bufferDuration, this.LoggerFactory));
-            return sharedAudioBuffer.Register(bufferDuration);
+            var factory = this.AudioBufferFactories.GetOrAdd(deviceKey, _ => new SharedAudioBufferFactory(deviceKey, bufferDuration, this.LoggerFactory));
+            return factory.Create(bufferDuration);
         }
 
         /// <inheritdoc/>
         public void Restart()
         {
-            foreach (var sharedAudioBuffer in this.SharedAudioBuffers.Values)
+            foreach (var sharedAudioBuffer in this.AudioBufferFactories.Values)
             {
                 sharedAudioBuffer.AudioBuffer.Restart();
             }
