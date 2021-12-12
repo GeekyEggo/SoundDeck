@@ -4,7 +4,8 @@
 
 ### ⭐ Added
 
-- Added option to select default audio device for recording actions! ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
+- Added option to select default audio device for recording actions. ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
+- Added "Play / Overlap" option to playback actions.  ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
 
 ## v3.0.2
 
