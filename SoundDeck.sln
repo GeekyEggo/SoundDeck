@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Core", "src\SoundDeck.Core\SoundDeck.Core.csproj", "{4336C68F-D7F1-4A1A-A87A-AEEC27DC6ACA}"
 EndProject
@@ -21,13 +21,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{1C030969-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.PI", "src\SoundDeck.PI\SoundDeck.PI.csproj", "{C9C562B9-745D-442E-A1CA-13E8314F5CF5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{9B86A610-720A-49E1-8D9E-ACEB63D464F0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{2B75D954-6630-4FBB-BDE4-D9C078656231}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{A02A5DD9-69EA-4C77-A4DB-3032A65E7FDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetAppAudioDevice", "tools\SetAppAudioDevice\SetAppAudioDevice.csproj", "{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SetAppAudioDevice", "tools\SetAppAudioDevice\SetAppAudioDevice.csproj", "{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +41,6 @@ Global
 		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9C562B9-745D-442E-A1CA-13E8314F5CF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B86A610-720A-49E1-8D9E-ACEB63D464F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Release|Any CPU.ActiveCfg = Release|Any CPU
