@@ -119,7 +119,7 @@ namespace SoundDeck.Core.Playback.Controllers
                 return Task.CompletedTask;
             }
 
-            return this.ActionAsync(this.ActiveCancellationToken);
+            return this.PlayAsync(this.ActiveCancellationToken);
         }
 
         /// <summary>
@@ -138,14 +138,6 @@ namespace SoundDeck.Core.Playback.Controllers
                 this.AudioPlayer = null;
             }
         }
-
-        /// <summary>
-        /// Applies the next action asynchronously.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The task of running the action.</returns>
-        protected virtual Task ActionAsync(CancellationToken cancellationToken)
-            => this.PlayAsync(cancellationToken);
 
         /// <summary>
         /// Continues playing asynchronously.

@@ -25,7 +25,7 @@ namespace SoundDeck.Core.Playback.Controllers
         public override ControllerActionType Action { get; }
 
         /// <inheritdoc/>
-        protected override Task ActionAsync(CancellationToken cancellationToken)
+        protected override Task PlayAsync(CancellationToken cancellationToken)
         {
             if (this.AudioPlayer.IsPlaying)
             {
@@ -33,7 +33,7 @@ namespace SoundDeck.Core.Playback.Controllers
                 return Task.CompletedTask;
             }
 
-            return this.PlayAsync(cancellationToken);
+            return base.PlayAsync(cancellationToken);
         }
     }
 }

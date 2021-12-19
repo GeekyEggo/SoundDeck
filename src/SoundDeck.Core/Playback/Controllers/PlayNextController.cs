@@ -22,11 +22,11 @@ namespace SoundDeck.Core.Playback.Controllers
         public override ControllerActionType Action { get; } = ControllerActionType.PlayNext;
 
         /// <inheritdoc/>
-        protected override Task ActionAsync(CancellationToken cancellationToken)
+        protected override Task PlayAsync(CancellationToken cancellationToken)
         {
             // Stopping sets the cancellation token to cancelled, so we must supply a new one.
             this.Stop();
-            return this.PlayAsync(this.ActiveCancellationToken);
+            return base.PlayAsync(this.ActiveCancellationToken);
         }
     }
 }

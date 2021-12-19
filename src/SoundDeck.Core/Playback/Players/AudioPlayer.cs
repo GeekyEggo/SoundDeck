@@ -7,7 +7,6 @@
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using NAudio.Wave;
-    using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
@@ -18,22 +17,12 @@
         /// <summary>
         /// The playback state polling delay, in milliseconds.
         /// </summary>
-        internal const int PLAYBACK_STATE_POLL_DELAY = 150;
+        private const int PLAYBACK_STATE_POLL_DELAY = 100;
 
         /// <summary>
-        /// Private member field for <see cref="Time"/>.
+        /// Private member field for <see cref="ReaderState"/>.
         /// </summary>
-        private PlaybackTimeEventArgs _time;
-
-        /// <summary>
-        /// The synchronization root.
-        /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
-
-        /// <summary>
-        /// Private member field for <see cref="Volume"/>.
-        /// </summary>
-        private float _volume = 1;
+        private AudioReaderStateInfo _readerState = AudioReaderStateInfo.Default;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
@@ -58,7 +47,7 @@
         /// <summary>
         /// Gets the name of the file being played.
         /// </summary>
-        public string FileName => this.ActiveReader?.FileName;
+        public string FileName => this.ReaderState.FileName;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is looped.
@@ -68,39 +57,26 @@
         /// <summary>
         /// Gets a value indicating whether this instance is playing.
         /// </summary>
-        public bool IsPlaying { get; private set; } = false;
+        public bool IsPlaying => this.ReaderState.IsPlaying;
 
         /// <summary>
         /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
         /// </summary>
         public float Volume
         {
-            get => this._volume;
-            set
-            {
-                if (this._volume != value)
-                {
-                    this._volume = value;
-                    using (this._syncRoot.Lock())
-                    {
-                        if (this.ActiveReader != null)
-                        {
-                            this.ActiveReader.Volume = value;
-                        }
-                    }
-                }
-            }
+            get => this.ReaderState.Volume;
+            set => this.ReaderState.Volume = value;
         }
-
-        /// <summary>
-        /// Gets or sets the active reader.
-        /// </summary>
-        private IAudioFileReader ActiveReader { get; set; }
 
         /// <summary>
         /// Gets the logger.
         /// </summary>
         private ILogger<IAudioPlayer> Logger { get; }
+
+        /// <summary>
+        /// Gets or sets the audio reader state information.
+        /// </summary>
+        private AudioReaderStateInfo ReaderState => this._readerState;
 
         /// <inheritdoc/>
         public IAudioPlayer Clone()
@@ -109,25 +85,34 @@
         /// <inheritdoc/>
         public Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken = default)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return Task.CompletedTask;
-            }
-
-            this.Stop();
             return Task.Factory.StartNew(async (state) =>
             {
-                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(this.ActiveCancellationToken, (CancellationToken)state))
+                if (((CancellationToken)state).IsCancellationRequested)
                 {
-                    var reader = this.GetAudioReader(file.Path);
-                    reader.Volume = file.Volume;
+                    return;
+                }
 
-                    using (await this._syncRoot.LockAsync(cts.Token))
+                this.Stop();
+
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(this.ActiveCancellationToken, (CancellationToken)state))
+                using (var reader = this.GetAudioReader(file.Path))
+                using (var readerState = new AudioReaderStateInfo(reader))
+                {
+                    try
                     {
-                        this.ActiveReader = reader;
-                    }
+                        reader.Volume = file.Volume;
+                        readerState.TimeChanged += this.TimeChanged;
 
-                    await this.PlayAsync(reader, cts.Token);
+                        var oldReaderState = Interlocked.Exchange(ref this._readerState, readerState);
+                        oldReaderState.TimeChanged -= this.TimeChanged;
+
+                        await this.PlayAsync(reader, readerState, cts.Token);
+                    }
+                    finally
+                    {
+                        Interlocked.CompareExchange(ref this._readerState, AudioReaderStateInfo.Default, readerState);
+                        readerState.TimeChanged -= this.TimeChanged;
+                    }
                 }
             },
             cancellationToken,
@@ -138,8 +123,9 @@
         /// Plays the specified <paramref name="reader"/> asynchronously.
         /// </summary>
         /// <param name="reader">The reader to play.</param>
+        /// <param name="readerState">The audio reader state information.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private async Task PlayAsync(IAudioFileReader reader, CancellationToken cancellationToken)
+        private async Task PlayAsync(IAudioFileReader reader, AudioReaderStateInfo readerState, CancellationToken cancellationToken)
         {
             try
             {
@@ -153,7 +139,6 @@
                         this.Logger.LogTrace($"Playing \"{reader.FileName}\" on \"{device.FriendlyName}\".");
 
                         // Registers the handlers responsible for stopping the player safely.
-                        cancellationToken.Register(state => ((WasapiOut)state)?.Stop(), player, useSynchronizationContext: true);
                         if (cancellationToken.IsCancellationRequested)
                         {
                             return;
@@ -172,21 +157,15 @@
                         // Initialise the player.
                         player.Init(reader);
                         player.PlaybackStopped += PlaybackStopped;
-                        this.WithActiveReader(reader, () => this.IsPlaying = true);
+                        readerState.IsPlaying = true;
 
                         do
                         {
-                            await this.PlayOnceAsync(reader, player, cancellationToken);
+                            await this.PlayOnceAsync(reader, readerState, player, cancellationToken);
                         } while (CanPlay());
 
-                        // Reset the reader when it is the active reader.
-                        this.WithActiveReader(reader, () =>
-                        {
-                            this.ActiveReader = null;
-                            this.IsPlaying = false;
-
-                            this.OnTimeChanged(PlaybackTimeEventArgs.Zero);
-                        });
+                        readerState.IsPlaying = false;
+                        readerState.Time = PlaybackTimeEventArgs.Zero;
 
                         await playbackStoppedTcs.Task;
                         player.PlaybackStopped -= PlaybackStopped;
@@ -211,9 +190,10 @@
         /// Plays the specified <paramref name="player"/> once, and awaits for playback to completely stop, asynchronously.
         /// </summary>
         /// <param name="reader">The reader.</param>
+        /// <param name="readerState">The audio reader state information.</param>
         /// <param name="player">The player.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private async Task PlayOnceAsync(IAudioFileReader reader, WasapiOut player, CancellationToken cancellationToken)
+        private async Task PlayOnceAsync(IAudioFileReader reader, AudioReaderStateInfo readerState, WasapiOut player, CancellationToken cancellationToken)
         {
             var playbackStoppedTcs = new TaskCompletionSource<bool>();
             player.PlaybackStopped += PlaybackStopped;
@@ -223,13 +203,15 @@
             player.Play();
 
             // Continually update the current time whilst the player is not stopped.
-            this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.Zero));
+            readerState.Time = PlaybackTimeEventArgs.Zero;
             while (player.PlaybackState != PlaybackState.Stopped && !cancellationToken.IsCancellationRequested)
             {
-                this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.FromReader(reader)));
+                readerState.Time = PlaybackTimeEventArgs.FromReader(reader);
                 Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
             }
 
+            // Important; this allows us to stop playback on the executing thread early in the event cancellation was requested.
+            player.Stop();
             await playbackStoppedTcs.Task;
 
             void PlaybackStopped(object sender, StoppedEventArgs e)
@@ -256,35 +238,6 @@
             }
 
             return new AudioFileReaderWrapper(file);
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:TimeChanged" /> event when the <paramref name="value"/> differs to <see cref="_time"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="PlaybackTimeEventArgs"/> instance containing the event data.</param>
-        private void OnTimeChanged(PlaybackTimeEventArgs value)
-        {
-            if (this._time?.Equals(value) != true)
-            {
-                this._time = value;
-                this.TimeChanged?.Invoke(this, value);
-            }
-        }
-
-        /// <summary>
-        /// Invokes the <paramref name="action"/> when the <paramref name="reader"/> is the <see cref="ActiveReader"/>.
-        /// </summary>
-        /// <param name="reader">The reader.</param>
-        /// <param name="action">The action.</param>
-        private void WithActiveReader(IAudioFileReader reader, Action action)
-        {
-            using (this._syncRoot.Lock())
-            {
-                if (this.ActiveReader?.Equals(reader) == true)
-                {
-                    action();
-                }
-            }
         }
     }
 }
