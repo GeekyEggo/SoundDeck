@@ -129,46 +129,28 @@
         {
             try
             {
-                var playbackStoppedTcs = new TaskCompletionSource<object>();
-
                 using (var device = this.Device.GetMMDevice())
                 using (var player = new WasapiOut(device, AudioClientShareMode.Shared, false, PLAYBACK_STATE_POLL_DELAY))
                 {
                     try
                     {
                         this.Logger.LogTrace($"Playing \"{reader.FileName}\" on \"{device.FriendlyName}\".");
-
-                        // Registers the handlers responsible for stopping the player safely.
                         if (cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
 
-                        bool CanPlay() => this.IsLooped && !cancellationToken.IsCancellationRequested;
-                        void PlaybackStopped(object sender, EventArgs e)
-                        {
-                            if (!CanPlay())
-                            {
-                                player.Dispose();
-                                playbackStoppedTcs.TrySetResult(true);
-                            }
-                        }
-
                         // Initialise the player.
                         player.Init(reader);
-                        player.PlaybackStopped += PlaybackStopped;
                         readerState.IsPlaying = true;
 
                         do
                         {
                             await this.PlayOnceAsync(reader, readerState, player, cancellationToken);
-                        } while (CanPlay());
+                        } while (this.IsLooped && !cancellationToken.IsCancellationRequested);
 
                         readerState.IsPlaying = false;
                         readerState.Time = PlaybackTimeEventArgs.Zero;
-
-                        await playbackStoppedTcs.Task;
-                        player.PlaybackStopped -= PlaybackStopped;
                     }
                     finally
                     {
