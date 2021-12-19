@@ -1,6 +1,6 @@
+![Image of the download count](https://img.shields.io/endpoint?url=https://streamdeck.api.moeritz.io/api/shields/downloads/com.geekyeggo.sounddeck)
 ![version-icon]
 [![beta-version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin)
-![Image of the download count](https://img.shields.io/endpoint?url=https://streamdeck.api.moeritz.io/api/shields/downloads/com.geekyeggo.sounddeck)
 [![Twitter icon](https://img.shields.io/badge/GeekyEggo--brightgreen?style=social&logo=twitter)](https://www.twitter.com/geekyeggo)
 
 # <img src="./assets/sound-deck.svg#gh-light-mode-only" width="25" alt="Sound Deck Logo" /><img src="./assets/dark-mode/sound-deck.svg#gh-dark-mode-only" width="25" alt="Sound Deck Logo" /> Sound Deck
