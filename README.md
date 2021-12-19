@@ -1,5 +1,5 @@
 ![Image of the download count](https://img.shields.io/endpoint?url=https://streamdeck.api.moeritz.io/api/shields/downloads/com.geekyeggo.sounddeck)
-[![version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin)
+[![version-icon]](https://github.com/GeekyEggo/SoundDeck)
 [![beta-version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin)
 [![Twitter icon](https://img.shields.io/badge/GeekyEggo--brightgreen?style=social&logo=twitter)](https://www.twitter.com/geekyeggo)
 
