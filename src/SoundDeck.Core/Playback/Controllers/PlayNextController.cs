@@ -1,5 +1,6 @@
 namespace SoundDeck.Core.Playback.Controllers
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -17,19 +18,15 @@ namespace SoundDeck.Core.Playback.Controllers
             this.PlaybackType = ContinuousPlaybackType.Single;
         }
 
-        /// <summary>
-        /// Gets the underlying action that determines how the player functions.
-        /// </summary>
+        /// <inheritdoc/>
         public override ControllerActionType Action { get; } = ControllerActionType.PlayNext;
 
-        /// <summary>
-        /// Applies the next action asynchronously.
-        /// </summary>
-        /// <returns>The task of running the action.</returns>
-        protected override Task ActionAsync()
+        /// <inheritdoc/>
+        protected override Task PlayAsync(CancellationToken cancellationToken)
         {
+            // Stopping sets the cancellation token to cancelled, so we must supply a new one.
             this.Stop();
-            return this.PlayAsync();
+            return base.PlayAsync(this.ActiveCancellationToken);
         }
     }
 }

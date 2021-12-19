@@ -1,9 +1,9 @@
 namespace SoundDeck.Core
 {
-    using SoundDeck.Core.Capture;
-    using SoundDeck.Core.Playback;
     using System;
     using System.Collections.Generic;
+    using SoundDeck.Core.Capture;
+    using SoundDeck.Core.Playback;
 
     /// <summary>
     /// Provides a service for interacting with local audio devices.
@@ -14,21 +14,6 @@ namespace SoundDeck.Core
         /// Gets the audio devices.
         /// </summary>
         IReadOnlyCollection<IAudioDevice> Devices { get; }
-
-        /// <summary>
-        /// Determines whether encoding to MP3 is possible based on the current environment.
-        /// </summary>
-        /// <returns><c>true</c> when encoding is possible; otherwise <c>false</c>.</returns>
-        bool CanEncodeToMP3();
-
-        /// <summary>
-        /// Creates a playlist controller with an audio player for the specified <paramref name="deviceKey"/>.
-        /// </summary>
-        /// <param name="deviceKey">The device key.</param>
-        /// <param name="action">The action type.</param>
-        /// <param name="playlist">The playlist.</param>
-        /// <returns>The playlist player.</returns>
-        IPlaylistController CreatePlaylistController(string deviceKey, ControllerActionType action);
 
         /// <summary>
         /// Gets an audio buffer for the specified device key.
@@ -57,6 +42,15 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device key.</param>
         /// <returns>The audio player.</returns>
         IAudioPlayer GetAudioPlayer(string deviceKey);
+
+        /// <summary>
+        /// Gets a playlist controller with an audio player for the specified <paramref name="deviceKey"/>.
+        /// </summary>
+        /// <param name="deviceKey">The device key.</param>
+        /// <param name="action">The action type.</param>
+        /// <param name="playlist">The playlist.</param>
+        /// <returns>The playlist player.</returns>
+        IPlaylistController GetPlaylistController(string deviceKey, ControllerActionType action);
 
         /// <summary>
         /// Stops all <see cref="IAudioPlayer"/> associated with this instance.

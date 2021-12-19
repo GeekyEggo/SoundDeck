@@ -1,49 +1,43 @@
-namespace SoundDeck.Core.Playback.Players
+﻿namespace SoundDeck.Core.Playback.Players
 {
     using System;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using NAudio.CoreAudioApi;
+    using NAudio.Wave;
+    using SoundDeck.Core.Playback.Readers;
 
     /// <summary>
     /// Provides an audio player for an audio device.
     /// </summary>
-    public class AudioPlayer : IAudioPlayer
+    public class AudioPlayer : Stopper, IAudioPlayer
     {
         /// <summary>
-        /// The synchronization root object.
+        /// The playback state polling delay, in milliseconds.
         /// </summary>
-        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+        private const int PLAYBACK_STATE_POLL_DELAY = 100;
 
         /// <summary>
-        /// Private member field for <see cref="Volume"/>.
+        /// Private member field for <see cref="ReaderState"/>.
         /// </summary>
-        private float _volume = 1;
+        private AudioReaderStateInfo _readerState = AudioReaderStateInfo.Default;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioPlayer"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        internal AudioPlayer(IAudioDevice device, ILogger<AudioPlayer> logger)
+        internal AudioPlayer(IAudioDevice device, ILogger<IAudioPlayer> logger)
         {
             this.Device = device;
             this.Logger = logger;
         }
 
         /// <summary>
-        /// Occurs when the audio player is disposed.
-        /// </summary>
-        public event EventHandler Disposed;
-
-        /// <summary>
         /// Occurs when the time of the current audio being played, changed.
         /// </summary>
         public event EventHandler<PlaybackTimeEventArgs> TimeChanged;
-
-        /// <summary>
-        /// Occurs when the volume of the audio player changes.
-        /// </summary>
-        public event EventHandler VolumeChanged;
 
         /// <summary>
         /// Gets or sets the audio device.
@@ -53,7 +47,7 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets the name of the file being played.
         /// </summary>
-        public string FileName { get; private set; }
+        public string FileName => this.ReaderState.FileName;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is looped.
@@ -63,146 +57,169 @@ namespace SoundDeck.Core.Playback.Players
         /// <summary>
         /// Gets a value indicating whether this instance is playing.
         /// </summary>
-        public bool IsPlaying { get; private set; } = false;
+        public bool IsPlaying => this.ReaderState.IsPlaying;
 
         /// <summary>
         /// Gets or sets the volume of the audio being played; this can be between 0 and 1.
         /// </summary>
         public float Volume
         {
-            get => this._volume;
-            set
-            {
-                if (this._volume != value)
-                {
-                    this._volume = value;
-                    this.VolumeChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
+            get => this.ReaderState.Volume;
+            set => this.ReaderState.Volume = value;
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is disposed.
-        /// </summary>
-        private bool IsDisposed { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the internal cancellation token source; this is used to cancel all audio on the player.
-        /// </summary>
-        private CancellationTokenSource InternalCancellationTokenSource { get; set; }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is in a playable state.
-        /// </summary>
-        private bool IsPlayableState => this.InternalCancellationTokenSource?.IsCancellationRequested == false && !this.IsDisposed;
 
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        private ILogger Logger { get; }
+        private ILogger<IAudioPlayer> Logger { get; }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Gets or sets the audio reader state information.
         /// </summary>
-        public void Dispose()
+        private AudioReaderStateInfo ReaderState => this._readerState;
+
+        /// <inheritdoc/>
+        public IAudioPlayer Clone()
+            => new AudioPlayer(this.Device, this.Logger);
+
+        /// <inheritdoc/>
+        public Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken = default)
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
+            return Task.Factory.StartNew(async (state) =>
+            {
+                if (((CancellationToken)state).IsCancellationRequested)
+                {
+                    return;
+                }
+
+                this.Stop();
+
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(this.ActiveCancellationToken, (CancellationToken)state))
+                using (var reader = this.GetAudioReader(file.Path))
+                using (var readerState = new AudioReaderStateInfo(reader))
+                {
+                    try
+                    {
+                        reader.Volume = file.Volume;
+                        readerState.TimeChanged += this.TimeChanged;
+
+                        var oldReaderState = Interlocked.Exchange(ref this._readerState, readerState);
+                        oldReaderState.TimeChanged -= this.TimeChanged;
+
+                        await this.PlayAsync(reader, readerState, cts.Token);
+                    }
+                    finally
+                    {
+                        Interlocked.CompareExchange(ref this._readerState, AudioReaderStateInfo.Default, readerState);
+                        readerState.TimeChanged -= this.TimeChanged;
+                    }
+                }
+            },
+            cancellationToken,
+            TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
-        /// Plays the audio file asynchronously.
+        /// Plays the specified <paramref name="reader"/> asynchronously.
         /// </summary>
-        /// <param name="file">The file to play.</param>
-        /// <returns>The task of the audio file being played.</returns>
-        public Task PlayAsync(AudioFileInfo file)
+        /// <param name="reader">The reader to play.</param>
+        /// <param name="readerState">The audio reader state information.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        private async Task PlayAsync(IAudioFileReader reader, AudioReaderStateInfo readerState, CancellationToken cancellationToken)
         {
-            if (this.IsDisposed)
+            try
             {
-                throw new ObjectDisposedException("The audio player has been disposed.");
+                using (var device = this.Device.GetMMDevice())
+                using (var player = new WasapiOut(device, AudioClientShareMode.Shared, false, PLAYBACK_STATE_POLL_DELAY))
+                {
+                    try
+                    {
+                        this.Logger.LogTrace($"Playing \"{reader.FileName}\" on \"{device.FriendlyName}\".");
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        // Initialise the player.
+                        player.Init(reader);
+                        readerState.IsPlaying = true;
+
+                        do
+                        {
+                            await this.PlayOnceAsync(reader, readerState, player, cancellationToken);
+                        } while (this.IsLooped && !cancellationToken.IsCancellationRequested);
+
+                        readerState.IsPlaying = false;
+                        readerState.Time = PlaybackTimeEventArgs.Zero;
+                    }
+                    finally
+                    {
+                        player.Stop();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                this.Logger.LogError(e, "Audio playback error.");
+            }
+            finally
+            {
+                reader.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Plays the specified <paramref name="player"/> once, and awaits for playback to completely stop, asynchronously.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="readerState">The audio reader state information.</param>
+        /// <param name="player">The player.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        private async Task PlayOnceAsync(IAudioFileReader reader, AudioReaderStateInfo readerState, WasapiOut player, CancellationToken cancellationToken)
+        {
+            var playbackStoppedTcs = new TaskCompletionSource<bool>();
+            player.PlaybackStopped += PlaybackStopped;
+
+            // Play the audio from the start.
+            reader.Seek(0, SeekOrigin.Begin);
+            player.Play();
+
+            // Continually update the current time whilst the player is not stopped.
+            readerState.Time = PlaybackTimeEventArgs.Zero;
+            while (player.PlaybackState != PlaybackState.Stopped && !cancellationToken.IsCancellationRequested)
+            {
+                readerState.Time = PlaybackTimeEventArgs.FromReader(reader);
+                Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
             }
 
-            return Task.Run(async () =>
+            // Important; this allows us to stop playback on the executing thread early in the event cancellation was requested.
+            player.Stop();
+            await playbackStoppedTcs.Task;
+
+            void PlaybackStopped(object sender, StoppedEventArgs e)
             {
-                try
-                {
-                    await this._syncRoot.WaitAsync();
-
-                    this.InternalCancellationTokenSource = new CancellationTokenSource();
-                    await this.InternalPlayAsync(file, this.InternalCancellationTokenSource.Token);
-                    this.InternalCancellationTokenSource = null;
-                }
-                finally
-                {
-                    this._syncRoot.Release();
-                }
-            });
-        }
-
-        /// <summary>
-        /// Stops any audio being played on this player.
-        /// </summary>
-        public void Stop()
-            => this.InternalCancellationTokenSource?.Cancel();
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool dispose)
-        {
-            this.InternalCancellationTokenSource?.Cancel();
-            if (dispose)
-            {
-                if (!this.IsDisposed)
-                {
-                    this.Disposed?.Invoke(this, EventArgs.Empty);
-                }
-
-                this.IsDisposed = true;
+                player.PlaybackStopped -= PlaybackStopped;
+                playbackStoppedTcs.TrySetResult(true);
             }
         }
 
         /// <summary>
-        /// Plays the audio file.
+        /// Gets the audio reader for the specified <paramref name="file"/>.
         /// </summary>
         /// <param name="file">The file.</param>
-        /// <param name="cancellationToken">The cancellation token responsible for stopping playback.</param>
-        /// <returns>The task of playing the audio file.</returns>
-        private async Task InternalPlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
+        /// <returns>The audio reader capable of reading the file.</returns>
+        private IAudioFileReader GetAudioReader(string file)
         {
-            this.FileName = file.Path;
-            this.Volume = file.Volume;
-
-            using (var device = this.Device.GetMMDevice())
-            using (var player = new AsyncWasapiOut(device, file.Path))
+            if (VorbisFileReader.CanReadFile(file))
             {
-                this.Logger.LogTrace($"Playing \"{file.Path}\" on \"{device.FriendlyName}\".");
-                void SynchronizeVolume(object sender, EventArgs e) => player.FileVolume = this.Volume;
-
-                // prepare the player
-                player.TimeChanged += this.TimeChanged;
-                this.VolumeChanged += SynchronizeVolume;
-
-                player.Init();
-                SynchronizeVolume(this, EventArgs.Empty);
-
-                do
-                {
-                    this.IsPlaying = true;
-
-                    cancellationToken.Register(() => this.IsPlaying = false);
-                    await player.PlayAsync(cancellationToken);
-
-                    this.IsPlaying = false;
-
-                } while (this.IsLooped && this.IsPlayableState);
-
-                this.TimeChanged?.Invoke(this, new PlaybackTimeEventArgs(TimeSpan.Zero, TimeSpan.Zero));
-                this.VolumeChanged -= SynchronizeVolume;
+                return new VorbisFileReader(file);
+            }
+            else if (StreamDeckAudioPlayer.CanReadFile(file))
+            {
+                return new StreamDeckAudioPlayer(file);
             }
 
-            this.FileName = string.Empty;
+            return new AudioFileReaderWrapper(file);
         }
     }
 }

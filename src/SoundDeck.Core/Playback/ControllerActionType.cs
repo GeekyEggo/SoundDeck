@@ -33,6 +33,11 @@ namespace SoundDeck.Core.Playback
         /// <summary>
         /// Continues to the play the playlist from the next clip, until stopped or the end of the playlist is reached.
         /// </summary>
-        PlayAllStop = 5
+        PlayAllStop = 5,
+
+        /// <summary>
+        /// Plays the next audio clip, with no regard for the current audio clip... absolute chaos.
+        /// </summary>
+        PlayOverlap = 6
     }
 }

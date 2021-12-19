@@ -7,7 +7,7 @@ namespace SoundDeck.Core.Playback
     /// <summary>
     /// Provides information and methods for a playlist controller.
     /// </summary>
-    public interface IPlaylistController : IIndexedAudioPlayer, IDisposable
+    public interface IPlaylistController : IIndexedAudioPlayer, IDisposable, IStopper
     {
         /// <summary>
         /// Gets the type of the action that occurs upon the button being pressed.

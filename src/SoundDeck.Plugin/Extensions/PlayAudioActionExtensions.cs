@@ -29,7 +29,7 @@ namespace SoundDeck.Plugin.Extensions
                 action.PlaylistController?.Dispose();
 
                 // Create the new controller, and assign its playlist
-                action.PlaylistController = action.AudioService.CreatePlaylistController(settings.PlaybackAudioDeviceId, settings.Action);
+                action.PlaylistController = action.AudioService.GetPlaylistController(settings.PlaybackAudioDeviceId, settings.Action);
                 action.PlaylistController.Playlist = playlist;
 
                 action.AddTimeChangedHandler();

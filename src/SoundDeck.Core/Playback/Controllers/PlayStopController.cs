@@ -1,5 +1,6 @@
 namespace SoundDeck.Core.Playback.Controllers
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -20,16 +21,11 @@ namespace SoundDeck.Core.Playback.Controllers
             this.PlaybackType = playbackType;
         }
 
-        /// <summary>
-        /// Gets the underlying action that determines how the player functions.
-        /// </summary>
+        /// <inheritdoc/>
         public override ControllerActionType Action { get; }
 
-        /// <summary>
-        /// Applies the next action asynchronously.
-        /// </summary>
-        /// <returns>The task of running the action.</returns>
-        protected override Task ActionAsync()
+        /// <inheritdoc/>
+        protected override Task PlayAsync(CancellationToken cancellationToken)
         {
             if (this.AudioPlayer.IsPlaying)
             {
@@ -37,7 +33,7 @@ namespace SoundDeck.Core.Playback.Controllers
                 return Task.CompletedTask;
             }
 
-            return this.PlayAsync();
+            return base.PlayAsync(cancellationToken);
         }
     }
 }

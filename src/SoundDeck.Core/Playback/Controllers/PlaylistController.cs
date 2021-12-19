@@ -8,7 +8,7 @@ namespace SoundDeck.Core.Playback.Controllers
     /// <summary>
     /// Provides a base class for controlling a <see cref="IPlaylist"/> through an audio player.
     /// </summary>
-    public abstract class PlaylistController : IPlaylistController
+    public abstract class PlaylistController : Stopper, IPlaylistController
     {
         /// <summary>
         /// The synchronization root object.
@@ -109,25 +109,6 @@ namespace SoundDeck.Core.Playback.Controllers
         }
 
         /// <summary>
-        /// Gets or sets the internal cancellation token source; this is used to cancel all audio on the player.
-        /// </summary>
-        private CancellationTokenSource AudioPlayerCancellationTokenSource { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is disposed.
-        /// </summary>
-        private bool IsDisposed { get; set; }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Moves to the next item within the playlist, and plays it asynchronously; this may stop audio depending on the type of player.
         /// </summary>
         /// <returns>The task of playing the item.</returns>
@@ -138,7 +119,7 @@ namespace SoundDeck.Core.Playback.Controllers
                 return Task.CompletedTask;
             }
 
-            return this.ActionAsync();
+            return this.PlayAsync(this.ActiveCancellationToken);
         }
 
         /// <summary>
@@ -147,65 +128,27 @@ namespace SoundDeck.Core.Playback.Controllers
         public void Reset()
             => this.Enumerator?.Reset();
 
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="dispose"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool dispose)
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
         {
-            this.AudioPlayerCancellationTokenSource?.Cancel();
-
-            if (dispose)
+            base.Dispose(disposing);
+            if (disposing)
             {
-                if (!this.IsDisposed)
-                {
-                    this.AudioPlayer?.Dispose();
-                    this.AudioPlayer = null;
-                }
-
-                this.IsDisposed = true;
+                this.AudioPlayer?.Dispose();
+                this.AudioPlayer = null;
             }
         }
-
-        /// <summary>
-        /// Stops any audio being played on this player.
-        /// </summary>
-        public void Stop()
-        {
-            this.AudioPlayerCancellationTokenSource?.Cancel();
-
-            try
-            {
-                this._syncRoot.Wait();
-                this.AudioPlayerCancellationTokenSource = null;
-            }
-            finally
-            {
-                this._syncRoot.Release();
-            }
-        }
-
-        /// <summary>
-        /// Applies the next action asynchronously.
-        /// </summary>
-        /// <returns>The task of running the action.</returns>
-        protected abstract Task ActionAsync();
 
         /// <summary>
         /// Continues playing asynchronously.
         /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task of playing.</returns>
-        protected virtual async Task PlayAsync()
+        protected virtual async Task PlayAsync(CancellationToken cancellationToken)
         {
             try
             {
-                this._syncRoot.Wait();
-
-                if (this.AudioPlayerCancellationTokenSource == null)
-                {
-                    this.AudioPlayerCancellationTokenSource = new CancellationTokenSource();
-                    this.AudioPlayerCancellationTokenSource.Token.Register(() => this.AudioPlayer.Stop());
-                }
+                await this._syncRoot.WaitAsync();
 
                 do
                 {
@@ -214,26 +157,29 @@ namespace SoundDeck.Core.Playback.Controllers
                         break;
                     }
 
-                    await this.AudioPlayer.PlayAsync(current);
+                    await this.PlayAsync(current, cancellationToken);
                 }
-                while (this.CanContinuePlaying(this.Enumerator, this.AudioPlayerCancellationTokenSource.Token));
+                while (CanContinuePlaying(this.Enumerator));
             }
             finally
             {
                 this._syncRoot.Release();
             }
+
+            bool CanContinuePlaying(IPlaylistEnumerator enumerator)
+            {
+                return !cancellationToken.IsCancellationRequested
+                    && (this.PlaybackType == ContinuousPlaybackType.ContiunousLoop || (this.PlaybackType == ContinuousPlaybackType.Continuous && !enumerator.IsLast));
+            }
         }
 
         /// <summary>
-        /// Determines when playback can continue based on the state of this instance, the <see cref="Playlist"/> and the <paramref name="cancellationToken"/>.
+        /// Plays the specified <paramref name="file"/>.
         /// </summary>
-        /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns><c>true</c> when playback can continue; otherwise <c>false</c>.</returns>
-        private bool CanContinuePlaying(IPlaylistEnumerator enumerator, CancellationToken cancellationToken)
-        {
-            return !cancellationToken.IsCancellationRequested
-                && (this.PlaybackType == ContinuousPlaybackType.ContiunousLoop || (this.PlaybackType == ContinuousPlaybackType.Continuous && !enumerator.IsLast));
-        }
+        /// <param name="file">The audio file information to play.</param>
+        /// <param name="cancellationToken">The cancellation token responsible for stopping playback.</param>
+        protected virtual Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
+            => this.AudioPlayer.PlayAsync(file, cancellationToken);
 
         /// <summary>
         /// Sets the <see cref="Enumerator"/> based on the <see cref="Order"/>.

@@ -3,8 +3,6 @@ namespace SoundDeck.Core
     using System;
     using System.Collections.Generic;
     using Microsoft.Extensions.Logging;
-    using NAudio.MediaFoundation;
-    using NAudio.Wave;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Capture.Sharing;
     using SoundDeck.Core.Playback;
@@ -33,9 +31,9 @@ namespace SoundDeck.Core
         public IReadOnlyCollection<IAudioDevice> Devices => AudioDevices.Current;
 
         /// <summary>
-        /// Gets or sets the players.
+        /// Gets the playback manager.
         /// </summary>
-        private AudioPlayerCollection Players { get; } = new AudioPlayerCollection();
+        private AudioPlaybackManager Playback { get; } = new AudioPlaybackManager();
 
         /// <summary>
         /// Sets the logger factory.
@@ -47,18 +45,65 @@ namespace SoundDeck.Core
         /// </summary>
         private SharedAudioBufferManager SharedAudioBufferManager { get; }
 
-        /// <summary>
-        /// Determines whether encoding to MP3 is possible based on the current environment.
-        /// </summary>
-        /// <returns><c>true</c> when encoding is possible; otherwise <c>false</c>.</returns>
-        public bool CanEncodeToMP3()
-            => MediaFoundationEncoder.SelectMediaType(AudioSubtypes.MFAudioFormat_MP3, Constants.DefaultWaveFormat, Constants.DesiredBitRate) != null;
+        /// <inheritdoc/>
+        public IAudioPlayer GetAudioPlayer(string deviceKey)
+        {
+            var player = this.CreateAudioPlayer(deviceKey);
+
+            this.Playback.Add(player);
+            return player;
+        }
 
         /// <inheritdoc/>
-        public IPlaylistController CreatePlaylistController(string deviceKey, ControllerActionType action)
-        {
-            var audioPlayer = this.GetAudioPlayer(deviceKey);
+        public IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan clipDuration)
+            => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceKey, clipDuration);
 
+        /// <inheritdoc/>
+        public IEnumerable<IAudioBuffer> GetAudioBuffers()
+            => this.SharedAudioBufferManager.GetAudioBuffers();
+
+        /// <inheritdoc/>
+        public IAudioRecorder GetAudioRecorder(string deviceKey)
+        {
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            return new AudioRecorder(device, this.LoggerFactory.CreateLogger<AudioRecorder>());
+        }
+
+        /// <inheritdoc/>
+        public IPlaylistController GetPlaylistController(string deviceKey, ControllerActionType action)
+        {
+            var playlist = this.CreatePlaylistController(this.CreateAudioPlayer(deviceKey), action);
+
+            this.Playback.Add(playlist);
+            return playlist;
+        }
+
+        /// <summary>
+        /// Stops all <see cref="IAudioPlayer"/> associated with this instance.
+        /// </summary>
+        public void StopAll()
+            => this.Playback.StopAll();
+
+        /// <summary>
+        /// Creates a new audio player for the specified <paramref name="deviceKey" />.
+        /// </summary>
+        /// <param name="deviceKey">The audio device key.</param>
+        /// <returns>The audio player.</returns>
+        private IAudioPlayer CreateAudioPlayer(string deviceKey)
+        {
+            return new AudioPlayer(
+                AudioDevices.Current.GetDeviceByKey(deviceKey),
+                this.LoggerFactory.CreateLogger<IAudioPlayer>());
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="IPlaylistController"/>.
+        /// </summary>
+        /// <param name="audioPlayer">The audio player.</param>
+        /// <param name="action">The action of the controller.</param>
+        /// <returns>The playlist controller.</returns>
+        private IPlaylistController CreatePlaylistController(IAudioPlayer audioPlayer, ControllerActionType action)
+        {
             switch (action)
             {
                 case ControllerActionType.LoopStop:
@@ -78,41 +123,12 @@ namespace SoundDeck.Core
 
                 case ControllerActionType.PlayAllStop:
                     return new PlayStopController(audioPlayer, action, ContinuousPlaybackType.Continuous);
+
+                case ControllerActionType.PlayOverlap:
+                    return new PlayOverlapController(audioPlayer);
             }
 
             throw new NotSupportedException($"The provided playlist player action is not supported: {action}");
         }
-
-        /// <inheritdoc/>
-        public IAudioBuffer GetAudioBuffer(string deviceKey, TimeSpan clipDuration)
-            => this.SharedAudioBufferManager.GetOrAddAudioBuffer(deviceKey, clipDuration);
-
-        /// <inheritdoc/>
-        public IEnumerable<IAudioBuffer> GetAudioBuffers()
-            => this.SharedAudioBufferManager.GetAudioBuffers();
-
-        /// <inheritdoc/>
-        public IAudioRecorder GetAudioRecorder(string deviceKey)
-        {
-            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
-            return new AudioRecorder(device, this.LoggerFactory.CreateLogger<AudioRecorder>());
-        }
-
-        /// <inheritdoc/>
-        public IAudioPlayer GetAudioPlayer(string deviceKey)
-        {
-            var player = new AudioPlayer(
-                AudioDevices.Current.GetDeviceByKey(deviceKey),
-                this.LoggerFactory.CreateLogger<AudioPlayer>());
-
-            this.Players.Add(player);
-            return player;
-        }
-
-        /// <summary>
-        /// Stops all <see cref="IAudioPlayer"/> associated with this instance.
-        /// </summary>
-        public void StopAll()
-            => this.Players.StopAll();
     }
 }

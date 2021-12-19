@@ -1,18 +1,14 @@
 namespace SoundDeck.Core.Playback
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
     /// Provides an audio player for an audio device.
     /// </summary>
-    public interface IAudioPlayer : IDisposable
+    public interface IAudioPlayer : IStopper, IDisposable
     {
-        /// <summary>
-        /// Occurs when the audio player is disposed.
-        /// </summary>
-        event EventHandler Disposed;
-
         /// <summary>
         /// Occurs when the time of the current audio being played, changed.
         /// </summary>
@@ -44,15 +40,16 @@ namespace SoundDeck.Core.Playback
         float Volume { get; set; }
 
         /// <summary>
+        /// Shallow clones this instance.
+        /// </summary>
+        IAudioPlayer Clone();
+
+        /// <summary>
         /// Plays the audio file asynchronously.
         /// </summary>
         /// <param name="file">The file to play.</param>
+        /// <param name="cancellationToken">The optional cancellation token.</param>
         /// <returns>The task of the audio file being played.</returns>
-        Task PlayAsync(AudioFileInfo file);
-
-        /// <summary>
-        /// Stops any audio being played on this player.
-        /// </summary>
-        void Stop();
+        Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken = default);
     }
 }
