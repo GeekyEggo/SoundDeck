@@ -167,11 +167,17 @@ namespace SoundDeck.Core.Playback.Controllers
 
                     await this.PlayAsync(current, cancellationToken);
                 }
-                while (this.CanContinuePlaying(this.Enumerator, cancellationToken));
+                while (CanContinuePlaying(this.Enumerator));
             }
             finally
             {
                 this._syncRoot.Release();
+            }
+
+            bool CanContinuePlaying(IPlaylistEnumerator enumerator)
+            {
+                return !cancellationToken.IsCancellationRequested
+                    && (this.PlaybackType == ContinuousPlaybackType.ContiunousLoop || (this.PlaybackType == ContinuousPlaybackType.Continuous && !enumerator.IsLast));
             }
         }
 
@@ -182,17 +188,6 @@ namespace SoundDeck.Core.Playback.Controllers
         /// <param name="cancellationToken">The cancellation token responsible for stopping playback.</param>
         protected virtual Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken)
             => this.AudioPlayer.PlayAsync(file, cancellationToken);
-
-        /// <summary>
-        /// Determines when playback can continue based on the state of this instance, the <see cref="Playlist"/> and the <paramref name="cancellationToken"/>.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns><c>true</c> when playback can continue; otherwise <c>false</c>.</returns>
-        private bool CanContinuePlaying(IPlaylistEnumerator enumerator, CancellationToken cancellationToken)
-        {
-            return !cancellationToken.IsCancellationRequested
-                && (this.PlaybackType == ContinuousPlaybackType.ContiunousLoop || (this.PlaybackType == ContinuousPlaybackType.Continuous && !enumerator.IsLast));
-        }
 
         /// <summary>
         /// Sets the <see cref="Enumerator"/> based on the <see cref="Order"/>.

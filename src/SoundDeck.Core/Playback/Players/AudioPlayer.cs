@@ -107,26 +107,31 @@
             => new AudioPlayer(this.Device, this.Logger);
 
         /// <inheritdoc/>
-        public async Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken = default)
+        public Task PlayAsync(AudioFileInfo file, CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             this.Stop();
-            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(this.ActiveCancellationToken, cancellationToken))
+            return Task.Factory.StartNew(async (state) =>
             {
-                var reader = this.GetAudioReader(file.Path);
-                reader.Volume = file.Volume;
-
-                using (this._syncRoot.Lock())
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(this.ActiveCancellationToken, (CancellationToken)state))
                 {
-                    this.ActiveReader = reader;
-                }
+                    var reader = this.GetAudioReader(file.Path);
+                    reader.Volume = file.Volume;
 
-                await Task.Factory.StartNew(() => this.PlayAsync(reader, cts.Token), TaskCreationOptions.RunContinuationsAsynchronously);
-            }
+                    using (await this._syncRoot.LockAsync(cts.Token))
+                    {
+                        this.ActiveReader = reader;
+                    }
+
+                    await this.PlayAsync(reader, cts.Token);
+                }
+            },
+            cancellationToken,
+            TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
@@ -171,16 +176,7 @@
 
                         do
                         {
-                            // Play the audio from the start.
-                            reader.Seek(0, SeekOrigin.Begin);
-                            player.Play();
-
-                            this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.Zero));
-                            while (player.PlaybackState != PlaybackState.Stopped && !cancellationToken.IsCancellationRequested)
-                            {
-                                this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.FromReader(reader)));
-                                Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
-                            }
+                            await this.PlayOnceAsync(reader, player, cancellationToken);
                         } while (CanPlay());
 
                         // Reset the reader when it is the active reader.
@@ -208,6 +204,38 @@
             finally
             {
                 reader.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Plays the specified <paramref name="player"/> once, and awaits for playback to completely stop, asynchronously.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="player">The player.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        private async Task PlayOnceAsync(IAudioFileReader reader, WasapiOut player, CancellationToken cancellationToken)
+        {
+            var playbackStoppedTcs = new TaskCompletionSource<bool>();
+            player.PlaybackStopped += PlaybackStopped;
+
+            // Play the audio from the start.
+            reader.Seek(0, SeekOrigin.Begin);
+            player.Play();
+
+            // Continually update the current time whilst the player is not stopped.
+            this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.Zero));
+            while (player.PlaybackState != PlaybackState.Stopped && !cancellationToken.IsCancellationRequested)
+            {
+                this.WithActiveReader(reader, () => this.OnTimeChanged(PlaybackTimeEventArgs.FromReader(reader)));
+                Thread.Sleep(PLAYBACK_STATE_POLL_DELAY);
+            }
+
+            await playbackStoppedTcs.Task;
+
+            void PlaybackStopped(object sender, StoppedEventArgs e)
+            {
+                player.PlaybackStopped -= PlaybackStopped;
+                playbackStoppedTcs.TrySetResult(true);
             }
         }
 
