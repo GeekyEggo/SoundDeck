@@ -3,7 +3,7 @@
     "Author": "GeekyEggo",
     "Description": "Take control of your audio! Quickly change the audio device of applications, create samples, clip or record audio from any device, play audio files (with advanced playlists), and more.",
     "Name": "Sound Deck",
-    "Version": "3.2.0",
+    "Version": "3.3.0",
     "SDKVersion": 2,
     "Category": "Sound Deck",
     "CategoryIcon": "Images/SoundDeck/Category",
@@ -79,6 +79,17 @@
             "VisibleInActionsList": true,
             "States": [
                 { "Image": "Images/SetAppAudioDevice/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/SessionMultimediaControls/Action",
+            "Name": "Multimedia Controls (App)",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Control the multimedia of a specific application.",
+            "UUID": "com.geekyeggo.sounddeck.sessionmultimediacontrols",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/SessionMultimediaControls/Key" }
             ]
         },
         {
