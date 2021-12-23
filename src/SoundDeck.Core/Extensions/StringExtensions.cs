@@ -8,6 +8,19 @@ namespace SoundDeck.Core.Extensions
     public static class StringExtensions
     {
         /// <summary>
+        /// Returns a value indicating whether a specified substring occurs within this string.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="value">The string to seek.</param>
+        /// <param name="stringComparison">The string comparison to be applied when matching.</param>
+        /// <returns><c>true</c> when this instance contains <see cref="value"/>.</returns>
+        public static bool Contains(this string source, string value, StringComparison stringComparison)
+        {
+            return value != null
+                && source?.IndexOf(value, stringComparison) >= 0;
+        }
+
+        /// <summary>
         /// Trims <paramref name="value"/> from the end of this instance; matching is based on <paramref name="stringComparison"/>.
         /// </summary>
         /// <param name="source">The source; this instance.</param>

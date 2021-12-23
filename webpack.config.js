@@ -83,6 +83,9 @@ module.exports = (env, _) => {
                     }
                 }
             }
+        },
+        watchOptions: {
+            ignored: ['**/node_modules'],
         }
     };
 

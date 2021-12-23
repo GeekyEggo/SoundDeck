@@ -1,12 +1,17 @@
 import React from "react";
+import AppMultimediaControlsSettings from "./appMultimediaControlsSettings";
 import CaptureAudioSettings from "./captureAudioSettings";
 import PlayAudioSettings from "./playAudioSettings";
 import SamplerSettings from "./samplerSettings";
 import SetAppAudioDeviceSettings from "./setAppAudioDeviceSettings"
+import SetAppVolumeSettings from "./setAppVolumeSettings"
 
 class App extends React.Component {
     render() {
         switch (this.props.uuid) {
+            case "com.geekyeggo.sounddeck.appmultimediacontrols":
+                return <AppMultimediaControlsSettings />;
+
             case "com.geekyeggo.sounddeck.clipaudio":
                 return <CaptureAudioSettings showDuration={true} />;
 
@@ -20,10 +25,13 @@ class App extends React.Component {
                 return <SamplerSettings />;
 
             case "com.geekyeggo.sounddeck.setappaudiodevice":
-                return <SetAppAudioDeviceSettings />
+                return <SetAppAudioDeviceSettings />;
+
+            case "com.geekyeggo.sounddeck.setappvolume":
+                return <SetAppVolumeSettings />;
 
             default:
-                return <div />
+                return <div />;
         }
     }
 }
