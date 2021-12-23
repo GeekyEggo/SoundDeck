@@ -1,4 +1,4 @@
-namespace SoundDeck.Plugin.Models.Settings
+﻿namespace SoundDeck.Core.Sessions
 {
     /// <summary>
     /// Defines an enumeration of ways a process can be selected.

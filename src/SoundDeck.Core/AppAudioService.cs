@@ -2,19 +2,32 @@ namespace SoundDeck.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
     using SoundDeck.Core.Interop.Helpers;
+    using SoundDeck.Core.Sessions;
+    using Windows.Media.Control;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
     /// </summary>
     public class AppAudioService : IAppAudioService
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// The session manager.
+        /// </summary>
+        private GlobalSystemMediaTransportControlsSessionManager _manager = null;
+
         /// <summary>
         /// The device interface string represents audio playback.
         /// </summary>
@@ -53,13 +66,11 @@ namespace SoundDeck.Core
         private IAudioPolicyConfigFactory AudioPolicyConfig { get; }
 
         /// <inheritdoc/>
-        public string GetDefaultAudioDevice(uint processId, AudioFlowType flow)
+        public string GetDefaultAudioDevice(uint processId, DataFlow flow)
         {
             try
             {
-                var dataFlow = this.GetDataFlow(flow);
-                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, dataFlow, Role.Multimedia | Role.Console, out var deviceId);
-
+                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, flow, Role.Multimedia | Role.Console, out var deviceId);
                 return this.ParseDeviceId(deviceId);
             }
             catch
@@ -69,82 +80,95 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceKey)
+        public void SetDefaultAudioDevice(IProcessSelectionCriteria criteria, string deviceKey)
         {
-            var processName = Process.GetProcessById((int)processId).ProcessName;
-            this.SetDefaultAudioDevice(processName, flow, deviceKey);
-        }
+            var dataFlow = this.GetDataFlow(deviceKey);
+            var predicate = criteria.ToPredicate();
 
-        //// <inheritdoc/>
-        public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceKey)
-        {
-            var dataFlow = this.GetDataFlow(flow);
-            if (this.TryGetAudioSessionProcessId(processName, dataFlow, out var audioSessionProcessId))
+            foreach (var audioSession in this.GetAudioSessions().Where(predicate.IsMatch))
             {
                 // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
                 var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
                 if (device.IsReadOnly)
                 {
-                    var persistDeviceId = this.GenerateDeviceId(device.Id);
+                    var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
                     Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
                 }
 
                 // Set the audio device for the process.
-                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                var audioSessionProcessId = audioSession.GetProcessID;
                 this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Communications, hstring);
             }
         }
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey)
+        public void SetVolume(IProcessSelectionCriteria criteria, VolumeAction action, int value)
         {
-            var hwnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(hwnd, out var pid);
-
-            this.SetDefaultAudioDevice(pid, flow, deviceKey);
-        }
-
-        /// <summary>
-        /// Tries the get audio session process identifier.
-        /// </summary>
-        /// <param name="processName">Name of the process.</param>
-        /// <param name="flow">The flow.</param>
-        /// <param name="audioSessionProcessId">The audio session process identifier.</param>
-        /// <returns><c>true</c> when the audio session was retrieved for the <paramref name="processName"/>; otherwise <c>false</c>.</returns>
-        private bool TryGetAudioSessionProcessId(string processName, DataFlow flow, out uint audioSessionProcessId)
-        {
-            const string DEFAULT_PROCESS_EXTENSION = ".exe";
-            foreach (var audioSession in this.GetAudioSessions(flow))
+            var predicate = criteria.ToPredicate();
+            foreach (var audioSession in this.GetAudioSessions().Where(predicate.IsMatch))
             {
-                audioSessionProcessId = audioSession.GetProcessID;
-
-                // Ensure both the process name we're looking for, and the audio session process name, don't end with ".exe".
-                var audioSessionProcessName = Process.GetProcessById((int)audioSessionProcessId).ProcessName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
-                processName = processName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
-
-                // When there is a case insensitive match, we're good!
-                if (audioSessionProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                switch (action)
                 {
-                    return true;
+                    case VolumeAction.Mute:
+                        audioSession.SimpleAudioVolume.Mute = true;
+                        break;
+
+                    case VolumeAction.Unmute:
+                        audioSession.SimpleAudioVolume.Mute = false;
+                        break;
+
+                    case VolumeAction.ToggleMute:
+                        audioSession.SimpleAudioVolume.Mute = !audioSession.SimpleAudioVolume.Mute;
+                        break;
+
+                    case VolumeAction.Set:
+                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, Math.Min(1f, value / 100f));
+                        break;
+
+                    case VolumeAction.IncreaseBy:
+                        audioSession.SimpleAudioVolume.Volume = Math.Min(1f, audioSession.SimpleAudioVolume.Volume + (value / 100f));
+                        break;
+
+                    case VolumeAction.DecreaseBy:
+                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, audioSession.SimpleAudioVolume.Volume - (value / 100f));
+                        break;
                 }
             }
+        }
 
-            audioSessionProcessId = 0;
-            return false;
+        /// <inheritdoc/>
+        public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
+        {
+            var manager = await this.GetManagerAsync();
+            var predicate = criteria.ToPredicate();
+
+            foreach (var session in manager.GetSessions().Where(predicate.IsMatch))
+            {
+                await (action switch
+                {
+                    MultimediaAction.Play => session.TryPlayAsync(),
+                    MultimediaAction.Pause => session.TryPauseAsync(),
+                    MultimediaAction.Stop => session.TryStopAsync(),
+                    MultimediaAction.SkipPrevious => session.TrySkipPreviousAsync(),
+                    MultimediaAction.SkipNext => session.TrySkipNextAsync(),
+                    _ => session.TryTogglePlayPauseAsync()
+                });
+            }
         }
 
         /// <summary>
         /// Gets the all active audio sessions audio sessions.
         /// </summary>
-        /// <param name="flow">The audio data flow.</param>
         /// <returns>The active audio sessions.</returns>
-        private IEnumerable<AudioSessionControl> GetAudioSessions(DataFlow flow)
+        private IEnumerable<AudioSessionControl> GetAudioSessions()
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var sessions = deviceEnumerator
-                    .EnumerateAudioEndPoints(flow, DeviceState.Active)
+                    .EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active)
                     .Select(d => d.AudioSessionManager.Sessions);
 
                 foreach (var session in sessions)
@@ -158,12 +182,20 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
-        /// Gets the data flow from the specified <see cref="AudioFlowType"/>.
+        /// Gets the data flow from the specified <paramref name="deviceKey"/>.
         /// </summary>
-        /// <param name="flow">The flow.</param>
+        /// <param name="deviceKey">The audio device key.</param>
         /// <returns>The interop data flow.</returns>
-        private DataFlow GetDataFlow(AudioFlowType flow)
-            => flow == AudioFlowType.Playback ? DataFlow.Render : DataFlow.Capture;
+        private DataFlow GetDataFlow(string deviceKey)
+        {
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            if (device == null)
+            {
+                throw new KeyNotFoundException($"Unable to find audio device with key {deviceKey}.");
+            }
+
+            return device.Flow;
+        }
 
         /// <summary>
         /// Generates the device identifier that can be used to set the persisted default audio endpoint for a process.
@@ -171,7 +203,7 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <param name="flow">The flow.</param>
         /// <returns>The device identifier.</returns>
-        private string GenerateDeviceId(string deviceId, DataFlow flow = DataFlow.Render)
+        private string GenerateDeviceId(string deviceId, DataFlow flow)
             => $"{MMDEVAPI_TOKEN}{deviceId}{(flow == DataFlow.Render ? DEVINTERFACE_AUDIO_RENDER : DEVINTERFACE_AUDIO_CAPTURE)}";
 
         /// <summary>
@@ -186,6 +218,33 @@ namespace SoundDeck.Core
             if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
 
             return deviceId;
+        }
+
+        /// <summary>
+        /// Gets the session manager asynchronously.
+        /// </summary>
+        /// <returns>The session manager.</returns>
+        private async Task<GlobalSystemMediaTransportControlsSessionManager> GetManagerAsync()
+        {
+            try
+            {
+                await _syncRoot.WaitAsync();
+
+                if (this._manager == null)
+                {
+                    this._manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+                    if (this._manager == null)
+                    {
+                        throw new NullReferenceException("Failed to get session manager.");
+                    }
+                }
+
+                return this._manager;
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
     }
 }

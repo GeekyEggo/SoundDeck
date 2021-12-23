@@ -1,6 +1,8 @@
 namespace SoundDeck.Core
 {
-    using SoundDeck.Core.Interop;
+    using System.Threading.Tasks;
+    using NAudio.CoreAudioApi;
+    using SoundDeck.Core.Sessions;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
@@ -13,29 +15,30 @@ namespace SoundDeck.Core
         /// <param name="processId">The process identifier.</param>
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <returns>The audio device; otherwise <c>null</c>.</returns>
-        string GetDefaultAudioDevice(uint processId, AudioFlowType flow);
+        string GetDefaultAudioDevice(uint processId, DataFlow flow);
 
         /// <summary>
-        /// Sets the default audio device for the specified process.
+        /// Sets the default audio device of an application that matches the specified <paramref name="criteria"/>.
         /// </summary>
-        /// <param name="processId">The process identifier.</param>
+        /// <param name="criteria">The process selection criteria that determines which process to update.</param>
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceKey);
+        void SetDefaultAudioDevice(IProcessSelectionCriteria criteria, string deviceKey);
 
         /// <summary>
-        /// Sets the default audio device for the specified process.
+        /// Sets the volume of an application that matches the specified <paramref name="criteria"/>.
         /// </summary>
-        /// <param name="processName">The process name.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceKey);
+        /// <param name="criteria">The criteria.</param>
+        /// <param name="action">The action.</param>
+        /// <param name="value">The value.</param>
+        void SetVolume(IProcessSelectionCriteria criteria, VolumeAction action, int value);
 
         /// <summary>
-        /// Sets the default audio device for the foreground application.
+        /// Attempts to control a session that matches the specified <paramref name="criteria"/>.
         /// </summary>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey);
+        /// <param name="criteria">The process selection criteria that determines which process to update.</param>
+        /// <param name="action">The multimedia action to apply.</param>
+        /// <returns>The task of controlling the multimedia.</returns>
+        Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action);
     }
 }
