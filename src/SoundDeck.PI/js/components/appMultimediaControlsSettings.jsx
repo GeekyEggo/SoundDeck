@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import { PropertyInspectorWrapper, Select, store, TextField } from "react-sharpdeck";
 
-class SessionMultimediaControlsSettings extends React.Component {
+class AppMultimediaControlsSettings extends React.Component {
     constructor(props) {
         super(props);
 
@@ -16,11 +16,11 @@ class SessionMultimediaControlsSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <TextField label="Name" valuePath="searchCriteria" />
+                <TextField label="Process" valuePath="processName" />
                 <Select label="Action" options={this.multimediaAction} valuePath="action" />
             </PropertyInspectorWrapper>
         );
     }
 }
 
-export default SessionMultimediaControlsSettings;
+export default AppMultimediaControlsSettings;

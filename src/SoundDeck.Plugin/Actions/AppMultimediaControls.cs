@@ -9,23 +9,23 @@
     /// <summary>
     /// Provides an action that is capable of controlling media for a specific app.
     /// </summary>
-    [StreamDeckAction("com.geekyeggo.sounddeck.sessionmultimediacontrols")]
-    public class SessionMultimediaControls : StreamDeckAction<SessionMultimediaControlsSettings>
+    [StreamDeckAction("com.geekyeggo.sounddeck.appmultimediacontrols")]
+    public class AppMultimediaControls : StreamDeckAction<AppMultimediaControlsSettings>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionMultimediaControls"/> class.
+        /// Initializes a new instance of the <see cref="AppMultimediaControls"/> class.
         /// </summary>
-        /// <param name="multimediaControlService">The multimedia control service.</param>
-        public SessionMultimediaControls(IMultimediaControlsService multimediaControlsService)
+        /// <param name="appAudioService">The application audio service.</param>
+        public AppMultimediaControls(IAppAudioService appAudioService)
            : base()
         {
-            this.MultimediaControlsService = multimediaControlsService;
+            this.AppAudioService = appAudioService;
         }
 
         /// <summary>
-        /// Gets the multimedia controls service.
+        /// Gets the application audio service.
         /// </summary>
-        private IMultimediaControlsService MultimediaControlsService { get; }
+        private IAppAudioService AppAudioService { get; }
 
         /// <summary>
         /// Occurs when <see cref="SharpDeck.Connectivity.IStreamDeckConnection.KeyDown" /> is received for this instance.
@@ -35,9 +35,9 @@
         {
             try
             {
-                var settings = args.Payload.GetSettings<SessionMultimediaControlsSettings>();
+                var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
 
-                await this.MultimediaControlsService.TryControlAsync(settings.SearchCriteria, settings.Action);
+                await this.AppAudioService.TryControlAsync(settings.ProcessName, settings.Action);
                 await this.ShowOkAsync();
             }
             catch

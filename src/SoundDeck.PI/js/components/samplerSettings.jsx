@@ -29,4 +29,4 @@ class SamplerSettings extends React.Component {
     }
 }
 
-export default SamplerSettings
+export default SamplerSettings;

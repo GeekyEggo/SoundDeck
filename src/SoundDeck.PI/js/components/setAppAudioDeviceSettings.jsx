@@ -32,4 +32,4 @@ class SetAppAudioDeviceSettings extends React.Component {
     }
 }
 
-export default SetAppAudioDeviceSettings
+export default SetAppAudioDeviceSettings;

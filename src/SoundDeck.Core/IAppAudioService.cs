@@ -1,5 +1,6 @@
 namespace SoundDeck.Core
 {
+    using System.Threading.Tasks;
     using SoundDeck.Core.Interop;
 
     /// <summary>
@@ -37,5 +38,13 @@ namespace SoundDeck.Core
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceKey">The device key.</param>
         void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey);
+
+        /// <summary>
+        /// Attempts to control a session with the specified matching <paramref name="searchCriteria"/>.
+        /// </summary>
+        /// <param name="searchCriteria">The search criteria of the session to match.</param>
+        /// <param name="action">The multimedia action to apply.</param>
+        /// <returns>The task of controlling the multimedia.</returns>
+        Task TryControlAsync(string searchCriteria, MultimediaAction action);
     }
 }

@@ -82,14 +82,14 @@
             ]
         },
         {
-            "Icon": "Images/SessionMultimediaControls/Action",
+            "Icon": "Images/AppMultimediaControls/Action",
             "Name": "Multimedia Controls (App)",
             "SupportedInMultiActions": true,
             "Tooltip": "Control the multimedia of a specific application.",
-            "UUID": "com.geekyeggo.sounddeck.sessionmultimediacontrols",
+            "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
             "VisibleInActionsList": true,
             "States": [
-                { "Image": "Images/SessionMultimediaControls/Key" }
+                { "Image": "Images/AppMultimediaControls/Key" }
             ]
         },
         {

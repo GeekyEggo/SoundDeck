@@ -4,17 +4,31 @@ namespace SoundDeck.Core
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
     using SoundDeck.Core.Interop.Helpers;
+    using Windows.ApplicationModel;
+    using Windows.Media.Control;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
     /// </summary>
     public class AppAudioService : IAppAudioService
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private static readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// The session manager.
+        /// </summary>
+        private GlobalSystemMediaTransportControlsSessionManager _manager = null;
+
         /// <summary>
         /// The device interface string represents audio playback.
         /// </summary>
@@ -105,6 +119,51 @@ namespace SoundDeck.Core
             this.SetDefaultAudioDevice(pid, flow, deviceKey);
         }
 
+        /// <inheritdoc/>
+        public async Task TryControlAsync(string processName, MultimediaAction action)
+        {
+            var manager = await this.GetManagerAsync();
+            foreach (var session in manager.GetSessions().Where(s => IsMatch(s, processName)))
+            {
+                switch (action)
+                {
+                    case MultimediaAction.SkipNext:
+                        await session.TrySkipNextAsync();
+                        break;
+
+                    case MultimediaAction.SkipPrevious:
+                        await session.TrySkipPreviousAsync();
+                        break;
+
+                    case MultimediaAction.Stop:
+                        await session.TryStopAsync();
+                        break;
+
+                    case MultimediaAction.TogglePlayPause:
+                        await session.TryTogglePlayPauseAsync();
+                        break;
+                }
+            }
+
+            bool IsMatch(GlobalSystemMediaTransportControlsSession session, string searchCriteria)
+            {
+                try
+                {
+                    if (session.SourceAppUserModelId.Contains(searchCriteria, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+
+                    var appInfo = AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId);
+                    return appInfo.DisplayInfo.DisplayName.Contains(searchCriteria, StringComparison.OrdinalIgnoreCase);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         /// <summary>
         /// Tries the get audio session process identifier.
         /// </summary>
@@ -186,6 +245,33 @@ namespace SoundDeck.Core
             if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
 
             return deviceId;
+        }
+
+        /// <summary>
+        /// Gets the session manager asynchronously.
+        /// </summary>
+        /// <returns>The session manager.</returns>
+        private async Task<GlobalSystemMediaTransportControlsSessionManager> GetManagerAsync()
+        {
+            try
+            {
+                await _syncRoot.WaitAsync();
+
+                if (this._manager == null)
+                {
+                    this._manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+                    if (this._manager == null)
+                    {
+                        throw new NullReferenceException("Failed to get session manager.");
+                    }
+                }
+
+                return this._manager;
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
         }
     }
 }

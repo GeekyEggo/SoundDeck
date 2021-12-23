@@ -33,4 +33,4 @@ CaptureAudioSettings.defaultProps = {
     showDuration: false
 };
 
-export default CaptureAudioSettings
+export default CaptureAudioSettings;

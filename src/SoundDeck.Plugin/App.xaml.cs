@@ -48,8 +48,7 @@ namespace SoundDeck.Plugin.Windows
                         .AddSingleton<IAppAudioService, AppAudioService>()
                         .AddSingleton<IFileDialogProvider, FileBrowserDialogWrapper>()
                         .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
-                        .AddSingleton<IHostedService, AudioBufferRestartService>()
-                        .AddSingleton<IMultimediaControlsService, MultimediaControlsService>();
+                        .AddSingleton<IHostedService, AudioBufferRestartService>();
                 })
                 .UseStreamDeck()
                 .StartAsync();

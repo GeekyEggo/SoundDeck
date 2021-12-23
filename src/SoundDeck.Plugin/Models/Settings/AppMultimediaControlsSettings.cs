@@ -4,9 +4,9 @@
     using SoundDeck.Plugin.Actions;
 
     /// <summary>
-    /// Provides settings for <see cref="SessionMultimediaControls"/>.
+    /// Provides settings for <see cref="AppMultimediaControls"/>.
     /// </summary>
-    public class SessionMultimediaControlsSettings
+    public class AppMultimediaControlsSettings
     {
         /// <summary>
         /// Gets or sets the action to apply.
@@ -14,8 +14,8 @@
         public MultimediaAction Action { get; set; } = MultimediaAction.TogglePlayPause;
 
         /// <summary>
-        /// Gets or sets the search criteria to match against the session.
+        /// Gets or sets the process name to search for.
         /// </summary>
-        public string SearchCriteria { get; set; }
+        public string ProcessName { get; set; }
     }
 }
