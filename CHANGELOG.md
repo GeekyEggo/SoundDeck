@@ -4,8 +4,15 @@
 
 ### ⭐ Added
 
-- Added option to select default audio device for recording actions. ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
-- Added "Play / Overlap" option to playback actions.  ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
+- New action, "App Media Controls", control playback of a specific applications, i.e. Chrome, Spotify, VLC etc. ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63))
+- New action, "Set App Volume", set the volume of an individual applications ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63)).
+- "Set App Audio Device" action now supports input devices ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63)). 
+- Added "Play / Overlap" option to playback actions ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
+- Added option to select default audio device for recording actions ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
+
+### ♻ Changed
+
+- Switched to GNU General Public License v3 (GPL-3) license.
 
 ## v3.0.2
 
@@ -17,7 +24,7 @@
 
 ### 🐞 Fixed
 
-- Fixed an error that could be encountered during initial setup of "Clip Audio" actions. ([#55](https://github.com/GeekyEggo/SoundDeck/issues/55)).
+- Fixed an error that could be encountered during initial setup of "Clip Audio" actions ([#55](https://github.com/GeekyEggo/SoundDeck/issues/55)).
 
 ## v3.0.0
 
