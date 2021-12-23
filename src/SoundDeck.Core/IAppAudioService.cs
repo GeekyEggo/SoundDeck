@@ -2,6 +2,7 @@ namespace SoundDeck.Core
 {
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core.Sessions;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
@@ -19,23 +20,17 @@ namespace SoundDeck.Core
         /// <summary>
         /// Sets the default audio device for the specified process.
         /// </summary>
-        /// <param name="processName">The process name.</param>
+        /// <param name="criteria">The process selection criteria that determines which process to update.</param>
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDevice(string processName, string deviceKey);
+        void SetDefaultAudioDevice(IProcessSelectionCriteria criteria, string deviceKey);
 
         /// <summary>
-        /// Sets the default audio device for the foreground application.
+        /// Attempts to control a session with the specified matching <paramref name="criteria"/>.
         /// </summary>
-        /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDeviceForForegroundApp(string deviceKey);
-
-        /// <summary>
-        /// Attempts to control a session with the specified matching <paramref name="searchCriteria"/>.
-        /// </summary>
-        /// <param name="searchCriteria">The search criteria of the session to match.</param>
+        /// <param name="criteria">The process selection criteria that determines which process to update.</param>
         /// <param name="action">The multimedia action to apply.</param>
         /// <returns>The task of controlling the multimedia.</returns>
-        Task TryControlAsync(string searchCriteria, MultimediaAction action);
+        Task TryControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action);
     }
 }

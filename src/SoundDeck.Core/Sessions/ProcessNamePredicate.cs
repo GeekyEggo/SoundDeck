@@ -1,13 +1,16 @@
-﻿namespace SoundDeck.Core.Comparers
+﻿namespace SoundDeck.Core.Sessions
 {
     using System;
     using System.Diagnostics;
+    using NAudio.CoreAudioApi;
     using SoundDeck.Core.Extensions;
+    using Windows.ApplicationModel;
+    using Windows.Media.Control;
 
     /// <summary>
-    /// Provides an <see cref="IProcessPredicate"/> that loosely matches the <see cref="Process.ProcessName"/> against <see cref="ProcessName"/>.
+    /// Provides an <see cref="ISessionPredicate"/> that loosely matches the <see cref="Process.ProcessName"/> against <see cref="ProcessName"/>.
     /// </summary>
-    public class ProcessNamePredicate : IProcessPredicate
+    public class ProcessNamePredicate : ISessionPredicate
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessNamePredicate"/> class.
@@ -22,15 +25,29 @@
         public string ProcessName { get; }
 
         /// <inheritdoc/>
-        public bool IsMatch(uint processId)
+        public bool IsMatch(AudioSessionControl session)
         {
             const string DEFAULT_PROCESS_EXTENSION = ".exe";
 
             try
             {
-                var process = Process.GetProcessById((int)processId);
+                var process = Process.GetProcessById((int)session.GetProcessID);
                 return process.ProcessName.Equals(this.ProcessName, StringComparison.OrdinalIgnoreCase)
                     || process.ProcessName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase).Equals(this.ProcessName, StringComparison.Ordinal);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool IsMatch(GlobalSystemMediaTransportControlsSession session)
+        {
+            try
+            {
+                return session.SourceAppUserModelId.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase)
+                    || AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase);
             }
             catch
             {

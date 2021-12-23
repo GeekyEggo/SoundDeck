@@ -7,11 +7,10 @@ namespace SoundDeck.Core
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
-    using SoundDeck.Core.Comparers;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
     using SoundDeck.Core.Interop.Helpers;
-    using Windows.ApplicationModel;
+    using SoundDeck.Core.Sessions;
     using Windows.Media.Control;
 
     /// <summary>
@@ -81,90 +80,47 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDevice(string processName, string deviceKey)
-            => this.SetDefaultAudioDevice(new ProcessNamePredicate(processName), deviceKey);
-
-        /// <inheritdoc/>
-        public void SetDefaultAudioDeviceForForegroundApp(string deviceKey)
-        {
-            var hwnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(hwnd, out var processId);
-
-            this.SetDefaultAudioDevice(new IdentifiedProcessPredicate(processId), deviceKey);
-        }
-
-        /// <inheritdoc/>
-        public async Task TryControlAsync(string processName, MultimediaAction action)
-        {
-            var manager = await this.GetManagerAsync();
-            foreach (var session in manager.GetSessions().Where(s => IsMatch(s, processName)))
-            {
-                switch (action)
-                {
-                    case MultimediaAction.SkipNext:
-                        await session.TrySkipNextAsync();
-                        break;
-
-                    case MultimediaAction.SkipPrevious:
-                        await session.TrySkipPreviousAsync();
-                        break;
-
-                    case MultimediaAction.Stop:
-                        await session.TryStopAsync();
-                        break;
-
-                    case MultimediaAction.TogglePlayPause:
-                        await session.TryTogglePlayPauseAsync();
-                        break;
-                }
-            }
-
-            bool IsMatch(GlobalSystemMediaTransportControlsSession session, string searchCriteria)
-            {
-                try
-                {
-                    if (session.SourceAppUserModelId.Contains(searchCriteria, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-
-                    var appInfo = AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId);
-                    return appInfo.DisplayInfo.DisplayName.Contains(searchCriteria, StringComparison.OrdinalIgnoreCase);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Sets the default audio device for the first process that matches the specified <paramref name="processPredicate"/>.
-        /// </summary>
-        /// <param name="processPredicate">The process predicate to match against.</param>
-        /// <param name="deviceKey">The audio device key.</param>
-        private void SetDefaultAudioDevice(IProcessPredicate processPredicate, string deviceKey)
+        public void SetDefaultAudioDevice(IProcessSelectionCriteria criteria, string deviceKey)
         {
             var dataFlow = this.GetDataFlow(deviceKey);
-            foreach (var audioSession in this.GetAudioSessions())
-            {
-                var audioSessionProcessId = audioSession.GetProcessID;
-                if (processPredicate.IsMatch(audioSessionProcessId))
-                {
-                    // Default to zero pointer; this will only change if an audio device has been specified.
-                    var hstring = IntPtr.Zero;
-                    var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
-                    if (device.IsReadOnly)
-                    {
-                        var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
-                        Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
-                    }
+            var predicate = criteria.ToPredicate();
 
-                    // Set the audio device for the process.
-                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
-                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
-                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Communications, hstring);
+            foreach (var audioSession in this.GetAudioSessions().Where(predicate.IsMatch))
+            {
+                // Default to zero pointer; this will only change if an audio device has been specified.
+                var hstring = IntPtr.Zero;
+                var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+                if (device.IsReadOnly)
+                {
+                    var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
+                    Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
                 }
+
+                // Set the audio device for the process.
+                var audioSessionProcessId = audioSession.GetProcessID;
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Communications, hstring);
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task TryControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
+        {
+            var manager = await this.GetManagerAsync();
+            var predicate = criteria.ToPredicate();
+
+            foreach (var session in manager.GetSessions().Where(predicate.IsMatch))
+            {
+                await (action switch
+                {
+                    MultimediaAction.Play => session.TryPlayAsync(),
+                    MultimediaAction.Pause => session.TryPauseAsync(),
+                    MultimediaAction.Stop => session.TryStopAsync(),
+                    MultimediaAction.SkipPrevious => session.TrySkipPreviousAsync(),
+                    MultimediaAction.SkipNext => session.TrySkipNextAsync(),
+                    _ => session.TryTogglePlayPauseAsync()
+                });
             }
         }
 

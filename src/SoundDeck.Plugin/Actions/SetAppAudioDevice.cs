@@ -37,41 +37,16 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The task of handling the event.</returns>
         protected async override Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            await base.OnKeyDown(args);
+            var settings = args.Payload.GetSettings<SetAppAudioDeviceSettings>();
 
             try
             {
-                var settings = args.Payload.GetSettings<SetAppAudioDeviceSettings>();
-
-                try
-                {
-                    // When the process selection type is by name, validate we have a name and then set the default audio device.
-                    if (settings.ProcessSelectionType == ProcessSelectionType.ByName)
-                    {
-                        if (string.IsNullOrWhiteSpace(settings.ProcessName))
-                        {
-                            throw new ArgumentNullException($"Cannot set default audio device for app: The process name has not been specified.");
-                        }
-
-                        this.AppAudioService.SetDefaultAudioDevice(settings.ProcessName, settings.AudioDeviceId);
-                    }
-                    else
-                    {
-                        // The process selection type is foreground, so select the process id and set the default audio device.
-                        this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(settings.AudioDeviceId);
-                    }
-
-                    await this.ShowOkAsync();
-                }
-                catch (Exception ex)
-                {
-                    this.Logger?.LogError(ex, $"Failed to set app audio device; AudioDeviceId=\"{settings.AudioDeviceId}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
-                    await this.ShowAlertAsync();
-                }
+                this.AppAudioService.SetDefaultAudioDevice(settings, settings.AudioDeviceId);
+                await this.ShowOkAsync();
             }
             catch (Exception ex)
             {
-                this.Logger?.LogError(ex, $"Failed to read settings.");
+                this.Logger?.LogError(ex, $"Failed to set app audio device; AudioDeviceId=\"{settings.AudioDeviceId}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
                 await this.ShowAlertAsync();
             }
         }

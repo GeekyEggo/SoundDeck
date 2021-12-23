@@ -6,23 +6,33 @@
     public enum MultimediaAction
     {
         /// <summary>
-        /// The skips to the next item.
+        /// Toggles between play / pause.
         /// </summary>
-        SkipNext = 0,
+        TogglePlayPause = 0,
 
         /// <summary>
-        /// The skips to the previous item.
+        /// Plays the media.
         /// </summary>
-        SkipPrevious = 1,
+        Play = 1,
 
         /// <summary>
-        /// Stops playback.
+        /// Pauses the media.
         /// </summary>
-        Stop = 2,
+        Pause = 2,
 
         /// <summary>
-        /// Toggle play/pause.
+        /// Stops the media.
         /// </summary>
-        TogglePlayPause = 3,
+        Stop = 3,
+
+        /// <summary>
+        /// Skips to the previous item.
+        /// </summary>
+        SkipPrevious = 4,
+
+        /// <summary>
+        /// Skips to the next item.
+        /// </summary>
+        SkipNext = 5
     }
 }

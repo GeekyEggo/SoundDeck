@@ -1,23 +1,26 @@
 ﻿import React from "react";
-import { PropertyInspectorWrapper, Select, store, TextField } from "react-sharpdeck";
+import { PropertyInspectorWrapper, Select, } from "react-sharpdeck";
+import ProcessSelector from "./ProcessSelector";
 
 class AppMultimediaControlsSettings extends React.Component {
     constructor(props) {
         super(props);
 
         this.multimediaAction = [
-            { label: "Previous", value: "1" },
-            { label: "Play / Pause", value: "3" },
-            { label: "Next", value: "0" },
-            { label: "Stop", value: "2" }
+            { label: "Play / Pause", value: "0" },
+            { label: "Play", value: "1" },
+            { label: "Pause", value: "2" },
+            { label: "Stop", value: "3" },
+            { label: "Skip Previous", value: "4" },
+            { label: "Skip Next", value: "5" }
         ]
     }
 
     render() {
         return (
             <PropertyInspectorWrapper>
-                <TextField label="Process" valuePath="processName" />
-                <Select label="Action" options={this.multimediaAction} valuePath="action" />
+                <Select label="Action" options={this.multimediaAction} valuePath="action" defaultValue="0" />
+                <ProcessSelector />
             </PropertyInspectorWrapper>
         );
     }

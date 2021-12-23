@@ -1,6 +1,8 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
+    using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -33,15 +35,16 @@
         /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
+            var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
+
             try
             {
-                var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
-
-                await this.AppAudioService.TryControlAsync(settings.ProcessName, settings.Action);
+                await this.AppAudioService.TryControlAsync(settings, settings.Action);
                 await this.ShowOkAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                this.Logger?.LogError(ex, $"Failed to control application's multimedia; Action=\"{settings.Action}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
                 await this.ShowAlertAsync();
             }
         }
