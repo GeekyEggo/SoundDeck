@@ -2,12 +2,12 @@ namespace SoundDeck.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core.Comparers;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Interop;
     using SoundDeck.Core.Interop.Helpers;
@@ -83,40 +83,16 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceKey)
-        {
-            var processName = Process.GetProcessById((int)processId).ProcessName;
-            this.SetDefaultAudioDevice(processName, flow, deviceKey);
-        }
-
-        //// <inheritdoc/>
         public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceKey)
-        {
-            var dataFlow = this.GetDataFlow(flow);
-            if (this.TryGetAudioSessionProcessId(processName, dataFlow, out var audioSessionProcessId))
-            {
-                // Default to zero pointer; this will only change if an audio device has been specified.
-                var hstring = IntPtr.Zero;
-                var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
-                if (device.IsReadOnly)
-                {
-                    var persistDeviceId = this.GenerateDeviceId(device.Id);
-                    Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
-                }
-
-                // Set the audio device for the process.
-                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
-                this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
-            }
-        }
+            => this.SetDefaultAudioDevice(new ProcessNamePredicate(processName), flow, deviceKey);
 
         /// <inheritdoc/>
         public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey)
         {
             var hwnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(hwnd, out var pid);
+            User32.GetWindowThreadProcessId(hwnd, out var processId);
 
-            this.SetDefaultAudioDevice(pid, flow, deviceKey);
+            this.SetDefaultAudioDevice(new IdentifiedProcessPredicate(processId), flow, deviceKey);
         }
 
         /// <inheritdoc/>
@@ -165,32 +141,33 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
-        /// Tries the get audio session process identifier.
+        /// Sets the default audio device for the first process that matches the specified <paramref name="processPredicate"/>.
         /// </summary>
-        /// <param name="processName">Name of the process.</param>
-        /// <param name="flow">The flow.</param>
-        /// <param name="audioSessionProcessId">The audio session process identifier.</param>
-        /// <returns><c>true</c> when the audio session was retrieved for the <paramref name="processName"/>; otherwise <c>false</c>.</returns>
-        private bool TryGetAudioSessionProcessId(string processName, DataFlow flow, out uint audioSessionProcessId)
+        /// <param name="processPredicate">The process predicate to match against.</param>
+        /// <param name="flow">The audio flow; either input or output.</param>
+        /// <param name="deviceKey">The device key.</param>
+        private void SetDefaultAudioDevice(IProcessPredicate processPredicate, AudioFlowType flow, string deviceKey)
         {
-            const string DEFAULT_PROCESS_EXTENSION = ".exe";
-            foreach (var audioSession in this.GetAudioSessions(flow))
+            var dataFlow = this.GetDataFlow(flow);
+            foreach (var audioSession in this.GetAudioSessions(dataFlow))
             {
-                audioSessionProcessId = audioSession.GetProcessID;
-
-                // Ensure both the process name we're looking for, and the audio session process name, don't end with ".exe".
-                var audioSessionProcessName = Process.GetProcessById((int)audioSessionProcessId).ProcessName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
-                processName = processName.TrimEnd(DEFAULT_PROCESS_EXTENSION, StringComparison.OrdinalIgnoreCase);
-
-                // When there is a case insensitive match, we're good!
-                if (audioSessionProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                var audioSessionProcessId = audioSession.GetProcessID;
+                if (processPredicate.IsMatch(audioSessionProcessId))
                 {
-                    return true;
+                    // Default to zero pointer; this will only change if an audio device has been specified.
+                    var hstring = IntPtr.Zero;
+                    var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+                    if (device.IsReadOnly)
+                    {
+                        var persistDeviceId = this.GenerateDeviceId(device.Id);
+                        Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
+                    }
+
+                    // Set the audio device for the process.
+                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
                 }
             }
-
-            audioSessionProcessId = 0;
-            return false;
         }
 
         /// <summary>

@@ -19,14 +19,6 @@ namespace SoundDeck.Core
         /// <summary>
         /// Sets the default audio device for the specified process.
         /// </summary>
-        /// <param name="processId">The process identifier.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceKey">The device key.</param>
-        void SetDefaultAudioDevice(uint processId, AudioFlowType flow, string deviceKey);
-
-        /// <summary>
-        /// Sets the default audio device for the specified process.
-        /// </summary>
         /// <param name="processName">The process name.</param>
         /// <param name="flow">The audio flow; either input or output.</param>
         /// <param name="deviceKey">The device key.</param>
