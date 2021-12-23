@@ -12,17 +12,7 @@
     "PropertyInspectorPath": "PI/index.html",
     "URL": "https://github.com/GeekyEggo/SoundDeck",
     "Actions": [
-        {
-            "Icon": "Images/ClipAudio/Action",
-            "Name": "Clip Audio",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Clip those last precious seconds of audio; you'll never miss a funny moment again.",
-            "UUID": "com.geekyeggo.sounddeck.clipaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/ClipAudio/Key" }
-            ]
-        },
+
         {
             "Icon": "Images/PlayAudio/Action",
             "Name": "Play Audio",
@@ -32,18 +22,6 @@
             "VisibleInActionsList": true,
             "States": [
                 { "Image": "Images/PlayAudio/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/RecordAudio/Action",
-            "Name": "Record Audio",
-            "SupportedInMultiActions": false,
-            "Tooltip": "Record Audio",
-            "UUID": "com.geekyeggo.sounddeck.recordaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/RecordAudio/Key0" },
-                { "Image": "Images/RecordAudio/Key1" }
             ]
         },
         {
@@ -71,6 +49,51 @@
             ]
         },
         {
+            "Icon": "Images/StopAudio/Action",
+            "Name": "Stop Audio",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Stops all audio being played through Sound Deck.",
+            "UUID": "com.geekyeggo.sounddeck.stopaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/StopAudio/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/ClipAudio/Action",
+            "Name": "Clip Audio",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Clip those last precious seconds of audio; you'll never miss a funny moment again.",
+            "UUID": "com.geekyeggo.sounddeck.clipaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/ClipAudio/Key" }
+            ]
+        },
+        {
+            "Icon": "Images/RecordAudio/Action",
+            "Name": "Record Audio",
+            "SupportedInMultiActions": false,
+            "Tooltip": "Record Audio",
+            "UUID": "com.geekyeggo.sounddeck.recordaudio",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/RecordAudio/Key0" },
+                { "Image": "Images/RecordAudio/Key1" }
+            ]
+        },
+        {
+            "Icon": "Images/AppMultimediaControls/Action",
+            "Name": "App Media Controls",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Control the multimedia of a specific application.",
+            "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/AppMultimediaControls/Key" }
+            ]
+        },
+        {
             "Icon": "Images/SetAppAudioDevice/Action",
             "Name": "Set App Audio Device",
             "SupportedInMultiActions": true,
@@ -82,25 +105,14 @@
             ]
         },
         {
-            "Icon": "Images/AppMultimediaControls/Action",
-            "Name": "Multimedia Controls (App)",
+            "Icon": "Images/SetAppVolume/Action",
+            "Name": "Set App Volume",
             "SupportedInMultiActions": true,
-            "Tooltip": "Control the multimedia of a specific application.",
-            "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
+            "Tooltip": "Set the volume of an application.",
+            "UUID": "com.geekyeggo.sounddeck.setappvolume",
             "VisibleInActionsList": true,
             "States": [
-                { "Image": "Images/AppMultimediaControls/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/StopAudio/Action",
-            "Name": "Stop Audio",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Stops all audio being played through Sound Deck.",
-            "UUID": "com.geekyeggo.sounddeck.stopaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/StopAudio/Key" }
+                { "Image": "Images/SetAppVolume/Key" }
             ]
         }
     ],

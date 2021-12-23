@@ -14,14 +14,10 @@
         /// </summary>
         public MultimediaAction Action { get; set; } = MultimediaAction.TogglePlayPause;
 
-        /// <summary>
-        /// Gets or sets the name of the process to change.
-        /// </summary>
+        /// <inheritdoc/>
         public string ProcessName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the type that defines how the process is selected.
-        /// </summary>
-        public ProcessSelectionType ProcessSelectionType { get; set; } = ProcessSelectionType.Foreground;
+        /// <inheritdoc/>
+        public ProcessSelectionType ProcessSelectionType { get; set; }
     }
 }

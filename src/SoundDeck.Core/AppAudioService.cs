@@ -105,7 +105,42 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public async Task TryControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
+        public void SetVolume(IProcessSelectionCriteria criteria, VolumeAction action, int value)
+        {
+            var predicate = criteria.ToPredicate();
+            foreach (var audioSession in this.GetAudioSessions().Where(predicate.IsMatch))
+            {
+                switch (action)
+                {
+                    case VolumeAction.Mute:
+                        audioSession.SimpleAudioVolume.Mute = true;
+                        break;
+
+                    case VolumeAction.Unmute:
+                        audioSession.SimpleAudioVolume.Mute = false;
+                        break;
+
+                    case VolumeAction.ToggleMute:
+                        audioSession.SimpleAudioVolume.Mute = !audioSession.SimpleAudioVolume.Mute;
+                        break;
+
+                    case VolumeAction.Set:
+                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, Math.Min(1f, value / 100f));
+                        break;
+
+                    case VolumeAction.IncreaseBy:
+                        audioSession.SimpleAudioVolume.Volume = Math.Min(1f, audioSession.SimpleAudioVolume.Volume + (value / 100f));
+                        break;
+
+                    case VolumeAction.DecreaseBy:
+                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, audioSession.SimpleAudioVolume.Volume - (value / 100f));
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
         {
             var manager = await this.GetManagerAsync();
             var predicate = criteria.ToPredicate();

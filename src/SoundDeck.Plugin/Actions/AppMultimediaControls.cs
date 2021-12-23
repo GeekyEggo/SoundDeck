@@ -39,7 +39,7 @@
 
             try
             {
-                await this.AppAudioService.TryControlAsync(settings, settings.Action);
+                await this.AppAudioService.ControlAsync(settings, settings.Action);
                 await this.ShowOkAsync();
             }
             catch (Exception ex)

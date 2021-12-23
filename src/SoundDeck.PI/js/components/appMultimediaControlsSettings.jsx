@@ -6,7 +6,7 @@ class AppMultimediaControlsSettings extends React.Component {
     constructor(props) {
         super(props);
 
-        this.multimediaAction = [
+        this.multimediaActions = [
             { label: "Play / Pause", value: "0" },
             { label: "Play", value: "1" },
             { label: "Pause", value: "2" },
@@ -19,7 +19,7 @@ class AppMultimediaControlsSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Action" options={this.multimediaAction} valuePath="action" defaultValue="0" />
+                <Select label="Action" options={this.multimediaActions} valuePath="action" defaultValue="0" />
                 <ProcessSelector />
             </PropertyInspectorWrapper>
         );

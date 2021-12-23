@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core
+﻿namespace SoundDeck.Core.Sessions
 {
     /// <summary>
     /// Provides an enumeration of possible multimedia actions.
