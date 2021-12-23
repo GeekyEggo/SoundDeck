@@ -67,13 +67,11 @@ namespace SoundDeck.Core
         private IAudioPolicyConfigFactory AudioPolicyConfig { get; }
 
         /// <inheritdoc/>
-        public string GetDefaultAudioDevice(uint processId, AudioFlowType flow)
+        public string GetDefaultAudioDevice(uint processId, DataFlow flow)
         {
             try
             {
-                var dataFlow = this.GetDataFlow(flow);
-                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, dataFlow, Role.Multimedia | Role.Console, out var deviceId);
-
+                this.AudioPolicyConfig.GetPersistedDefaultAudioEndpoint(processId, flow, Role.Multimedia | Role.Console, out var deviceId);
                 return this.ParseDeviceId(deviceId);
             }
             catch
@@ -83,16 +81,16 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDevice(string processName, AudioFlowType flow, string deviceKey)
-            => this.SetDefaultAudioDevice(new ProcessNamePredicate(processName), flow, deviceKey);
+        public void SetDefaultAudioDevice(string processName, string deviceKey)
+            => this.SetDefaultAudioDevice(new ProcessNamePredicate(processName), deviceKey);
 
         /// <inheritdoc/>
-        public void SetDefaultAudioDeviceForForegroundApp(AudioFlowType flow, string deviceKey)
+        public void SetDefaultAudioDeviceForForegroundApp(string deviceKey)
         {
             var hwnd = User32.GetForegroundWindow();
             User32.GetWindowThreadProcessId(hwnd, out var processId);
 
-            this.SetDefaultAudioDevice(new IdentifiedProcessPredicate(processId), flow, deviceKey);
+            this.SetDefaultAudioDevice(new IdentifiedProcessPredicate(processId), deviceKey);
         }
 
         /// <inheritdoc/>
@@ -144,12 +142,11 @@ namespace SoundDeck.Core
         /// Sets the default audio device for the first process that matches the specified <paramref name="processPredicate"/>.
         /// </summary>
         /// <param name="processPredicate">The process predicate to match against.</param>
-        /// <param name="flow">The audio flow; either input or output.</param>
-        /// <param name="deviceKey">The device key.</param>
-        private void SetDefaultAudioDevice(IProcessPredicate processPredicate, AudioFlowType flow, string deviceKey)
+        /// <param name="deviceKey">The audio device key.</param>
+        private void SetDefaultAudioDevice(IProcessPredicate processPredicate, string deviceKey)
         {
-            var dataFlow = this.GetDataFlow(flow);
-            foreach (var audioSession in this.GetAudioSessions(dataFlow))
+            var dataFlow = this.GetDataFlow(deviceKey);
+            foreach (var audioSession in this.GetAudioSessions())
             {
                 var audioSessionProcessId = audioSession.GetProcessID;
                 if (processPredicate.IsMatch(audioSessionProcessId))
@@ -159,13 +156,14 @@ namespace SoundDeck.Core
                     var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
                     if (device.IsReadOnly)
                     {
-                        var persistDeviceId = this.GenerateDeviceId(device.Id);
+                        var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
                         Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
                     }
 
                     // Set the audio device for the process.
-                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
                     this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Console, hstring);
+                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Multimedia, hstring);
+                    this.AudioPolicyConfig.SetPersistedDefaultAudioEndpoint(audioSessionProcessId, dataFlow, Role.Communications, hstring);
                 }
             }
         }
@@ -173,14 +171,13 @@ namespace SoundDeck.Core
         /// <summary>
         /// Gets the all active audio sessions audio sessions.
         /// </summary>
-        /// <param name="flow">The audio data flow.</param>
         /// <returns>The active audio sessions.</returns>
-        private IEnumerable<AudioSessionControl> GetAudioSessions(DataFlow flow)
+        private IEnumerable<AudioSessionControl> GetAudioSessions()
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var sessions = deviceEnumerator
-                    .EnumerateAudioEndPoints(flow, DeviceState.Active)
+                    .EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active)
                     .Select(d => d.AudioSessionManager.Sessions);
 
                 foreach (var session in sessions)
@@ -194,12 +191,20 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
-        /// Gets the data flow from the specified <see cref="AudioFlowType"/>.
+        /// Gets the data flow from the specified <paramref name="deviceKey"/>.
         /// </summary>
-        /// <param name="flow">The flow.</param>
+        /// <param name="deviceKey">The audio device key.</param>
         /// <returns>The interop data flow.</returns>
-        private DataFlow GetDataFlow(AudioFlowType flow)
-            => flow == AudioFlowType.Playback ? DataFlow.Render : DataFlow.Capture;
+        private DataFlow GetDataFlow(string deviceKey)
+        {
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            if (device == null)
+            {
+                throw new KeyNotFoundException($"Unable to find audio device with key {deviceKey}.");
+            }
+
+            return device.Flow;
+        }
 
         /// <summary>
         /// Generates the device identifier that can be used to set the persisted default audio endpoint for a process.
@@ -207,7 +212,7 @@ namespace SoundDeck.Core
         /// <param name="deviceId">The device identifier.</param>
         /// <param name="flow">The flow.</param>
         /// <returns>The device identifier.</returns>
-        private string GenerateDeviceId(string deviceId, DataFlow flow = DataFlow.Render)
+        private string GenerateDeviceId(string deviceId, DataFlow flow)
             => $"{MMDEVAPI_TOKEN}{deviceId}{(flow == DataFlow.Render ? DEVINTERFACE_AUDIO_RENDER : DEVINTERFACE_AUDIO_CAPTURE)}";
 
         /// <summary>

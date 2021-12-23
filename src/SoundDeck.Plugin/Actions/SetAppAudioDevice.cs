@@ -6,7 +6,6 @@ namespace SoundDeck.Plugin.Actions
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
-    using SoundDeck.Core.Interop;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>
@@ -54,12 +53,12 @@ namespace SoundDeck.Plugin.Actions
                             throw new ArgumentNullException($"Cannot set default audio device for app: The process name has not been specified.");
                         }
 
-                        this.AppAudioService.SetDefaultAudioDevice(settings.ProcessName, AudioFlowType.Playback, settings.AudioDeviceId);
+                        this.AppAudioService.SetDefaultAudioDevice(settings.ProcessName, settings.AudioDeviceId);
                     }
                     else
                     {
                         // The process selection type is foreground, so select the process id and set the default audio device.
-                        this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(AudioFlowType.Playback, settings.AudioDeviceId);
+                        this.AppAudioService.SetDefaultAudioDeviceForForegroundApp(settings.AudioDeviceId);
                     }
 
                     await this.ShowOkAsync();

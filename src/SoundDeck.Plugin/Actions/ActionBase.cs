@@ -34,17 +34,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public OptionsPayload GetCaptureAudioDevices()
-        {
-            var options = this.AudioService.Devices
-                .GroupBy(device => device.Flow)
-                .Select(g =>
-                {
-                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Key)).ToList();
-                    return new Option(g.Key.ToString(), children);
-                });
-
-            return new OptionsPayload(options);
-        }
+            => this.GetAudioDevices();
 
         /// <summary>
         /// Gets the audio devices capable of having an application assigned to them.
@@ -52,7 +42,7 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public OptionsPayload GetAppAssignableAudioDevices()
-            => this.GetPlaybackAudioDevicesInternal(device => device.Role != Role.Communications);
+            => this.GetAudioDevices(device => device.Role != Role.Communications);
 
         /// <summary>
         /// Gets the audio devices capable of playback.
@@ -60,21 +50,31 @@ namespace SoundDeck.Plugin.Actions
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
         public OptionsPayload GetPlaybackAudioDevices()
-            => this.GetPlaybackAudioDevicesInternal();
-
-        /// <summary>
-        /// Gets the playback audio devices that fulfil the specified <paramref name="filter"/>.
-        /// </summary>
-        /// <param name="filter">The optional filter.</param>
-        /// <returns>The payload containing the audio devices.</returns>
-        private OptionsPayload GetPlaybackAudioDevicesInternal(Func<IAudioDevice, bool> filter = null)
         {
-            filter ??= (_ => true);
-
             var options = this.AudioService.Devices
                 .Where(d => d.Flow == DataFlow.Render)
-                .Where(filter)
                 .Select(d => new Option(d.FriendlyName, d.Key));
+
+            return new OptionsPayload(options);
+        }
+
+        /// <summary>
+        /// Gets the audio devices that match the specified <paramref name="filter"/>; otherwise all.
+        /// </summary>
+        /// <param name="filter">The optional filter.</param>
+        /// <returns>The audio devices. </returns>
+        public OptionsPayload GetAudioDevices(Func<IAudioDevice, bool> filter = null)
+        {
+            filter ??= (_) => true;
+
+            var options = this.AudioService.Devices
+                .Where(filter)
+                .GroupBy(device => device.Flow)
+                .Select(g =>
+                {
+                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Key)).ToList();
+                    return new Option(g.Key == DataFlow.Render ? "Playback" : "Recording", children);
+                });
 
             return new OptionsPayload(options);
         }

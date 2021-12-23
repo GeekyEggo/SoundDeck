@@ -1,6 +1,5 @@
 namespace SoundDeck.Plugin.Models.Settings
 {
-    using SoundDeck.Core.Interop;
     using SoundDeck.Plugin.Actions;
 
     /// <summary>
@@ -12,11 +11,6 @@ namespace SoundDeck.Plugin.Models.Settings
         /// Gets or sets the audio device identifier.
         /// </summary>
         public string AudioDeviceId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the audio flow to set; i.e. input or output.
-        /// </summary>
-        public AudioFlowType AudioFlow { get; set; } = AudioFlowType.Playback;
 
         /// <summary>
         /// Gets or sets the name of the process to change.
