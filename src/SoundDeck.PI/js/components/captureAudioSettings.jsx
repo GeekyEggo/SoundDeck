@@ -17,7 +17,7 @@ class CaptureAudioSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Capture Device" dataSourceUri="GetCaptureAudioDevices" valuePath="audioDeviceId" />
+                <Select label="Capture Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" />
                 {this.props.showDuration &&
                     <Select label="Duration" options={this.durationOptions} valuePath="duration" />
                 }

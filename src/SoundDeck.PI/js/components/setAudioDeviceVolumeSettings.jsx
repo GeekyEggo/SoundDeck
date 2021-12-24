@@ -3,15 +3,15 @@ import { PropertyInspectorWrapper, Range, Select, store, TextField } from "react
 import ProcessSelector from "./processSelector";
 import VolumeAdjustment from "./volumeAdjustment";
 
-class SetAppVolumeSettings extends React.Component {
+class SetAudioDeviceVolumeSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <ProcessSelector />
+                <Select label="Audio Device" dataSourceUri="GetAudioDevices" valuePath="audioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
                 <VolumeAdjustment />
             </PropertyInspectorWrapper>
         );
     }
 }
 
-export default SetAppVolumeSettings;
+export default SetAudioDeviceVolumeSettings;

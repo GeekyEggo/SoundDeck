@@ -114,6 +114,17 @@
             "States": [
                 { "Image": "Images/SetAppVolume/Key" }
             ]
+        },
+        {
+            "Icon": "Images/SetAudioDeviceVolume/Action",
+            "Name": "Set Audio Device Volume",
+            "SupportedInMultiActions": true,
+            "Tooltip": "Set the volume of an audio device.",
+            "UUID": "com.geekyeggo.sounddeck.setaudiodevicevolume",
+            "VisibleInActionsList": true,
+            "States": [
+                { "Image": "Images/SetAudioDeviceVolume/Key" }
+            ]
         }
     ],
     "OS": [

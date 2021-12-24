@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import { PropertyInspectorWrapper, Select, } from "react-sharpdeck";
-import ProcessSelector from "./ProcessSelector";
+import ProcessSelector from "./processSelector";
 
 class AppMultimediaControlsSettings extends React.Component {
     constructor(props) {

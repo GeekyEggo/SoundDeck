@@ -33,8 +33,8 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
-        public OptionsPayload GetCaptureAudioDevices()
-            => this.GetAudioDevices();
+        public OptionsPayload GetAudioDevices()
+            => this.GetAudioDevices(_ => true);
 
         /// <summary>
         /// Gets the audio devices capable of having an application assigned to them.
@@ -63,10 +63,8 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <param name="filter">The optional filter.</param>
         /// <returns>The audio devices. </returns>
-        public OptionsPayload GetAudioDevices(Func<IAudioDevice, bool> filter = null)
+        private OptionsPayload GetAudioDevices(Func<IAudioDevice, bool> filter)
         {
-            filter ??= (_) => true;
-
             var options = this.AudioService.Devices
                 .Where(filter)
                 .GroupBy(device => device.Flow)

@@ -1,4 +1,4 @@
-﻿namespace SoundDeck.Core.Sessions
+﻿namespace SoundDeck.Core.Volume
 {
     /// <summary>
     /// Provides an enumeation of possible actions to apply to the volume of an audio device or application.

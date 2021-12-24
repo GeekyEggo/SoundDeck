@@ -36,12 +36,12 @@
 
             try
             {
-                this.AppAudioService.SetVolume(settings, settings.Action, settings.ActionValue);
+                this.AppAudioService.SetVolume(settings);
                 await this.ShowOkAsync();
             }
             catch (Exception ex)
             {
-                this.Logger?.LogError(ex, $"Failed to set app audio volume; Action=\"{settings.Action}\", Value=\"{settings.ActionValue}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
+                this.Logger?.LogError(ex, $"Failed to set app audio volume; Action=\"{settings.VolumeAction}\", Value=\"{settings.VolumeValue}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
                 await this.ShowAlertAsync();
             }
         }
