@@ -59,7 +59,7 @@ namespace SoundDeck.Core.Devices
         }
 
         /// <inheritdoc/>
-        public bool IsReadOnly { get; protected set; } = true;
+        public bool IsDynamic { get; protected set; } = false;
 
         /// <inheritdoc/>
         public virtual string Key => this.Id;

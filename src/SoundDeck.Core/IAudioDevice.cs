@@ -29,9 +29,9 @@ namespace SoundDeck.Core
         string Id { get; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance represents a read-only identifier.
+        /// Gets a value indicating whether this instance represents a dynamic audio device identifier.
         /// </summary>
-        bool IsReadOnly { get; }
+        bool IsDynamic { get; }
 
         /// <summary>
         /// Gets the unique key that represents the audio device.

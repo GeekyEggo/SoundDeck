@@ -3,6 +3,7 @@ namespace SoundDeck.Core
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Sessions;
+    using SoundDeck.Core.Volume;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
@@ -26,12 +27,11 @@ namespace SoundDeck.Core
         void SetDefaultAudioDevice(IProcessSelectionCriteria criteria, string deviceKey);
 
         /// <summary>
-        /// Sets the volume of an application that matches the specified <paramref name="criteria"/>.
+        /// Sets the volume of an application based on the specified <paramref name="settings"/>.
         /// </summary>
-        /// <param name="criteria">The criteria.</param>
-        /// <param name="action">The action.</param>
-        /// <param name="value">The value.</param>
-        void SetVolume(IProcessSelectionCriteria criteria, VolumeAction action, int value);
+        /// <param name="settings">The settings that determine the application and the volume adjustment.</param>
+        void SetVolume<T>(T settings)
+            where T : IProcessSelectionCriteria, IVolumeSettings;
 
         /// <summary>
         /// Attempts to control a session that matches the specified <paramref name="criteria"/>.

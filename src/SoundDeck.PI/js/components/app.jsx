@@ -3,8 +3,10 @@ import AppMultimediaControlsSettings from "./appMultimediaControlsSettings";
 import CaptureAudioSettings from "./captureAudioSettings";
 import PlayAudioSettings from "./playAudioSettings";
 import SamplerSettings from "./samplerSettings";
-import SetAppAudioDeviceSettings from "./setAppAudioDeviceSettings"
-import SetAppVolumeSettings from "./setAppVolumeSettings"
+import SetAppAudioDeviceSettings from "./setAppAudioDeviceSettings";
+import SetAppVolumeSettings from "./setAppVolumeSettings";
+import SetAudioDeviceVolumeSettings from "./setAudioDeviceVolumeSettings";
+import SetDefaultAudioDeviceSettings from "./setDefaultAudioDeviceSettings";
 
 class App extends React.Component {
     render() {
@@ -29,6 +31,12 @@ class App extends React.Component {
 
             case "com.geekyeggo.sounddeck.setappvolume":
                 return <SetAppVolumeSettings />;
+
+            case "com.geekyeggo.sounddeck.setaudiodevicevolume":
+                return <SetAudioDeviceVolumeSettings />;
+
+            case "com.geekyeggo.sounddeck.setdefaultaudiodevice":
+                return <SetDefaultAudioDeviceSettings />;
 
             default:
                 return <div />;

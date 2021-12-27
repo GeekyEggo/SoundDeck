@@ -11,6 +11,7 @@ namespace SoundDeck.Core
     using SoundDeck.Core.Interop;
     using SoundDeck.Core.Interop.Helpers;
     using SoundDeck.Core.Sessions;
+    using SoundDeck.Core.Volume;
     using Windows.Media.Control;
 
     /// <summary>
@@ -90,7 +91,7 @@ namespace SoundDeck.Core
                 // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
                 var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
-                if (device.IsReadOnly)
+                if (!device.IsDynamic)
                 {
                     var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
                     Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);
@@ -105,37 +106,13 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public void SetVolume(IProcessSelectionCriteria criteria, VolumeAction action, int value)
+        public void SetVolume<T>(T settings)
+            where T : IProcessSelectionCriteria, IVolumeSettings
         {
-            var predicate = criteria.ToPredicate();
+            var predicate = settings.ToPredicate();
             foreach (var audioSession in this.GetAudioSessions().Where(predicate.IsMatch))
             {
-                switch (action)
-                {
-                    case VolumeAction.Mute:
-                        audioSession.SimpleAudioVolume.Mute = true;
-                        break;
-
-                    case VolumeAction.Unmute:
-                        audioSession.SimpleAudioVolume.Mute = false;
-                        break;
-
-                    case VolumeAction.ToggleMute:
-                        audioSession.SimpleAudioVolume.Mute = !audioSession.SimpleAudioVolume.Mute;
-                        break;
-
-                    case VolumeAction.Set:
-                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, Math.Min(1f, value / 100f));
-                        break;
-
-                    case VolumeAction.IncreaseBy:
-                        audioSession.SimpleAudioVolume.Volume = Math.Min(1f, audioSession.SimpleAudioVolume.Volume + (value / 100f));
-                        break;
-
-                    case VolumeAction.DecreaseBy:
-                        audioSession.SimpleAudioVolume.Volume = Math.Max(0f, audioSession.SimpleAudioVolume.Volume - (value / 100f));
-                        break;
-                }
+                audioSession.SimpleAudioVolume.Set(settings);
             }
         }
 

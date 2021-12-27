@@ -2,6 +2,7 @@ namespace SoundDeck.Core
 {
     using System;
     using System.Collections.Generic;
+    using NAudio.CoreAudioApi;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Playback;
 
@@ -51,6 +52,13 @@ namespace SoundDeck.Core
         /// <param name="playlist">The playlist.</param>
         /// <returns>The playlist player.</returns>
         IPlaylistController GetPlaylistController(string deviceKey, ControllerActionType action);
+
+        /// <summary>
+        /// Sets <paramref name="deviceKey"/> as the default audio device for <paramref name="role"/>.
+        /// </summary>
+        /// <param name="deviceKey">The device key.</param>
+        /// <param name="role">The role; when <see cref="Role.Multimedia"/> or <see cref="Role.Console"/>, both are set.</param>
+        void SetDefaultDevice(string deviceKey, Role role);
 
         /// <summary>
         /// Stops all <see cref="IAudioPlayer"/> associated with this instance.

@@ -23,7 +23,7 @@ namespace SoundDeck.Core.Devices
         public DefaultAudioDevice(string key, string friendlyName, Role role, MMDevice device)
             : base(device)
         {
-            this.IsReadOnly = false;
+            this.IsDynamic = true;
             this.FriendlyName = friendlyName;
             this.Key = key;
             this.Role = role;
