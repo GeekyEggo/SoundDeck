@@ -3,7 +3,7 @@ import { PropertyInspectorWrapper, Select } from "react-sharpdeck";
 
 class SetDefaultAudioDeviceSettings extends React.Component {
     render() {
-		const roles = [
+        const roles = [
             { label: "Default", value: "0" },
             { label: "Communication", value: "2" }
         ];

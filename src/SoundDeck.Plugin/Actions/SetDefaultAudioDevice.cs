@@ -1,6 +1,8 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
+    using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -22,12 +24,20 @@
         }
 
         /// <inheritdoc/>
-        protected override Task OnKeyDown(ActionEventArgs<KeyPayload> args)
+        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
             var settings = args.Payload.GetSettings<SetDefaultAudioDeviceSettings>();
-            this.AudioService.SetDefaultDevice(settings.AudioDeviceId, settings.Role);
 
-            return this.ShowOkAsync();
+            try
+            {
+                this.AudioService.SetDefaultDevice(settings.AudioDeviceId, settings.Role);
+                await this.ShowOkAsync();
+            }
+            catch (Exception ex)
+            {
+                this.Logger?.LogError(ex, $"Failed to set default audio device; Device=\"{settings.AudioDeviceId}\", Role=\"{settings.Role}\".");
+                await this.ShowAlertAsync();
+            }
         }
     }
 }
