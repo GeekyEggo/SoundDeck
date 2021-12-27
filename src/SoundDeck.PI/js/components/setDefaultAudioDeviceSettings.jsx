@@ -11,7 +11,7 @@ class SetDefaultAudioDeviceSettings extends React.Component {
         return (
             <PropertyInspectorWrapper>
                 <Select label="Audio Device" dataSourceUri="GetDefaultAssignableAudioDevices" valuePath="audioDeviceId" defaultValue="PLAYBACK_DEFAULT" />
-				<Select label="Role" options={roles} valuePath="role" defaultValue="0" />
+                <Select label="Role" options={roles} valuePath="role" defaultValue="0" />
             </PropertyInspectorWrapper>
         );
     }
