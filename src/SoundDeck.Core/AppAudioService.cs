@@ -91,7 +91,7 @@ namespace SoundDeck.Core
                 // Default to zero pointer; this will only change if an audio device has been specified.
                 var hstring = IntPtr.Zero;
                 var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
-                if (device.IsReadOnly)
+                if (!device.IsDynamic)
                 {
                     var persistDeviceId = this.GenerateDeviceId(device.Id, dataFlow);
                     Combase.WindowsCreateString(persistDeviceId, (uint)persistDeviceId.Length, out hstring);

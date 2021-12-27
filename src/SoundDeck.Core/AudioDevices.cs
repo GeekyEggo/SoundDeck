@@ -140,7 +140,7 @@ namespace SoundDeck.Core
         {
             lock (_syncRoot)
             {
-                this.Devices.RemoveAll(device => device.Id == deviceId && device.IsReadOnly);
+                this.Devices.RemoveAll(device => device.Id == deviceId && !device.IsDynamic);
             }
         }
 

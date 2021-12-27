@@ -3,8 +3,10 @@ namespace SoundDeck.Core
     using System;
     using System.Collections.Generic;
     using Microsoft.Extensions.Logging;
+    using NAudio.CoreAudioApi;
     using SoundDeck.Core.Capture;
     using SoundDeck.Core.Capture.Sharing;
+    using SoundDeck.Core.Interop.Helpers;
     using SoundDeck.Core.Playback;
     using SoundDeck.Core.Playback.Controllers;
     using SoundDeck.Core.Playback.Players;
@@ -76,6 +78,31 @@ namespace SoundDeck.Core
 
             this.Playback.Add(playlist);
             return playlist;
+        }
+
+        /// <inheritdoc/>
+        public void SetDefaultDevice(string deviceKey, Role role)
+        {
+            var device = AudioDevices.Current.GetDeviceByKey(deviceKey);
+            if (device == null)
+            {
+                throw new KeyNotFoundException($"No device found matching key \"{deviceKey}\".");
+            }
+
+            using (var policyConfigClient = PolicyConfigClientFactory.Create())
+            {
+                switch (role)
+                {
+                    case Role.Communications:
+                        policyConfigClient.SetDefaultEndpoint(device.Id, Role.Communications);
+                        break;
+
+                    default:
+                        policyConfigClient.SetDefaultEndpoint(device.Id, Role.Console);
+                        policyConfigClient.SetDefaultEndpoint(device.Id, Role.Multimedia);
+                        break;
+                }
+            }
         }
 
         /// <summary>

@@ -45,6 +45,14 @@ namespace SoundDeck.Plugin.Actions
             => this.GetAudioDevices(device => device.Role != Role.Communications);
 
         /// <summary>
+        /// Gets the audio devices that are capable of being assigned as a the default audio device.
+        /// </summary>
+        /// <returns>The payload containing the audio devices.</returns>
+        [PropertyInspectorMethod]
+        public OptionsPayload GetDefaultAssignableAudioDevices()
+            => this.GetAudioDevices(device => !device.IsDynamic);
+
+        /// <summary>
         /// Gets the audio devices capable of playback.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>

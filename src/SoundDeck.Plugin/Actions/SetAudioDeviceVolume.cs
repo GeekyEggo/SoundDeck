@@ -3,8 +3,6 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
-    using NAudio.CoreAudioApi;
-    using NAudio.Wave;
     using SharpDeck;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
