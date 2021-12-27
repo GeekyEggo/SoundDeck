@@ -6,6 +6,8 @@
 
 - New action, "App Media Controls", control playback of a specific applications, i.e. Chrome, Spotify, VLC etc. ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63))
 - New action, "Set App Volume", set the volume of an individual applications ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63)).
+- New action, "Set Default Audio Device" ([#64](https://github.com/GeekyEggo/SoundDeck/issues/64)).
+- New action, "Set Audio Device Volume" ([#64](https://github.com/GeekyEggo/SoundDeck/issues/64)).
 - "Set App Audio Device" action now supports input devices ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63)). 
 - Added "Play / Overlap" option to playback actions ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
 - Added option to select default audio device for recording actions ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
