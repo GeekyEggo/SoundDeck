@@ -51,7 +51,8 @@ namespace SoundDeck.Plugin.Windows
                         .AddSingleton<IHostedService, AudioBufferRestartService>();
                 })
                 .UseStreamDeck()
-                .StartAsync();
+                .Build()
+                .RunAsync();
         }
     }
 }

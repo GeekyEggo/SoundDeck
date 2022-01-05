@@ -590,7 +590,7 @@
 
         if (props.dataSourceUri) {
           streamDeckClient.get(props.dataSourceUri).then(r => this.setState({
-            options: r.payload.options
+            options: r.payload.data
           }));
         }
       }
