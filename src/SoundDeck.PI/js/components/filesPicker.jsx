@@ -47,8 +47,12 @@ const FileItem = sortableElement(({ enableSort, fileIndex, item, onDelete, onVol
     function handlePlay() {
         streamDeckClient.sendToPlugin({
             event: "TestVolume",
-            path: item.path,
-            volume: item.volume || DEFAULT_VOLUME
+            parameters: {
+                file: {
+                    path: item.path,
+                    volume: item.volume || DEFAULT_VOLUME
+                }
+            }
         })
     }
 
@@ -150,7 +154,9 @@ class FilesPicker extends React.Component {
     handleDelete(index) {
         streamDeckClient.sendToPlugin({
             event: "RemoveFile",
-            index: index
+            parameters: {
+                index
+            }
         });
     }
 
@@ -163,8 +169,10 @@ class FilesPicker extends React.Component {
     handleSortEnd({ oldIndex, newIndex }) {
         streamDeckClient.sendToPlugin({
             event: "MoveFile",
-            oldIndex: oldIndex,
-            newIndex: newIndex
+            parameters: {
+                oldIndex: oldIndex,
+                newIndex: newIndex
+            }
         });
     }
 
@@ -176,7 +184,9 @@ class FilesPicker extends React.Component {
     handleVolumeChanged(file) {
         streamDeckClient.sendToPlugin({
             event: "SetVolume",
-            ...file
+            parameters: {
+                file: { ...file }
+            }
         });
     }
 

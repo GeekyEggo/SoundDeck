@@ -140,7 +140,6 @@ li.sortable span:first-child.sortable_value {
 }
 
 input[type="range"] {
-    margin-top: 0 !important;
     width: 100% !important;
 }
 

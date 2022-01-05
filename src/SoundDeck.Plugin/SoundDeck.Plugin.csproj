@@ -30,10 +30,10 @@
         <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
         <PackageReference Include="NLog" Version="4.7.13" />
         <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
-        <PackageReference Include="SharpDeck" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\SharpDeck\src\SharpDeck\SharpDeck.csproj" />
         <ProjectReference Include="..\SoundDeck.Core\SoundDeck.Core.csproj" />
     </ItemGroup>
 

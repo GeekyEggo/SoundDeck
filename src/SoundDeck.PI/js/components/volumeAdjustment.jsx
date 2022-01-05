@@ -28,7 +28,7 @@ class VolumeAdjustment extends React.Component {
             <React.Fragment>
                 <Select label="Action" options={this.volumeActions} valuePath="volumeAction" defaultValue="0" />
                 {this.state.isVolumeValueVisible &&
-                    <Range label="Value" valuePath="volumeValue" defaultValue="100" min="0" max="100" step="5" />
+                    <Range label="Value" valuePath="volumeValue" defaultValue="100" min="0" max="100" step="1" />
                 }
             </React.Fragment>
         );
