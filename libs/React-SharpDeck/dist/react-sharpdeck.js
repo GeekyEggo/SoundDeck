@@ -214,17 +214,17 @@
         /**
          * Sends a `get` request to the plugin, utilising SharpDeck libraries `PropertyInspectorMethod` attribute.
          * @param event The name of the event or method, i.e. URI endpoint.
-         * @param payload The optional payload.
+         * @param parameters The optional parameters.
          * @returns A promise containing the result.
          */
-        get(event, payload) {
+        get(event, parameters) {
             return __awaiter(this, void 0, void 0, function* () {
                 let request = {
                     event: event,
                     requestId: getUUID()
                 };
                 const client = yield this.connect();
-                return yield client.get(EVENTS.SEND_TO_PLUGIN, (data) => data.payload && data.payload.event == request.event && data.payload.requestId == request.requestId, Object.assign(Object.assign({}, payload), request));
+                return yield client.get(EVENTS.SEND_TO_PLUGIN, (data) => data.payload && data.payload.event == request.event && data.payload.requestId == request.requestId, Object.assign({ data: Object.assign({}, parameters) }, request));
             });
         }
         /**

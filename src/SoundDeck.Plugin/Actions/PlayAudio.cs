@@ -77,34 +77,36 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// Moves the file within the playlist.
         /// </summary>
+        /// <param name="oldIndex">The old index.</param>
+        /// <param name="newIndex">The new index.</param>
         /// <param name="payload">The payload containing the old and new indexes.</param>
         [PropertyInspectorMethod]
-        public void MoveFile(MovePlaylistFilePayload payload)
-            => this.WhenUserDefinedPlaylist(p => p.Move(payload.OldIndex, payload.NewIndex));
+        public void MoveFile(int oldIndex, int newIndex)
+            => this.WhenUserDefinedPlaylist(p => p.Move(oldIndex, newIndex));
 
         /// <summary>
         /// Deletes the file from the playlist.
         /// </summary>
-        /// <param name="payload">The payload containing the index of the file to delete.</param>
+        /// <param name="index">The index of the file to remove.</param>
         [PropertyInspectorMethod]
-        public void RemoveFile(RemovePlaylistFilePayload payload)
-            => this.WhenUserDefinedPlaylist(p => p.RemoveAt(payload.Index));
+        public void RemoveFile(int index)
+            => this.WhenUserDefinedPlaylist(p => p.RemoveAt(index));
 
         /// <summary>
         /// Sets the volume of the audio clip whos volume is being tested.
         /// </summary>
-        /// <param name="payload">The file.</param>
+        /// <param name="file">The file.</param>
         [PropertyInspectorMethod]
-        public void SetVolume(AdjustPlaylistFileVolumePayload payload)
+        public void SetVolume(AdjustPlaylistFileVolumePayload file)
         {
             lock (_syncRoot)
             {
                 // Update the volume of anything playing this file.
-                this.PlaylistController.TrySetVolume(payload);
-                this.VolumeTester.TrySetVolume(payload);
+                this.PlaylistController.TrySetVolume(file);
+                this.VolumeTester.TrySetVolume(file);
 
                 // Set the volume on the playlist item, and persist it.
-                this.PlaylistController.Playlist[payload.Index].Volume = payload.Volume;
+                this.PlaylistController.Playlist[file.Index].Volume = file.Volume;
                 this.SavePlaylist();
             }
         }
@@ -112,9 +114,9 @@ namespace SoundDeck.Plugin.Actions
         /// <summary>
         /// Tests the volume of the specified audio file by playing it.
         /// </summary>
-        /// <param name="payload">The payload.</param>
+        /// <param name="file">The file.</param>
         [PropertyInspectorMethod]
-        public void TestVolume(AdjustPlaylistFileVolumePayload payload)
+        public void TestVolume(AdjustPlaylistFileVolumePayload file)
         {
             lock (_syncRoot)
             {
@@ -125,7 +127,7 @@ namespace SoundDeck.Plugin.Actions
                     this.VolumeTester = new VolumeTester(this.AudioService.GetAudioPlayer(device.Key));
                 }
 
-                _ = this.VolumeTester.PlayAsync(payload, device);
+                _ = this.VolumeTester.PlayAsync(file, device);
             }
         }
 
