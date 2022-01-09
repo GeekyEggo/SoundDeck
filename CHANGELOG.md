@@ -12,6 +12,10 @@
 - Added "Play / Overlap" option to playback actions ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
 - Added option to select default audio device for recording actions ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
 
+### 🐞 Fixed
+
+- Fixed an error that would cause playback to stop when switching profiles ([#65](https://github.com/GeekyEggo/SoundDeck/issues/65)).
+
 ### ♻ Changed
 
 - Switched to GNU General Public License v3 (GPL-3) license.
