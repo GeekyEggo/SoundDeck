@@ -1,7 +1,6 @@
 namespace SoundDeck.Plugin.Extensions
 {
     using SoundDeck.Core.Playback;
-    using SoundDeck.Plugin.Models.Payloads;
 
     /// <summary>
     /// Provides extension methods for <see cref="IIndexedAudioPlayer"/>.
@@ -9,16 +8,17 @@ namespace SoundDeck.Plugin.Extensions
     public static class IndexedAudioPlayerExtensions
     {
         /// <summary>
-        /// When the current audio being played matches the indexes defined within the specified <paramref name="payload"/>, the volume of the audio player is updated.
+        /// When the current audio being played matches the indexes defined, the volume of the audio player is updated.
         /// </summary>
         /// <param name="player">The player; this instance.</param>
-        /// <param name="payload">The payload.</param>
-        public static void TrySetVolume(this IIndexedAudioPlayer player, AdjustPlaylistFileVolumePayload payload)
+        /// <param name="index">The index of the file.</param>
+        /// <param name="volume">The volume.</param>
+        public static void TrySetVolume(this IIndexedAudioPlayer player, int index, float volume)
         {
-            if (player?.Index == payload.Index
+            if (player?.Index == index
                 && player.AudioPlayer != null)
             {
-                player.AudioPlayer.Volume = payload.Volume;
+                player.AudioPlayer.Volume = volume;
             }
         }
 

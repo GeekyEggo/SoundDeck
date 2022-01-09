@@ -96,6 +96,14 @@ namespace SoundDeck.Plugin.Actions
         protected override Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, SamplerSettings settings)
         {
             this.SetPlaylistController(settings);
+
+            if (this.PlaylistController.Playlist.Count > 0)
+            {
+                var volume = settings.PlaybackVolume / 100f;
+                this.PlaylistController.Playlist[0].Volume = volume;
+                this.PlaylistController.TrySetVolume(0, volume);
+            }
+
             return base.OnDidReceiveSettings(args, settings);
         }
 

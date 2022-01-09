@@ -9,8 +9,9 @@
 - New action, "Set Default Audio Device" ([#64](https://github.com/GeekyEggo/SoundDeck/issues/64)).
 - New action, "Set Audio Device Volume" ([#64](https://github.com/GeekyEggo/SoundDeck/issues/64)).
 - "Set App Audio Device" action now supports input devices ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63)). 
-- Added "Play / Overlap" option to playback actions ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
 - Added option to select default audio device for recording actions ([#54](https://github.com/GeekyEggo/SoundDeck/issues/54)).
+- Added "Play / Overlap" option to playback actions ([#60](https://github.com/GeekyEggo/SoundDeck/issues/60)).
+- Added playback volume control to "Sampler" action ([#61](https://github.com/GeekyEggo/SoundDeck/issues/61)).
 
 ### 🐞 Fixed
 

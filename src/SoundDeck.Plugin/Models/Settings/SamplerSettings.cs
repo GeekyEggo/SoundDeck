@@ -36,6 +36,11 @@ namespace SoundDeck.Plugin.Models.Settings
         public string PlaybackAudioDeviceId { get; set; }
 
         /// <summary>
+        /// Gets or sets the playback volume.
+        /// </summary>
+        public int PlaybackVolume { get; set; } = 75;
+
+        /// <summary>
         /// Gets or sets the type of the action that occurs upon the button being pressed.
         /// </summary>
         public ControllerActionType Action { get; set; } = ControllerActionType.PlayNext;
@@ -50,7 +55,14 @@ namespace SoundDeck.Plugin.Models.Settings
             {
                 return string.IsNullOrWhiteSpace(this.FilePath)
                     ? new AudioFileInfo[0]
-                    : new[] { new AudioFileInfo { Path = this.FilePath } };
+                    : new[]
+                    {
+                        new AudioFileInfo
+                        {
+                            Path = this.FilePath,
+                            Volume = this.PlaybackVolume / 100f
+                        }
+                    };
             }
         }
 

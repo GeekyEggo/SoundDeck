@@ -102,8 +102,8 @@ namespace SoundDeck.Plugin.Actions
             lock (_syncRoot)
             {
                 // Update the volume of anything playing this file.
-                this.PlaylistController.TrySetVolume(file);
-                this.VolumeTester.TrySetVolume(file);
+                this.PlaylistController.TrySetVolume(file.Index, file.Volume);
+                this.VolumeTester.TrySetVolume(file.Index, file.Volume);
 
                 // Set the volume on the playlist item, and persist it.
                 this.PlaylistController.Playlist[file.Index].Volume = file.Volume;
