@@ -1,9 +1,9 @@
 {
     "$schema": "https://gist.githubusercontent.com/GeekyEggo/607881f1133ee2973b0140871023c9b8/raw/4d96b5d8b2bbca1bf88f836b8e5c1d527a77961c/esdsdk-schema.json",
     "Author": "GeekyEggo",
-    "Description": "A powerful plugin that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.",
+    "Description": "A powerful audio-focused plugin that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.",
     "Name": "Sound Deck",
-    "Version": "3.6.1",
+    "Version": "3.6.2",
     "SDKVersion": 2,
     "Category": "Sound Deck",
     "CategoryIcon": "Images/SoundDeck/Category",
