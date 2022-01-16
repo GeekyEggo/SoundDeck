@@ -4,7 +4,7 @@
 
 # <img src="./assets/sound-deck.svg#gh-light-mode-only" width="25" alt="Sound Deck Logo" /><img src="./assets/dark-mode/sound-deck.svg#gh-dark-mode-only" width="25" alt="Sound Deck Logo" /> Sound Deck
 
-A powerful audio-focused plugin for the Elgato Stream Deck that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.
+Sound Deck is a powerful audio-focused plugin for the Elgato Stream Deck that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.
 
 ## ⚡ Actions
 
