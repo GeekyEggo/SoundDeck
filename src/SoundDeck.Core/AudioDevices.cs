@@ -16,22 +16,22 @@ namespace SoundDeck.Core
         /// <summary>
         /// /// The identifier used to determine the default playback device.
         /// </summary>
-        private const string PLAYBACK_DEFAULT = "PLAYBACK_DEFAULT";
+        public const string PLAYBACK_DEFAULT = "PLAYBACK_DEFAULT";
 
         /// <summary>
         /// The identifier used to determine the default playback communication device.
         /// </summary>
-        private const string PLAYBACK_DEFAULT_COMMUNICATION = "PLAYBACK_DEFAULT_COMMUNICATION";
+        public const string PLAYBACK_DEFAULT_COMMUNICATION = "PLAYBACK_DEFAULT_COMMUNICATION";
 
         /// <summary>
         /// The identifier used to determine the default recording device.
         /// </summary>
-        private const string RECORDING_DEFAULT = "RECORDING_DEFAULT";
+        public const string RECORDING_DEFAULT = "RECORDING_DEFAULT";
 
         /// <summary>
         /// The identifier used to determine the default recording communication device.
         /// </summary>
-        private const string RECORDING_DEFAULT_COMMUNICATION = "RECORDING_DEFAULT_COMMUNICATION";
+        public const string RECORDING_DEFAULT_COMMUNICATION = "RECORDING_DEFAULT_COMMUNICATION";
 
         /// <summary>
         /// Private member field for <see cref="Current"/>.

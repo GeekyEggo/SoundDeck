@@ -1,9 +1,11 @@
 namespace SetAppAudioDevice
 {
+    using SoundDeck.Core.Sessions;
+
     /// <summary>
     /// Provides options parsed from the command line arguments.
     /// </summary>
-    public class Options
+    public class Options : IProcessSelectionCriteria
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Options"/> class.
@@ -28,7 +30,7 @@ namespace SetAppAudioDevice
 
                     case "-p":
                     case "/p":
-                        this.Process = args[i + 1];
+                        this.ProcessName = args[i + 1];
                         break;
                 }
             }
@@ -39,9 +41,10 @@ namespace SetAppAudioDevice
         /// </summary>
         public string Device { get; set; }
 
-        /// <summary>
-        /// Gets or sets the process; when empty or null, the foreground process is used.
-        /// </summary>
-        public string Process { get; set; }
+        /// <inheritdoc/>
+        public string ProcessName { get; }
+
+        /// <inheritdoc/>
+        public ProcessSelectionType ProcessSelectionType => string.IsNullOrWhiteSpace(this.ProcessName) ? ProcessSelectionType.Foreground : ProcessSelectionType.ByName;
     }
 }

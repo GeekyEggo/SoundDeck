@@ -1,11 +1,9 @@
 ﻿namespace SoundDeck.Plugin.Models.Payloads
 {
-    using SharpDeck.PropertyInspectors;
-
     /// <summary>
     /// Provides payload information for the selection of a folder.
     /// </summary>
-    public class FolderPickerPayload : PropertyInspectorPayload
+    public class FolderPickerPayload
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderPickerPayload"/> class.

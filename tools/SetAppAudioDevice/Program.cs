@@ -2,7 +2,6 @@ namespace SetAppAudioDevice
 {
     using System;
     using SoundDeck.Core;
-    using SoundDeck.Core.Interop;
 
     /// <summary>
     /// The main application.
@@ -25,16 +24,7 @@ namespace SetAppAudioDevice
                     ? options.Device = AudioDevices.PLAYBACK_DEFAULT
                     : GetDeviceId(options.Device);
 
-                if (string.IsNullOrWhiteSpace(options.Process))
-                {
-                    // No process; assume foreground.
-                    appAudioService.SetDefaultAudioDeviceForForegroundApp(AudioFlowType.Playback, options.Device);
-                }
-                else
-                {
-                    // Set the specified process.
-                    appAudioService.SetDefaultAudioDevice(options.Process, AudioFlowType.Playback, options.Device);
-                }
+                appAudioService.SetDefaultAudioDevice(options, options.Device);
             }
             catch (Exception ex)
             {
