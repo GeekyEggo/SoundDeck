@@ -1,13 +1,9 @@
 namespace SoundDeck.Plugin.Windows
 {
     using System.Diagnostics;
-    using System.IO;
     using System.Windows;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using NLog.Extensions.Logging;
     using SharpDeck.Extensions.Hosting;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.UI;
@@ -27,20 +23,8 @@ namespace SoundDeck.Plugin.Windows
 #if DEBUG
             Debugger.Launch();
 #endif
-            _ = new HostBuilder()
-                .ConfigureAppConfiguration(configBuilder =>
-                {
-                    configBuilder
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
-                })
-                .ConfigureLogging((hostingContext, loggingBuilder) =>
-                {
-                    loggingBuilder
-                        .ClearProviders()
-                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
-                        .AddNLog(new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog")));
-                })
+            _ = StreamDeckPluginHost
+                .CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services
@@ -50,9 +34,7 @@ namespace SoundDeck.Plugin.Windows
                         .AddSingleton<IFolderBrowserDialogProvider, FolderBrowserDialogWrapper>()
                         .AddSingleton<IHostedService, AudioBufferRestartService>();
                 })
-                .UseStreamDeck()
-                .Build()
-                .RunAsync();
+                .RunStreamDeckPluginAsync();
         }
     }
 }
