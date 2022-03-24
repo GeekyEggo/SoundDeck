@@ -19,8 +19,8 @@ class AppMultimediaControlsSettings extends React.Component {
     render() {
         return (
             <PropertyInspectorWrapper>
-                <Select label="Action" options={this.multimediaActions} valuePath="action" defaultValue="0" />
                 <ProcessSelector />
+                <Select label="Action" options={this.multimediaActions} valuePath="action" defaultValue="0" />
             </PropertyInspectorWrapper>
         );
     }
