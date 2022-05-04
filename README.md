@@ -1,6 +1,4 @@
-[![download-count]](https://apps.elgato.com/plugins/com.geekyeggo.sounddeck)
-[![beta-version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin)
-[![Twitter icon](https://img.shields.io/static/v1?style=flat-square&message=GeekyEggo&logo=Twitter&label=&color=blue&logoColor=white&labelColor=grey)](https://www.twitter.com/geekyeggo)
+[![download-count]](https://apps.elgato.com/plugins/com.geekyeggo.sounddeck) [![beta-version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin) [![Twitter icon](https://img.shields.io/static/v1?style=flat-square&message=GeekyEggo&logo=Twitter&label=&color=blue&logoColor=white&labelColor=grey)](https://www.twitter.com/geekyeggo)
 
 # <img src="./assets/sound-deck.svg#gh-light-mode-only" width="25" alt="Sound Deck Logo" /><img src="./assets/dark-mode/sound-deck.svg#gh-dark-mode-only" width="25" alt="Sound Deck Logo" /> Sound Deck
 
