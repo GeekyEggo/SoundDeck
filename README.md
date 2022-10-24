@@ -1,5 +1,8 @@
 [![download-count]](https://apps.elgato.com/plugins/com.geekyeggo.sounddeck) [![beta-version-icon]](https://github.com/GeekyEggo/SoundDeck/raw/main/dist/com.geekyeggo.sounddeck.streamDeckPlugin) [![Twitter icon](https://img.shields.io/static/v1?style=flat-square&message=GeekyEggo&logo=Twitter&label=&color=blue&logoColor=white&labelColor=grey)](https://www.twitter.com/geekyeggo)
 
+> **Warning**
+> Sound Deck is not currently supported in Stream Deck v6-beta due to breaking changes in the SDK; the beta is subject to change until we know more from Elgato. Should these changes become permanent, Sound Deck will be updated accordingly. More information can be found on the Elgato Discord, in [this thread](https://discord.com/channels/581549424518365226/1029710971909967904).
+
 # <img src="./assets/sound-deck.svg#gh-light-mode-only" width="25" alt="Sound Deck Logo" /><img src="./assets/dark-mode/sound-deck.svg#gh-dark-mode-only" width="25" alt="Sound Deck Logo" /> Sound Deck
 
 Sound Deck is a powerful audio-focused plugin for the Elgato Stream Deck that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.
