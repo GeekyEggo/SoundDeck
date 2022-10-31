@@ -2,11 +2,15 @@ namespace SoundDeck.Plugin.Actions
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
+    using Newtonsoft.Json.Linq;
     using SharpDeck;
+    using SharpDeck.Events.Received;
     using SharpDeck.PropertyInspectors;
     using SharpDeck.PropertyInspectors.Payloads;
     using SoundDeck.Core;
+    using SoundDeck.Plugin.Models.Payloads;
 
     /// <summary>
     /// Provides a base action.
@@ -33,23 +37,15 @@ namespace SoundDeck.Plugin.Actions
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
-        public Option[] GetAudioDevices()
+        public DataSourceItem[] GetAudioDevices()
             => this.GetAudioDevices(_ => true);
-
-        /// <summary>
-        /// Gets the audio devices capable of having an application assigned to them.
-        /// </summary>
-        /// <returns>The payload containing the audio devices.</returns>
-        [PropertyInspectorMethod]
-        public Option[] GetAppAssignableAudioDevices()
-            => this.GetAudioDevices(device => device.Role != Role.Communications);
 
         /// <summary>
         /// Gets the audio devices that are capable of being assigned as a the default audio device.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
         [PropertyInspectorMethod]
-        public Option[] GetDefaultAssignableAudioDevices()
+        public DataSourceItem[] GetDefaultAssignableAudioDevices()
             => this.GetAudioDevices(device => !device.IsDynamic);
 
         /// <summary>
@@ -65,20 +61,32 @@ namespace SoundDeck.Plugin.Actions
                 .ToArray();
         }
 
+        /// <inheritdoc/>
+        protected override async Task OnSendToPlugin(ActionEventArgs<JObject> args)
+        {
+            await base.OnSendToPlugin(args);
+
+            var payload = args.Payload.ToObject<DataSourcePayload>();
+            if (payload.Event == "getAppAssignableAudioDevices")
+            {
+                await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
+            }
+        }
+
         /// <summary>
         /// Gets the audio devices that match the specified <paramref name="filter"/>; otherwise all.
         /// </summary>
         /// <param name="filter">The optional filter.</param>
         /// <returns>The audio devices. </returns>
-        private Option[] GetAudioDevices(Func<IAudioDevice, bool> filter)
+        private DataSourceItem[] GetAudioDevices(Func<IAudioDevice, bool> filter)
         {
             return this.AudioService.Devices
                 .Where(filter)
                 .GroupBy(device => device.Flow)
                 .Select(g =>
                 {
-                    var children = g.Select(opt => new Option(opt.FriendlyName, opt.Key)).ToList();
-                    return new Option(g.Key == DataFlow.Render ? "Playback" : "Recording", children);
+                    var children = g.Select(opt => new DataSourceItem(opt.Key, opt.FriendlyName)).ToArray();
+                    return new DataSourceItem(g.Key == DataFlow.Render ? "Playback" : "Recording", children);
                 }).ToArray();
         }
     }

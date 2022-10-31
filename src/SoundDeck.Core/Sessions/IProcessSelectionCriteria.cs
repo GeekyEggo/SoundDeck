@@ -6,13 +6,13 @@
     public interface IProcessSelectionCriteria
     {
         /// <summary>
-        /// Gets the name of the process to change.
+        /// Gets or sets the name of the process to change.
         /// </summary>
-        string ProcessName { get; }
+        string ProcessName { get; set; }
 
         /// <summary>
-        /// Gets the type that defines how the process is selected.
+        /// Gets or sets the type that defines how the process is selected.
         /// </summary>
-        ProcessSelectionType ProcessSelectionType { get; }
+        ProcessSelectionType ProcessSelectionType { get; set; }
     }
 }

@@ -27,6 +27,7 @@
     {
       "Icon": "Images/SetAppAudioDevice/Action",
       "Name": "Set App Audio Device",
+      "PropertyInspectorPath": "PI/setAppAudioDevice.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Set the default audio device for an application.",
       "UUID": "com.geekyeggo.sounddeck.setappaudiodevice",

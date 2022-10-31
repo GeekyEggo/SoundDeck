@@ -17,14 +17,15 @@
     /// Provides an action that is capable of controlling media for a specific app.
     /// </summary>
     [StreamDeckAction("com.geekyeggo.sounddeck.appmultimediacontrols")]
-    public class AppMultimediaControls : StreamDeckAction<AppMultimediaControlsSettings>
+    public class AppMultimediaControls : AppActionBase<AppMultimediaControlsSettings>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AppMultimediaControls"/> class.
+        /// Initializes a new instance of the <see cref="AppMultimediaControls" /> class.
         /// </summary>
+        /// <param name="audioService">The audio service.</param>
         /// <param name="appAudioService">The application audio service.</param>
-        public AppMultimediaControls(IAppAudioService appAudioService)
-           : base() => this.AppAudioService = appAudioService;
+        public AppMultimediaControls(IAudioService audioService, IAppAudioService appAudioService)
+           : base(audioService) => this.AppAudioService = appAudioService;
 
         /// <summary>
         /// Gets the application audio service.
@@ -59,23 +60,7 @@
             var payload = args.Payload.ToObject<DataSourcePayload>();
             if (payload.Event == "getMultimediaSessions")
             {
-                // Add the default items.
-                var items = new List<DataSourceItem>
-                {
-                    new DataSourceItem("0", "Foreground (Active)"),
-                    new DataSourceItem("1", "By Name")
-                };
-
-                // Add the active sessions if we have any.
-                var sessions = await this.GetMultimediaSessions();
-                if (sessions.Count > 0)
-                {
-                    items.Add(new DataSourceItem("Current Media", sessions));
-                }
-
-                // Return the items.
-                var response = new DataSourceResponse(payload.Event, items);
-                await this.SendToPropertyInspectorAsync(response);
+                await this.SendProcessOptions(payload.Event, "Active Apps", await this.GetMultimediaSessions());
             }
         }
 

@@ -34,6 +34,8 @@ namespace SetAppAudioDevice
                         break;
                 }
             }
+
+            this.ProcessSelectionType = string.IsNullOrWhiteSpace(this.ProcessName) ? ProcessSelectionType.Foreground : ProcessSelectionType.ByName;
         }
 
         /// <summary>
@@ -42,9 +44,9 @@ namespace SetAppAudioDevice
         public string Device { get; set; }
 
         /// <inheritdoc/>
-        public string ProcessName { get; }
+        public string ProcessName { get; set; }
 
         /// <inheritdoc/>
-        public ProcessSelectionType ProcessSelectionType => string.IsNullOrWhiteSpace(this.ProcessName) ? ProcessSelectionType.Foreground : ProcessSelectionType.ByName;
+        public ProcessSelectionType ProcessSelectionType { get; set; }
     }
 }

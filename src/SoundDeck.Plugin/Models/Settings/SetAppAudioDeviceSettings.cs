@@ -1,11 +1,14 @@
 namespace SoundDeck.Plugin.Models.Settings
 {
+    using Newtonsoft.Json;
     using SoundDeck.Core.Sessions;
     using SoundDeck.Plugin.Actions;
+    using SoundDeck.Plugin.Serialization;
 
     /// <summary>
     /// Provides settings for the <see cref="SetAppAudioDevice"/> action.
     /// </summary>
+    [JsonConverter(typeof(SetAppAudioDeviceSettingsJsonConverter))]
     public class SetAppAudioDeviceSettings : IProcessSelectionCriteria
     {
         /// <summary>
