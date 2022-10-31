@@ -1,149 +1,150 @@
 {
-    "$schema": "https://gist.githubusercontent.com/GeekyEggo/607881f1133ee2973b0140871023c9b8/raw/4d96b5d8b2bbca1bf88f836b8e5c1d527a77961c/esdsdk-schema.json",
-    "Author": "GeekyEggo",
-    "Description": "A powerful audio-focused plugin that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.",
-    "Name": "Sound Deck",
-    "Version": "3.7.2",
-    "SDKVersion": 2,
-    "Category": "Sound Deck",
-    "CategoryIcon": "Images/SoundDeck/Category",
-    "CodePath": "SoundDeck.exe",
-    "Icon": "Images/SoundDeck/Icon",
-    "PropertyInspectorPath": "PI/index.html",
-    "URL": "https://github.com/GeekyEggo/SoundDeck",
-    "Actions": [
-        {
-            "Icon": "Images/AppMultimediaControls/Action",
-            "Name": "App Media Controls",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Control the multimedia of a specific application.",
-            "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/AppMultimediaControls/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/SetAppAudioDevice/Action",
-            "Name": "Set App Audio Device",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Set the default audio device for an application.",
-            "UUID": "com.geekyeggo.sounddeck.setappaudiodevice",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/SetAppAudioDevice/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/SetAppVolume/Action",
-            "Name": "Set App Volume",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Set the volume of an application.",
-            "UUID": "com.geekyeggo.sounddeck.setappvolume",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/SetAppVolume/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/SetDefaultAudioDevice/Action",
-            "Name": "Set Default Audio Device",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Set the default audio device.",
-            "UUID": "com.geekyeggo.sounddeck.setdefaultaudiodevice",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/SetDefaultAudioDevice/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/SetAudioDeviceVolume/Action",
-            "Name": "Set Audio Device Volume",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Set the volume of an audio device.",
-            "UUID": "com.geekyeggo.sounddeck.setaudiodevicevolume",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/SetAudioDeviceVolume/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/Sampler/Action",
-            "Name": "Sampler",
-            "SupportedInMultiActions": false,
-            "Tooltip": "Record and playback samples!",
-            "UUID": "com.geekyeggo.sounddeck.sampler",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/Sampler/Key0" },
-                { "Image": "Images/Sampler/Key1" }
-            ]
-        },
-        {
-            "Icon": "Images/SamplerClear/Action",
-            "Name": "Clear Sampler",
-            "SupportedInMultiActions": false,
-            "Tooltip": "Activate sampler clearing.",
-            "UUID": "com.geekyeggo.sounddeck.clearsample",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/SamplerClear/Key0" },
-                { "Image": "Images/SamplerClear/Key1" }
-            ]
-        },
-        {
-            "Icon": "Images/ClipAudio/Action",
-            "Name": "Clip Audio",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Clip those last precious seconds of audio; you'll never miss a funny moment again.",
-            "UUID": "com.geekyeggo.sounddeck.clipaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/ClipAudio/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/RecordAudio/Action",
-            "Name": "Record Audio",
-            "SupportedInMultiActions": false,
-            "Tooltip": "Record Audio",
-            "UUID": "com.geekyeggo.sounddeck.recordaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/RecordAudio/Key0" },
-                { "Image": "Images/RecordAudio/Key1" }
-            ]
-        },
-        {
-            "Icon": "Images/PlayAudio/Action",
-            "Name": "Play Audio",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Play an audio clip, or three... or more, in the order your heart desires.",
-            "UUID": "com.geekyeggo.sounddeck.playaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/PlayAudio/Key" }
-            ]
-        },
-        {
-            "Icon": "Images/StopAudio/Action",
-            "Name": "Stop Audio",
-            "SupportedInMultiActions": true,
-            "Tooltip": "Stops all audio being played through Sound Deck.",
-            "UUID": "com.geekyeggo.sounddeck.stopaudio",
-            "VisibleInActionsList": true,
-            "States": [
-                { "Image": "Images/StopAudio/Key" }
-            ]
-        }
-    ],
-    "OS": [
-        {
-            "Platform": "windows",
-            "MinimumVersion": "10"
-        }
-    ],
-    "Software": {
-        "MinimumVersion": "4.3"
+  "$schema": "https://gist.githubusercontent.com/GeekyEggo/607881f1133ee2973b0140871023c9b8/raw/4d96b5d8b2bbca1bf88f836b8e5c1d527a77961c/esdsdk-schema.json",
+  "Author": "GeekyEggo",
+  "Description": "A powerful audio-focused plugin that allows you to capture, record, playback, and sample audio. Sound Deck also includes actions that let you control your audio devices and the audio of applications, e.g. set the default audio device, change the audio volume, or control the media playback of an application.",
+  "Name": "Sound Deck",
+  "Version": "3.7.2",
+  "SDKVersion": 2,
+  "Category": "Sound Deck",
+  "CategoryIcon": "Images/SoundDeck/Category",
+  "CodePath": "SoundDeck.exe",
+  "Icon": "Images/SoundDeck/Icon",
+  "PropertyInspectorPath": "PI/index.html",
+  "URL": "https://github.com/GeekyEggo/SoundDeck",
+  "Actions": [
+    {
+      "Icon": "Images/AppMultimediaControls/Action",
+      "Name": "App Media Controls",
+      "PropertyInspectorPath": "PI/appMultimediaControls.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Control the multimedia of a specific application.",
+      "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/AppMultimediaControls/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/SetAppAudioDevice/Action",
+      "Name": "Set App Audio Device",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set the default audio device for an application.",
+      "UUID": "com.geekyeggo.sounddeck.setappaudiodevice",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/SetAppAudioDevice/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/SetAppVolume/Action",
+      "Name": "Set App Volume",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set the volume of an application.",
+      "UUID": "com.geekyeggo.sounddeck.setappvolume",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/SetAppVolume/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/SetDefaultAudioDevice/Action",
+      "Name": "Set Default Audio Device",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set the default audio device.",
+      "UUID": "com.geekyeggo.sounddeck.setdefaultaudiodevice",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/SetDefaultAudioDevice/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/SetAudioDeviceVolume/Action",
+      "Name": "Set Audio Device Volume",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Set the volume of an audio device.",
+      "UUID": "com.geekyeggo.sounddeck.setaudiodevicevolume",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/SetAudioDeviceVolume/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/Sampler/Action",
+      "Name": "Sampler",
+      "SupportedInMultiActions": false,
+      "Tooltip": "Record and playback samples!",
+      "UUID": "com.geekyeggo.sounddeck.sampler",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/Sampler/Key0" },
+        { "Image": "Images/Sampler/Key1" }
+      ]
+    },
+    {
+      "Icon": "Images/SamplerClear/Action",
+      "Name": "Clear Sampler",
+      "SupportedInMultiActions": false,
+      "Tooltip": "Activate sampler clearing.",
+      "UUID": "com.geekyeggo.sounddeck.clearsample",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/SamplerClear/Key0" },
+        { "Image": "Images/SamplerClear/Key1" }
+      ]
+    },
+    {
+      "Icon": "Images/ClipAudio/Action",
+      "Name": "Clip Audio",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Clip those last precious seconds of audio; you'll never miss a funny moment again.",
+      "UUID": "com.geekyeggo.sounddeck.clipaudio",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/ClipAudio/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/RecordAudio/Action",
+      "Name": "Record Audio",
+      "SupportedInMultiActions": false,
+      "Tooltip": "Record Audio",
+      "UUID": "com.geekyeggo.sounddeck.recordaudio",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/RecordAudio/Key0" },
+        { "Image": "Images/RecordAudio/Key1" }
+      ]
+    },
+    {
+      "Icon": "Images/PlayAudio/Action",
+      "Name": "Play Audio",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Play an audio clip, or three... or more, in the order your heart desires.",
+      "UUID": "com.geekyeggo.sounddeck.playaudio",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/PlayAudio/Key" }
+      ]
+    },
+    {
+      "Icon": "Images/StopAudio/Action",
+      "Name": "Stop Audio",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Stops all audio being played through Sound Deck.",
+      "UUID": "com.geekyeggo.sounddeck.stopaudio",
+      "VisibleInActionsList": true,
+      "States": [
+        { "Image": "Images/StopAudio/Key" }
+      ]
     }
+  ],
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "4.3"
+  }
 }

@@ -1,12 +1,14 @@
 ﻿namespace SoundDeck.Plugin.Models.Settings
 {
-    using SoundDeck.Core;
+    using Newtonsoft.Json;
     using SoundDeck.Core.Sessions;
     using SoundDeck.Plugin.Actions;
+    using SoundDeck.Plugin.Serialization;
 
     /// <summary>
     /// Provides settings for <see cref="AppMultimediaControls"/>.
     /// </summary>
+    [JsonConverter(typeof(AppMultimediaControlsSettingsJsonConverter))]
     public class AppMultimediaControlsSettings : IProcessSelectionCriteria
     {
         /// <summary>

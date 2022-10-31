@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SetAppAudioDevice", "tools\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{8EB54E40-917C-4EE9-96DE-225D419CF72A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck.Extensions.Hosting", "..\SharpDeck\src\SharpDeck.Extensions.Hosting\SharpDeck.Extensions.Hosting.csproj", "{D8612EFF-30FB-45A9-8BA4-61CF589D719E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,10 +55,6 @@ Global
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8612EFF-30FB-45A9-8BA4-61CF589D719E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8612EFF-30FB-45A9-8BA4-61CF589D719E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8612EFF-30FB-45A9-8BA4-61CF589D719E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8612EFF-30FB-45A9-8BA4-61CF589D719E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
