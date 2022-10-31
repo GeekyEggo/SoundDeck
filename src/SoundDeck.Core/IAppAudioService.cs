@@ -1,9 +1,11 @@
 namespace SoundDeck.Core
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using NAudio.CoreAudioApi;
     using SoundDeck.Core.Sessions;
     using SoundDeck.Core.Volume;
+    using Windows.Media.Control;
 
     /// <summary>
     /// Provides a service for controlling and interacting with the audio device of an application.
@@ -40,5 +42,17 @@ namespace SoundDeck.Core
         /// <param name="action">The multimedia action to apply.</param>
         /// <returns>The task of controlling the multimedia.</returns>
         Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action);
+
+        /// <summary>
+        /// Gets the all active audio sessions audio sessions.
+        /// </summary>
+        /// <returns>The active audio sessions.</returns>
+        IEnumerable<AudioSessionControl> GetAudioSessions();
+
+        /// <summary>
+        /// Gets the all active multimedia session asynchronously.
+        /// </summary>
+        /// <returns>The active multimedia sessions.</returns>
+        Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionAsync();
     }
 }

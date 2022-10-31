@@ -119,10 +119,10 @@ namespace SoundDeck.Core
         /// <inheritdoc/>
         public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
         {
-            var manager = await this.GetManagerAsync();
             var predicate = criteria.ToPredicate();
+            var sessions = await this.GetMultimediaSessionAsync();
 
-            foreach (var session in manager.GetSessions().Where(predicate.IsMatch))
+            foreach (var session in sessions.Where(predicate.IsMatch))
             {
                 await (action switch
                 {
@@ -136,11 +136,32 @@ namespace SoundDeck.Core
             }
         }
 
-        /// <summary>
-        /// Gets the all active audio sessions audio sessions.
-        /// </summary>
-        /// <returns>The active audio sessions.</returns>
-        private IEnumerable<AudioSessionControl> GetAudioSessions()
+        /// <inheritdoc/>
+        public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionAsync()
+        {
+            try
+            {
+                await _syncRoot.WaitAsync();
+
+                if (this._manager == null)
+                {
+                    this._manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+                    if (this._manager == null)
+                    {
+                        throw new NullReferenceException("Failed to get session manager.");
+                    }
+                }
+
+                return this._manager.GetSessions();
+            }
+            finally
+            {
+                _syncRoot.Release();
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<AudioSessionControl> GetAudioSessions()
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
@@ -195,33 +216,6 @@ namespace SoundDeck.Core
             if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
 
             return deviceId;
-        }
-
-        /// <summary>
-        /// Gets the session manager asynchronously.
-        /// </summary>
-        /// <returns>The session manager.</returns>
-        private async Task<GlobalSystemMediaTransportControlsSessionManager> GetManagerAsync()
-        {
-            try
-            {
-                await _syncRoot.WaitAsync();
-
-                if (this._manager == null)
-                {
-                    this._manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-                    if (this._manager == null)
-                    {
-                        throw new NullReferenceException("Failed to get session manager.");
-                    }
-                }
-
-                return this._manager;
-            }
-            finally
-            {
-                _syncRoot.Release();
-            }
         }
     }
 }
