@@ -6,7 +6,7 @@
 </head>
 <body>
     <sdpi-item label="Process">
-        <sdpi-select setting="processSelectionType" id="__process" datasource="getMultimediaSessions"></sdpi-select>
+        <sdpi-select setting="processSelectionType" id="__process" datasource="getMultimediaSessions" placeholder="Foreground"></sdpi-select>
     </sdpi-item>
 
     <sdpi-item label="Name" id="__name" style="display: none;">
@@ -14,7 +14,7 @@
     </sdpi-item>
 
     <sdpi-item label="Action">
-        <sdpi-select setting="action" value-type="number">
+        <sdpi-select setting="action" value-type="number" placeholder="Play / Pause">
             <option value="0">Play / Pause</option>
             <option value="1">Play</option>
             <option value="2">Pause</option>

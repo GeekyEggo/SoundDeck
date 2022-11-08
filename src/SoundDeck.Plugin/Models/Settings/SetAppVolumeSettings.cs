@@ -1,17 +1,17 @@
 ﻿namespace SoundDeck.Plugin.Models.Settings
 {
-    using SoundDeck.Core.Sessions;
+    using SoundDeck.Core.Volume;
     using SoundDeck.Plugin.Actions;
 
     /// <summary>
     /// Provides settings for the <see cref="SetAppAudioDevice"/> action.
     /// </summary>
-    public class SetAppVolumeSettings : VolumeSettings, IProcessSelectionCriteria
+    public class SetAppVolumeSettings : ProcessSelectionCriteriaSettings, IVolumeSettings
     {
         /// <inheritdoc/>
-        public string ProcessName { get; set; }
+        public VolumeAction VolumeAction { get; set; }
 
         /// <inheritdoc/>
-        public ProcessSelectionType ProcessSelectionType { get; set; }
+        public int VolumeValue { get; set; } = 100;
     }
 }

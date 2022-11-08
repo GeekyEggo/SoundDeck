@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script src="./js/sdpi-components.js"></script>
+</head>
+<body>
+    <sdpi-item label="Process">
+        <sdpi-select setting="processSelectionType" id="__process" datasource="getAudioSessions" placeholder="Foreground (Active)"></sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Name" id="__name" style="display: none;">
+        <sdpi-textfield setting="processName"></sdpi-textfield>
+    </sdpi-item>
+
+    <sdpi-item label="Action">
+        <sdpi-select setting="volumeAction" id="__action" placeholder="Mute / Unmute" value-type="Number">
+            <option value="0">Mute / Unmute</option>
+            <option value="1">Mute</option>
+            <option value="2">Unmute</option>
+            <option value="3">Set</option>
+            <option value="4">Increase By</option>
+            <option value="5">Decrease By</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Value" id="__value" style="display: none">
+        <sdpi-range setting="volumeValue" min="0" max="100" step="1" showlabels></sdpi-range>
+    </sdpi-item>
+
+    <script>
+        document.getElementById('__process').addEventListener('valuechange', ev => {
+            document.getElementById('__name').style.display = ev.srcElement.value == 1 ? '' : 'none';
+        });
+
+        document.getElementById('__action').addEventListener('valuechange', ev => {
+            document.getElementById('__value').style.display = ev.srcElement.value > 2 ? '' : 'none';
+        });
+    </script>
+</body>
+</html>

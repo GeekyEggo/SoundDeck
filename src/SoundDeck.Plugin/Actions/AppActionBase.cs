@@ -1,7 +1,12 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
     using System.Threading.Tasks;
+    using global::Windows.ApplicationModel;
+    using Newtonsoft.Json.Linq;
+    using SharpDeck.Events.Received;
     using SoundDeck.Core;
     using SoundDeck.Plugin.Models.Payloads;
 
@@ -16,18 +21,92 @@
         /// Initializes a new instance of the <see cref="AppActionBase{TSettings}"/> class.
         /// </summary>
         /// <param name="audioService">The audio service.</param>
-        public AppActionBase(IAudioService audioService)
-            : base(audioService)
+        public AppActionBase(IAudioService audioService, IAppAudioService appAudioService)
+            : base(audioService) => this.AppAudioService = appAudioService;
+
+        /// <summary>
+        /// Gets the application audio service.
+        /// </summary>
+        protected IAppAudioService AppAudioService { get; }
+
+        /// <inheritdoc/>
+        protected override async Task OnSendToPlugin(ActionEventArgs<JObject> args)
         {
+            await base.OnSendToPlugin(args);
+
+            var payload = args.Payload.ToObject<DataSourcePayload>();
+            switch (payload.Event)
+            {
+                case "getMultimediaSessions":
+                    await this.SendProcessOptions(payload.Event, await this.GetMultimediaSessions());
+                    break;
+                case "getAudioSessions":
+                    await this.SendProcessOptions(payload.Event, this.GetAudioSessions());
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current active audio sessions.
+        /// </summary>
+        /// <returns>The current audio sessions.</returns>
+        private IReadOnlyList<DataSourceItem> GetAudioSessions()
+        {
+            var sessions = new Dictionary<string, string>();
+            foreach (var session in this.AppAudioService.GetAudioSessions())
+            {
+                if (session.GetProcessID == 0)
+                {
+                    continue;
+                }
+
+                var process = Process.GetProcessById((int)session.GetProcessID);
+                if (!sessions.ContainsKey(process.ProcessName))
+                {
+                    sessions.Add(process.ProcessName, process.MainModule.FileVersionInfo.FileDescription);
+                }
+            }
+
+            return sessions
+                .OrderBy(opt => opt.Key)
+                .Select(opt => new DataSourceItem(opt.Key, opt.Value))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Gets the current active multimedia sessions.
+        /// </summary>
+        /// <returns>The current multimedia sessions.</returns>
+        private async Task<IReadOnlyList<DataSourceItem>> GetMultimediaSessions()
+        {
+            var sessions = new Dictionary<string, string>();
+            foreach (var session in await this.AppAudioService.GetMultimediaSessionAsync())
+            {
+                if (!sessions.ContainsKey(session.SourceAppUserModelId))
+                {
+                    try
+                    {
+                        sessions.Add(session.SourceAppUserModelId, AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName);
+                    }
+                    catch
+                    {
+                        sessions.Add(session.SourceAppUserModelId, session.SourceAppUserModelId);
+                    }
+                }
+            }
+
+            return sessions
+                .OrderBy(opt => opt.Value)
+                .Select(opt => new DataSourceItem(opt.Key, opt.Value))
+                .ToArray();
         }
 
         /// <summary>
         /// Sends the process options to the property inspector.
         /// </summary>
         /// <param name="eventName">Name of the event that requested the data source.</param>
-        /// <param name="sessionsLabel">The sessions label.</param>
         /// <param name="sessions">The sessions.</param>
-        protected async Task SendProcessOptions(string eventName, string sessionsLabel, IReadOnlyList<DataSourceItem> sessions)
+        private async Task SendProcessOptions(string eventName, IReadOnlyList<DataSourceItem> sessions)
         {
             // Add the default items.
             var items = new List<DataSourceItem>
@@ -39,7 +118,7 @@
             // Add the active sessions if we have any.
             if (sessions.Count > 0)
             {
-                items.Add(new DataSourceItem(sessionsLabel, sessions));
+                items.Add(new DataSourceItem("Apps", sessions));
             }
 
             // Return the items.
