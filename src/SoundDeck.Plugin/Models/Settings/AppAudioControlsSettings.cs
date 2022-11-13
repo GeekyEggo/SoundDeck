@@ -13,12 +13,17 @@
         /// <summary>
         /// Gets or sets the press action.
         /// </summary>
-        public PressAction PressAction { get; set; } = PressAction.PlayPause;
+        public AudioControlAction PressAction { get; set; } = AudioControlAction.Track;
 
         /// <summary>
         /// Gets or sets the rotate action.
         /// </summary>
-        public RotateAction RotateAction { get; set; } = RotateAction.Track;
+        public AudioControlAction RotateAction { get; set; } = AudioControlAction.Track;
+
+        /// <summary>
+        /// Gets or sets the volume value.
+        /// </summary>
+        public int VolumeValue { get; set; } = 5;
     }
 
     /// <summary>
@@ -38,33 +43,17 @@
     }
 
     /// <summary>
-    /// The action that occurs when pressing.
+    /// The enumeration of possible entities that can be controlled on the audio.
     /// </summary>
-    public enum PressAction
+    public enum AudioControlAction
     {
         /// <summary>
-        /// Toggle play/pause.
-        /// </summary>
-        PlayPause = 0,
-
-        /// <summary>
-        /// Toggle mute.
-        /// </summary>
-        ToggleMute = 1
-    }
-
-    /// <summary>
-    /// The action that occurs when rotating.
-    /// </summary>
-    public enum RotateAction
-    {
-        /// <summary>
-        /// Track control, e.g. previous/next.
+        /// Controls the track, e.g. play/pause, skip/next.
         /// </summary>
         Track = 0,
 
         /// <summary>
-        /// Volume control.
+        /// Controls the volume.
         /// </summary>
         Volume = 1
     }
