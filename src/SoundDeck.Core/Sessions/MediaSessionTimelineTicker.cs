@@ -7,7 +7,7 @@
     /// <summary>
     /// Provides an artificial wrapper around the <see cref="GlobalSystemMediaTransportControlsSession.TimelinePropertiesChanged"/> event that allows for more "responsive" feedback.
     /// </summary>
-    public sealed class SessionTimelineTicker : IDisposable
+    public sealed class MediaSessionTimelineTicker : IDisposable
     {
         /// <summary>
         /// The default timer tick used by <see cref="ArtificialSynchronizationTimer"/>.
@@ -30,10 +30,10 @@
         private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionTimelineTicker"/> class.
+        /// Initializes a new instance of the <see cref="MediaSessionTimelineTicker"/> class.
         /// </summary>
         /// <param name="session">The session to monitor.</param>
-        public SessionTimelineTicker(GlobalSystemMediaTransportControlsSession session)
+        public MediaSessionTimelineTicker(GlobalSystemMediaTransportControlsSession session)
         {
             this.Session = session;
             this.Session.PlaybackInfoChanged += this.OnPlaybackInfoChanged;
@@ -125,7 +125,7 @@
         /// <param name="state">The state.</param>
         private void OnArtificiallySynchronization(object state)
         {
-            var ticker = (SessionTimelineTicker)state;
+            var ticker = (MediaSessionTimelineTicker)state;
             if (!ticker.IsActive)
             {
                 return;

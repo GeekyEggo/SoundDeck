@@ -26,7 +26,7 @@
         /// <summary>
         /// Private backing field for <see cref="Session"/>.
         /// </summary>
-        private SessionWatcher _session;
+        private MediaSessionWatcher _session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppAudioControls"/> class.
@@ -41,7 +41,7 @@
         /// <summary>
         /// Gets or sets the current session.
         /// </summary>
-        private SessionWatcher Session
+        private MediaSessionWatcher Session
         {
             get => this._session;
             set
@@ -120,7 +120,7 @@
                 if (this.Session == null)
                 {
                     var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
-                    this.Session = new SessionWatcher(manager, args.Payload.GetSettings<AppAudioControlSettings>().ToPredicate());
+                    this.Session = new MediaSessionWatcher(manager, args.Payload.GetSettings<AppAudioControlSettings>().ToPredicate());
                 }
                 else
                 {
@@ -144,7 +144,7 @@
         }
 
         /// <summary>
-        /// Handles the <see cref="SessionWatcher.MediaSessionChanged"/> event, updating the image associated with this action.
+        /// Handles the <see cref="MediaSessionWatcher.MediaSessionChanged"/> event, updating the image associated with this action.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -164,7 +164,7 @@
         }
 
         /// <summary>
-        /// Handles the <see cref="SessionWatcher.ThumbnailChanged"/> event, updating the image associated with this action.
+        /// Handles the <see cref="MediaSessionWatcher.ThumbnailChanged"/> event, updating the image associated with this action.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -179,7 +179,7 @@
         }
 
         /// <summary>
-        /// Handles the <see cref="SessionWatcher.TimelineChanged"/> event, providing feedback to the Stream Deck.
+        /// Handles the <see cref="MediaSessionWatcher.TimelineChanged"/> event, providing feedback to the Stream Deck.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>

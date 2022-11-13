@@ -11,7 +11,7 @@
     /// <summary>
     /// Provides methods for monitoring the timeline, thumbnail, and playback information associated with a media session.
     /// </summary>
-    public sealed class SessionWatcher : IDisposable
+    public sealed class MediaSessionWatcher : IDisposable
     {
         /// <summary>
         /// The synchronization root.
@@ -41,14 +41,14 @@
         /// <summary>
         /// Private backing field for <see cref="GetTimelineTicker()"/>.
         /// </summary>
-        private SessionTimelineTicker _timelineTicker;
+        private MediaSessionTimelineTicker _timelineTicker;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionWatcher"/> class.
+        /// Initializes a new instance of the <see cref="MediaSessionWatcher"/> class.
         /// </summary>
         /// <param name="manager">The manager.</param>
         /// <param name="predicate">The predicate.</param>
-        public SessionWatcher(GlobalSystemMediaTransportControlsSessionManager manager, ISessionPredicate predicate)
+        public MediaSessionWatcher(GlobalSystemMediaTransportControlsSessionManager manager, ISessionPredicate predicate)
         {
             this.Manager = manager;
             this.Predicate = predicate;
@@ -184,7 +184,7 @@
                 {
                     this._mediaSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
 
-                    this._timelineTicker = new SessionTimelineTicker(value);
+                    this._timelineTicker = new MediaSessionTimelineTicker(value);
                     this._timelineTicker.EnableRaisingEvents = this._enableRaisingEvents;
                     this._timelineTicker.TimelineChanged += this.OnTimelineChanged;
 
@@ -243,7 +243,7 @@
         }
 
         /// <summary>
-        /// Propagates the <see cref="SessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
+        /// Propagates the <see cref="MediaSessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>

@@ -5,29 +5,59 @@
     <script src="./js/sdpi-components.js"></script>
 </head>
 <body>
-    <sdpi-item label="Process">
-        <sdpi-select setting="processSelectionType" label-setting="processSelectionTypeLabel" id="__process" datasource="getAudioSessions"></sdpi-select>
+    <sdpi-item label="App">
+        <sdpi-select setting="processSelectionType" label-setting="processSelectionTypeLabel" datasource="getAudioSessions"></sdpi-select>
     </sdpi-item>
 
-    <sdpi-item label="Name" id="__name" style="display: none;">
+    <sdpi-item label="Name" style="display: none;">
         <sdpi-textfield setting="processName"></sdpi-textfield>
     </sdpi-item>
 
-    <sdpi-item label="Action">
-        <sdpi-select setting="action" value-type="number" placeholder="Play / Pause">
-            <option value="0">Play / Pause</option>
-            <option value="1">Play</option>
-            <option value="2">Pause</option>
-            <option value="3">Stop</option>
-            <option value="4">Skip Previous</option>
-            <option value="5">Skip Next</option>
+    <sdpi-item label="Actions">
+        <sdpi-select setting="actionLayout" value-type="number" placeholder="Playback and Volume (toggle via touch)">
+            <option value="0">Playback and Volume (toggle via touch)</option>
+            <option value="1">Custom</option>
         </sdpi-select>
     </sdpi-item>
 
+    <sdpi-item label="Press" style="display: none">
+        <sdpi-select setting="pressAction" value-type="number" placeholder="Play / Pause">
+            <option value="0">Play / Pause</option>
+            <option value="1">Mute / Unmute</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Rotate" style="display: none">
+        <sdpi-select setting="rotateAction" value-type="number" placeholder="Previous / Next">
+            <option value="0">Previous / Next</option>
+            <option value="1">Volume</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Volume Step">
+        <sdpi-range setting="volumeValue" min="0" max="100" step="5" showlabels></sdpi-range>
+    </sdpi-item>
+
     <script>
-        document.getElementById('__process').addEventListener('valuechange', ev => {
-            document.getElementById('__name').style.display = ev.srcElement.value == 1 ? '' : 'none';
-        });
+        (function () {
+            document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+            });
+
+            document.querySelector('sdpi-select[setting="actionLayout"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Press"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+                document.querySelector('sdpi-item[label="Rotate"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+
+                const volumeStepDisplay = (ev.srcElement.value == 0 || document.querySelector('sdpi-select[setting="rotateAction"]').value == 1) ? '' : 'none';
+                document.querySelector('sdpi-item[label="Volume Step"]').style.display = volumeStepDisplay;
+            });
+
+            document.querySelector('sdpi-select[setting="rotateAction"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Volume Step"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+            });
+
+        })();
+
     </script>
 </body>
 </html>
