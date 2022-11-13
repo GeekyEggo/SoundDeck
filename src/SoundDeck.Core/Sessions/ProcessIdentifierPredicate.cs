@@ -43,6 +43,22 @@
         public uint SourceProciessId { get; }
 
         /// <inheritdoc/>
+        public bool Equals(ISessionPredicate x, ISessionPredicate y)
+        {
+            if (x is ProcessIdentifierPredicate a
+                && y is ProcessIdentifierPredicate b)
+            {
+                return a.SourceProciessId == b.SourceProciessId;
+            }
+
+            return x == null && y == null;
+        }
+
+        /// <inheritdoc/>
+        public int GetHashCode(ISessionPredicate obj)
+            => this.SourceProciessId.GetHashCode();
+
+        /// <inheritdoc/>
         public bool IsMatch(AudioSessionControl session)
             => this.ProcessIds.Contains(session.GetProcessID);
 

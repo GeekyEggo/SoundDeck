@@ -1,12 +1,13 @@
 ﻿namespace SoundDeck.Core.Sessions
 {
+    using System.Collections.Generic;
     using NAudio.CoreAudioApi;
     using Windows.Media.Control;
 
     /// <summary>
     /// Provides a predicate that determines whether a session matches this instance.
     /// </summary>
-    public interface ISessionPredicate
+    public interface ISessionPredicate : IEqualityComparer<ISessionPredicate>
     {
         /// <summary>
         /// Determines whether the specified <paramref name="session"/> fulfils this predicate.

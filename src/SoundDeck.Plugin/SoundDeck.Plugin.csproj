@@ -34,6 +34,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="6.0.0" />
         <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+        <PackageReference Include="Nito.AsyncEx.Tasks" Version="5.1.2" />
         <PackageReference Include="NLog" Version="4.7.13" />
         <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
     </ItemGroup>

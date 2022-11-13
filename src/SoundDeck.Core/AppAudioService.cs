@@ -120,7 +120,7 @@ namespace SoundDeck.Core
         public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
         {
             var predicate = criteria.ToPredicate();
-            var sessions = await this.GetMultimediaSessionAsync();
+            var sessions = await this.GetMultimediaSessionsAsync();
 
             foreach (var session in sessions.Where(predicate.IsMatch))
             {
@@ -137,7 +137,14 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionAsync()
+        public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionsAsync()
+        {
+            var manager = await this.GetMultimediaSessionManagerAsync();
+            return manager.GetSessions();
+        }
+
+        /// <inheritdoc/>
+        public async Task<GlobalSystemMediaTransportControlsSessionManager> GetMultimediaSessionManagerAsync()
         {
             try
             {
@@ -152,7 +159,7 @@ namespace SoundDeck.Core
                     }
                 }
 
-                return this._manager.GetSessions();
+                return this._manager;
             }
             finally
             {

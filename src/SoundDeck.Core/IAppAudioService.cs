@@ -53,6 +53,12 @@ namespace SoundDeck.Core
         /// Gets the all active multimedia session asynchronously.
         /// </summary>
         /// <returns>The active multimedia sessions.</returns>
-        Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionAsync();
+        Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionsAsync();
+
+        /// <summary>
+        /// Gets the multimedia session manager asynchronously.
+        /// </summary>
+        /// <returns>The multimedia session manager.</returns>
+        Task<GlobalSystemMediaTransportControlsSessionManager> GetMultimediaSessionManagerAsync();
     }
 }

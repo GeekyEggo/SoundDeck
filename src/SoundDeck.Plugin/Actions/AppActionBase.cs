@@ -37,11 +37,11 @@
             var payload = args.Payload.ToObject<DataSourcePayload>();
             switch (payload.Event)
             {
-                case "getMultimediaSessions":
-                    await this.SendProcessOptions(payload.Event, await this.GetMultimediaSessions());
-                    break;
                 case "getAudioSessions":
                     await this.SendProcessOptions(payload.Event, this.GetAudioSessions());
+                    break;
+                case "getMultimediaSessions":
+                    await this.SendProcessOptions(payload.Event, await this.GetMultimediaSessions());
                     break;
             }
         }
@@ -80,7 +80,7 @@
         private async Task<IReadOnlyList<DataSourceItem>> GetMultimediaSessions()
         {
             var sessions = new Dictionary<string, string>();
-            foreach (var session in await this.AppAudioService.GetMultimediaSessionAsync())
+            foreach (var session in await this.AppAudioService.GetMultimediaSessionsAsync())
             {
                 if (!sessions.ContainsKey(session.SourceAppUserModelId))
                 {

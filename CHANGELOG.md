@@ -2,6 +2,11 @@
 
 ## vNext
 
+- New action, "App Audio Controls" for Stream Deck+! Control playback and volume for a specific application.
+- Add active apps to dropdown when creating app-specific actions.
+
+## v3.7.2
+
 ### ⭐ Added
 
 - New action, "App Media Controls", control playback of a specific applications, i.e. Chrome, Spotify, VLC etc. ([#63](https://github.com/GeekyEggo/SoundDeck/issues/63))
