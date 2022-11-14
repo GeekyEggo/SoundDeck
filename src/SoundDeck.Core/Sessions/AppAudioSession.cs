@@ -14,12 +14,17 @@
     /// <summary>
     /// Provides methods for monitoring audio and media playback associated with an application.
     /// </summary>
-    public sealed class AppAudioSession : IDisposable, IAudioSessionEventsHandler
+    public sealed class AppAudioSession : IDisposable, IAudioSessionEventsHandler, IMMNotificationClient
     {
         /// <summary>
         /// The synchronization root.
         /// </summary>
         private readonly object _syncRoot = new object();
+
+        /// <summary>
+        /// The identifier possibly assists with session changes as <see cref="AudioSessionManager.OnSessionCreated"/> sometimes does not work.
+        /// </summary>
+        private static readonly Guid POSSIBLE_NEW_SESSION_ID = new Guid("9855c4cd-df8c-449c-a181-8191b68bd06c");
 
         /// <summary>
         /// Private backing field for <see cref="Audio"/>.
@@ -62,11 +67,13 @@
             this.Manager = manager;
             this.Predicate = predicate;
 
-            this.Manager.SessionsChanged += this.OnMediaSessionsChanged;
-            foreach (var device in this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+            this.DeviceEnumerator.RegisterEndpointNotificationCallback(this);
+            foreach (var device in this.DeviceEnumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active))
             {
                 device.AudioSessionManager.OnSessionCreated += this.OnAudioSessionCreated;
             }
+
+            this.Manager.SessionsChanged += this.OnMediaSessionsChanged;
         }
 
         /// <summary>
@@ -99,9 +106,10 @@
                     this._audioSession?.UnRegisterEventClient(this);
 
                     this._audioSession = value;
-                    if (this.EnableRaisingEvents)
+                    if (this._audioSession != null)
                     {
-                        this._audioSession?.RegisterEventClient(this);
+                        this._audioSession.RegisterEventClient(this); // Always register; this is required for monitoring sessions.
+                        this.VolumeChanged?.Invoke(this, new VolumeEventArgs(this._audioSession.SimpleAudioVolume.Volume, this._audioSession.SimpleAudioVolume.Mute));
                     }
                 }
             }
@@ -208,7 +216,7 @@
                     {
                         this._predicate = value;
 
-                        this.Audio = value == null ? null : this.DeviceEnumerator.GetAudioSessions(DataFlow.Render).FirstOrDefault(value.IsMatch);
+                        this.SetAudioSession();
                         this.Media = value == null ? null : this.Manager.GetSessions().FirstOrDefault(value.IsMatch);
                     }
                 }
@@ -255,6 +263,8 @@
         public void Dispose()
         {
             this.Predicate = null;
+            this.DeviceEnumerator.UnregisterEndpointNotificationCallback(this);
+
             GC.SuppressFinalize(this);
         }
 
@@ -264,14 +274,7 @@
         /// <param name="sender">The sender.</param>
         /// <param name="newSession">The new session.</param>
         private void OnAudioSessionCreated(object sender, IAudioSessionControl newSession)
-        {
-            lock (this._syncRoot)
-            {
-                this.Audio = this.Predicate == null
-                    ? null
-                    : this.DeviceEnumerator.GetAudioSessions(DataFlow.Render).FirstOrDefault(this.Predicate.IsMatch);
-            }
-        }
+            => this.SetAudioSession();
 
         /// <summary>
         /// Handles the <see cref="GlobalSystemMediaTransportControlsSession.MediaPropertiesChanged"/> event.
@@ -327,6 +330,56 @@
         }
 
         /// <summary>
+        /// Handles the <see cref="IMMNotificationClient.OnPropertyValueChanged(string, PropertyKey)"/> event.
+        /// </summary>
+        /// <param name="pwstrDeviceId">The device identifier.</param>
+        /// <param name="key">The property key.</param>
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key)
+        {
+            if (key.formatId != POSSIBLE_NEW_SESSION_ID
+                || this.Audio != null)
+            {
+                return;
+            }
+
+            lock (this._syncRoot)
+            {
+                if (this.Audio == null)
+                {
+                    this.SetAudioSession();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IAudioSessionEventsHandler.OnStateChanged(AudioSessionState)"/> event.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        void IAudioSessionEventsHandler.OnStateChanged(AudioSessionState state)
+        {
+            if (state != AudioSessionState.AudioSessionStateInactive
+                || this.Audio == null)
+            {
+                return;
+            }
+
+            lock (this._syncRoot)
+            {
+                if (this.Audio != null)
+                {
+                    this.SetAudioSession();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IAudioSessionEventsHandler.OnSessionDisconnected(AudioSessionDisconnectReason)"/> event.
+        /// </summary>
+        /// <param name="disconnectReason">The disconnect reason.</param>
+        void IAudioSessionEventsHandler.OnSessionDisconnected(AudioSessionDisconnectReason disconnectReason)
+            => ((IAudioSessionEventsHandler)this).OnStateChanged(AudioSessionState.AudioSessionStateInactive);
+
+        /// <summary>
         /// Propagates the <see cref="MediaSessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -340,20 +393,38 @@
         }
 
         /// <summary>
-        /// Propages <see cref="IAudioSessionEventsHandler.OnVolumeChanged(float, bool)"/>
+        /// Handles the <see cref="IAudioSessionEventsHandler.OnVolumeChanged(float, bool)"/> event.
         /// </summary>
         /// <param name="volume">The volume.</param>
         /// <param name="isMuted">Value indicating whether the volume is muted.</param>
         void IAudioSessionEventsHandler.OnVolumeChanged(float volume, bool isMuted)
             => this.VolumeChanged?.Invoke(this, new VolumeEventArgs(volume, isMuted));
 
+        /// <summary>
+        /// Sets the <see cref="Audio"/> session from the current audio sessions.
+        /// </summary>
+        private void SetAudioSession()
+        {
+            lock (this._syncRoot)
+            {
+                this.Audio = this.Predicate == null
+                    ? null
+                    : this.DeviceEnumerator.GetAudioSessions(DataFlow.Render, DeviceState.Active).FirstOrDefault(this.Predicate.IsMatch);
+            }
+        }
+
         #region IAudioSessionEventsHandler
         void IAudioSessionEventsHandler.OnDisplayNameChanged(string displayName) { }
         void IAudioSessionEventsHandler.OnIconPathChanged(string iconPath) { }
         void IAudioSessionEventsHandler.OnChannelVolumeChanged(uint channelCount, IntPtr newVolumes, uint channelIndex) { }
         void IAudioSessionEventsHandler.OnGroupingParamChanged(ref Guid groupingId) { }
-        void IAudioSessionEventsHandler.OnStateChanged(AudioSessionState state) { }
-        void IAudioSessionEventsHandler.OnSessionDisconnected(AudioSessionDisconnectReason disconnectReason) { }
+        #endregion
+
+        #region IMMNotificationClient
+        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) { }
+        void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId) { }
+        void IMMNotificationClient.OnDeviceRemoved(string deviceId) { }
+        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId) { }
         #endregion
     }
 }
