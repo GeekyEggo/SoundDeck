@@ -88,6 +88,10 @@
                 {
                     this.CurrentFeedback = value.RotateAction;
                 }
+                else if (this.CurrentFeedback == null)
+                {
+                    this.CurrentFeedback = AudioControlAction.Track;
+                }
 
                 this._settings = value;
             }
@@ -114,7 +118,7 @@
                 {
                     this.AppAudioSession.Predicate = settings.ToPredicate();
                     this.Settings = settings;
-                    this.RefreshCurrentFeedbackAsync(setIcon: false);
+                    await this.RefreshCurrentFeedbackAsync(setIcon: false);
                 }
             }
         }
@@ -279,7 +283,7 @@
             {
                 // Set the feedback from the volume.
                 var value = (int)(Math.Round(this.AppAudioSession?.Audio?.SimpleAudioVolume?.Volume ?? 0, 2) * 100);
-                this.SetFeedbackAsync(new VolumeFeedback()
+                await this.SetFeedbackAsync(new VolumeFeedback()
                 {
                     Indicator = new VolumeIndicator
                     {
@@ -294,7 +298,7 @@
             else if (this.AppAudioSession?.TrackEndTime > TimeSpan.Zero)
             {
                 // Set the feedback from the timeline, when we have a track and a value.
-                this.SetFeedbackAsync(new VolumeFeedback()
+                await this.SetFeedbackAsync(new VolumeFeedback()
                 {
                     Indicator = new VolumeIndicator
                     {
@@ -309,7 +313,7 @@
             else
             {
                 // Set the feedback from the timeline, when we have a track.
-                this.SetFeedbackAsync(new VolumeFeedback()
+                await this.SetFeedbackAsync(new VolumeFeedback()
                 {
                     Indicator = new VolumeIndicator
                     {
