@@ -17,6 +17,11 @@
         public ProcessSelectionType ProcessSelectionType { get; set; }
 
         /// <summary>
+        /// Gets or sets the label that accompanies the selected process.
+        /// </summary>
+        public string ProcessLabel { get; set; }
+
+        /// <summary>
         /// Sets the <see cref="ProcessName"/> and <see cref="ProcessSelectionType"/> based on the value, providing backwards compatibility.
         /// </summary>
         [JsonProperty("processSelectionType")]

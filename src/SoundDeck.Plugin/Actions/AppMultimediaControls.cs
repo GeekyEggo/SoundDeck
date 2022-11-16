@@ -1,11 +1,16 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using Nito.AsyncEx;
     using SharpDeck;
     using SharpDeck.Events.Received;
+    using SharpDeck.Events.Sent.Feedback;
     using SoundDeck.Core;
+    using SoundDeck.Core.Extensions;
+    using SoundDeck.Core.Sessions;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>
@@ -14,6 +19,16 @@
     [StreamDeckAction("com.geekyeggo.sounddeck.appmultimediacontrols")]
     public class AppMultimediaControls : AppActionBase<AppMultimediaControlsSettings>
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// Private backing field for <see cref="MediaSessionWatcher"/>.
+        /// </summary>
+        private MediaSessionWatcher _mediaSession;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AppMultimediaControls" /> class.
         /// </summary>
@@ -25,9 +40,127 @@
         }
 
         /// <summary>
-        /// Occurs when <see cref="SharpDeck.Connectivity.IStreamDeckConnection.KeyDown" /> is received for this instance.
+        /// Gets or sets the <see cref="MediaSessionWatcher"/>, responsible for tracking the media session associated with the action.
         /// </summary>
-        /// <param name="args">The <see cref="ActionEventArgs`1" /> instance containing the event data.</param>
+        private MediaSessionWatcher SessionWatcher
+        {
+            get => this._mediaSession;
+            set
+            {
+                if (this._mediaSession is not null)
+                {
+                    this._mediaSession.ProcessImageChanged -= this.OnProcessImageChanged;
+                    this._mediaSession.SessionChanged -= this.OnSessionChanged;
+                    this._mediaSession.ThumbnailChanged -= this.OnThumbnailChanged;
+                    this._mediaSession.TimelineChanged -= this.OnTimelineChanged;
+                }
+
+                this._mediaSession = value;
+                if (this._mediaSession is not null)
+                {
+                    this._mediaSession.ProcessImageChanged += this.OnProcessImageChanged;
+                    this._mediaSession.SessionChanged += this.OnSessionChanged;
+                    this._mediaSession.ThumbnailChanged += this.OnThumbnailChanged;
+                    this._mediaSession.TimelineChanged += this.OnTimelineChanged;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            using (this._syncRoot.Lock())
+            {
+                this.SessionWatcher?.Dispose();
+                this.SessionWatcher = null;
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args, AppMultimediaControlsSettings settings)
+        {
+            await base.OnDidReceiveSettings(args, settings);
+            using (this._syncRoot.Lock())
+            {
+                if (this.SessionWatcher is not null)
+                {
+                    this.SessionWatcher.Predicate = settings.ToPredicate();
+                    await this.RefreshFeedbackAsync(title: settings.ProcessLabel);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnDialPress(ActionEventArgs<DialPayload> args)
+        {
+            await base.OnDialPress(args);
+            if (args.Payload.Pressed)
+            {
+                await (this.SessionWatcher?.Session?.TryTogglePlayPauseAsync()?.AsTask() ?? Task.CompletedTask);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnDialRotate(ActionEventArgs<DialRotatePayload> args)
+        {
+            await base.OnDialRotate(args);
+            if (args.Payload.Ticks < 0)
+            {
+                await (this.SessionWatcher?.Session?.TrySkipPreviousAsync()?.AsTask() ?? Task.CompletedTask);
+            }
+            else
+            {
+                await (this.SessionWatcher?.Session?.TrySkipNextAsync()?.AsTask() ?? Task.CompletedTask);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnTouchTap(ActionEventArgs<TouchTapPayload> args)
+        {
+            await base.OnTouchTap(args);
+            await (this.SessionWatcher?.Session?.TryTogglePlayPauseAsync()?.AsTask() ?? Task.CompletedTask);
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+        {
+            await base.OnWillAppear(args);
+            if (args.Payload.Controller is Controller.Encoder)
+            {
+                using (await this._syncRoot.LockAsync())
+                {
+                    if (this.SessionWatcher == null)
+                    {
+                        var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
+                        await this.RefreshFeedbackAsync(title: settings.ProcessLabel);
+
+                        var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
+                        this.SessionWatcher = new MediaSessionWatcher(manager, settings.ToPredicate());
+                    }
+                    else
+                    {
+                        this.SessionWatcher.EnableRaisingEvents = true;
+                        await this.RefreshFeedbackAsync(this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64);
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
+        {
+            await base.OnWillDisappear(args);
+            using (await this._syncRoot.LockAsync())
+            {
+                if (this.SessionWatcher != null)
+                {
+                    this.SessionWatcher.EnableRaisingEvents = false;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
             var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
@@ -42,6 +175,84 @@
                 this.Logger?.LogError(ex, $"Failed to control application's multimedia; Action=\"{settings.Action}\", ProcessSelectionType=\"{settings.ProcessSelectionType}\", ProcessName=\"{settings.ProcessName}\".");
                 await this.ShowAlertAsync();
             }
+        }
+
+        /// <summary>
+        /// Called when <see cref="SessionWatcher{T}.ProcessImageChanged"/> occurs, and updates the image.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="image">The image.</param>
+        private void OnProcessImageChanged(object sender, string image)
+            => this.SetImageAsync(image).Forget(this.Logger);
+
+        /// <summary>
+        /// Occurs when <see cref="SessionWatcher{T}.SessionChanged"/> occurs, and updates the feedback.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="session">The new session.</param>
+        private void OnSessionChanged(object sender, global::Windows.Media.Control.GlobalSystemMediaTransportControlsSession session)
+        {
+            if (session is null)
+            {
+                var feedback = new VolumeFeedback
+                {
+                    Indicator = new VolumeIndicator
+                    {
+                        IsEnabled = true,
+                        Value = 0
+                    },
+                    Icon = this.SessionWatcher?.ProcessImageAsBase64,
+                    Value = "--:--"
+                };
+
+                this.SetFeedbackAsync(feedback).Forget(this.Logger);
+            }
+            else
+            {
+                this.RefreshFeedbackAsync().Forget(this.Logger);
+                this.SetTitleAsync(global::Windows.ApplicationModel.AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when <see cref="MediaSessionWatcher.ThumbnailChanged"/> occurs, and updates the feedback.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void OnThumbnailChanged(object sender, EventArgs e)
+            => this.RefreshFeedbackAsync(this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64).Forget(this.Logger);
+
+        /// <summary>
+        /// Occurs when <see cref="MediaSessionWatcher.TimelineChanged"/> occurs, and updates the feedback.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void OnTimelineChanged(object sender, TimelineEventArgs e)
+            => this.RefreshFeedbackAsync().Forget(this.Logger);
+
+        /// <summary>
+        /// Refreshes the feedback based on the <see cref="SessionWatcher{T}.Session" /> asynchronously.
+        /// </summary>
+        /// <param name="icon">When specified, the <see cref="VolumeFeedback.Icon"/> is updated.</param>
+        /// <param name="title">When specified, the <see cref="VolumeFeedback.Title"/> is updated.</param>
+        /// <returns>The task of setting the feedback.</returns>
+        private Task RefreshFeedbackAsync(string icon = null, string title = null)
+        {
+            var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan;
+            var feedback = new VolumeFeedback()
+            {
+                Indicator = new VolumeIndicator
+                {
+                    IsEnabled = true,
+                    Opacity = 1,
+                    Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
+                },
+                Icon = icon,
+                Title = title,
+                Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
+            };
+
+            return this.SetFeedbackAsync(feedback);
         }
     }
 }

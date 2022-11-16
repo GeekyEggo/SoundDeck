@@ -31,7 +31,7 @@
             {
                 try
                 {
-                    await task;
+                    await task.ConfigureAwait(continueOnCapturedContext: false);
                 }
                 catch (TaskCanceledException tce)
                 {

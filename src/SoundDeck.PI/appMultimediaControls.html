@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="utf-8" />
+        <script type="text/javascript">
+            function connectElgatoStreamDeckSocket(inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
+                const { payload: { controller }} = JSON.parse(inActionInfo);
+                if (controller == 'Keypad') {
+                    document.querySelector('sdpi-item[label="Action"]').style.display = '';
+                }
+            }
+        </script>
+        <script src="./js/sdpi-components.js"></script>
+    </head>
+    <body>
+        <sdpi-item label="App">
+            <sdpi-select setting="processSelectionType" label-setting="processLabel" datasource="getAudioSessionsOnly" placeholder=""></sdpi-select>
+        </sdpi-item>
+
+        <sdpi-item label="Action" style="display: none">
+            <sdpi-select setting="action" value-type="number" placeholder="Play / Pause">
+                <option value="0">Play / Pause</option>
+                <option value="1">Play</option>
+                <option value="2">Pause</option>
+                <option value="3">Stop</option>
+                <option value="4">Skip Previous</option>
+                <option value="5">Skip Next</option>
+            </sdpi-select>
+        </sdpi-item>
+    </body>
+</html>
