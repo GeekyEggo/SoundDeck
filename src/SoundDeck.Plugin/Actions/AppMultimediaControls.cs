@@ -83,12 +83,15 @@
             await base.OnDidReceiveSettings(args, settings);
             using (this._syncRoot.Lock())
             {
-                if (this.SessionWatcher is not null)
+                if (this.SessionWatcher is null)
                 {
-                    this.SessionWatcher.Predicate = settings.ToPredicate();
-                    await this.RefreshFeedbackAsync(title: settings.ProcessLabel);
+                    return;
                 }
+
+                this.SessionWatcher.Predicate = settings.ToPredicate();
             }
+
+            await this.RefreshFeedbackAsync();
         }
 
         /// <inheritdoc/>
@@ -130,20 +133,18 @@
             {
                 using (await this._syncRoot.LockAsync())
                 {
-                    if (this.SessionWatcher == null)
+                    if (this.SessionWatcher is null)
                     {
-                        var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
-                        await this.RefreshFeedbackAsync(title: settings.ProcessLabel);
-
                         var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
-                        this.SessionWatcher = new MediaSessionWatcher(manager, settings.ToPredicate());
+                        this.SessionWatcher = new MediaSessionWatcher(manager, args.Payload.GetSettings<AppMultimediaControlsSettings>().ToPredicate());
                     }
                     else
                     {
                         this.SessionWatcher.EnableRaisingEvents = true;
-                        await this.RefreshFeedbackAsync(this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64);
                     }
                 }
+
+                await this.RefreshFeedbackAsync(updateIcon: true);
             }
         }
 
@@ -183,7 +184,10 @@
         /// <param name="sender">The sender.</param>
         /// <param name="image">The image.</param>
         private void OnProcessImageChanged(object sender, string image)
-            => this.SetImageAsync(image).Forget(this.Logger);
+        {
+            this.SetImageAsync(image).Forget(this.Logger);
+            this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
+        }
 
         /// <summary>
         /// Occurs when <see cref="SessionWatcher{T}.SessionChanged"/> occurs, and updates the feedback.
@@ -220,7 +224,7 @@
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void OnThumbnailChanged(object sender, EventArgs e)
-            => this.RefreshFeedbackAsync(this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64).Forget(this.Logger);
+            => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
 
         /// <summary>
         /// Occurs when <see cref="MediaSessionWatcher.TimelineChanged"/> occurs, and updates the feedback.
@@ -231,28 +235,28 @@
             => this.RefreshFeedbackAsync().Forget(this.Logger);
 
         /// <summary>
-        /// Refreshes the feedback based on the <see cref="SessionWatcher{T}.Session" /> asynchronously.
+        /// Refreshes the feedback provided to the user asynchronously.
         /// </summary>
-        /// <param name="icon">When specified, the <see cref="VolumeFeedback.Icon"/> is updated.</param>
-        /// <param name="title">When specified, the <see cref="VolumeFeedback.Title"/> is updated.</param>
-        /// <returns>The task of setting the feedback.</returns>
-        private Task RefreshFeedbackAsync(string icon = null, string title = null)
+        /// <param name="updateIcon">When <c>true</c>, the icon is updated based on the <see cref="SessionWatcher"/>.</param>
+        private async Task RefreshFeedbackAsync(bool updateIcon = false)
         {
-            var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan;
-            var feedback = new VolumeFeedback()
+            using (await this._syncRoot.LockAsync())
             {
-                Indicator = new VolumeIndicator
+                var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan;
+                var feedback = new VolumeFeedback()
                 {
-                    IsEnabled = true,
-                    Opacity = 1,
-                    Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
-                },
-                Icon = icon,
-                Title = title,
-                Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
-            };
+                    Indicator = new VolumeIndicator
+                    {
+                        IsEnabled = true,
+                        Opacity = 1,
+                        Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
+                    },
+                    Icon = updateIcon ? this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64 : null,
+                    Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
+                };
 
-            return this.SetFeedbackAsync(feedback);
+                await this.SetFeedbackAsync(feedback);
+            }
         }
     }
 }
