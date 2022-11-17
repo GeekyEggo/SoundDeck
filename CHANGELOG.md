@@ -2,7 +2,7 @@
 
 ## vNext
 
-- New action, "App Audio Controls" for Stream Deck+! Control playback and volume for a specific application.
+- Update "App Multimedia Controls" to support Stream Deck+ dials and touchpad!
 - Add active apps to dropdown when creating app-specific actions.
 
 ## v3.7.2
