@@ -10,6 +10,11 @@
     public interface ISessionPredicate : IEqualityComparer<ISessionPredicate>
     {
         /// <summary>
+        /// Gets the name of the process associated with the predicate.
+        /// </summary>
+        string ProcessName { get; }
+
+        /// <summary>
         /// Determines whether the specified <paramref name="session"/> fulfils this predicate.
         /// </summary>
         /// <param name="session">The session.</param>

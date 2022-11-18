@@ -16,6 +16,34 @@
     /// </summary>
     public sealed class AppAudioSession : IDisposable, IAudioSessionEventsHandler, IMMNotificationClient
     {
+        /*
+         * private void TrySetProcessIcon()
+        {
+            lock (this._syncRoot)
+            {
+                using var deviceEnumerator = new MMDeviceEnumerator();
+                if (deviceEnumerator.GetAudioSessions().FirstOrDefault(this.Predicate.IsMatch) is AudioSessionControl audioSession
+                    && audioSession.GetProcessID is uint processId and not 0
+                    && Process.GetProcessById((int)processId) is Process process)
+                {
+                    if (process.Id != this.ProcessId)
+                    {
+                        var me = audioSession.IconPath;
+
+                        this.ProcessId = process.Id;
+                        this.ProcessIcon = process.GetIconAsBase64();
+
+                        FileUtils.WriteAllText(this.ProcessIconCacheFilePath, this.ProcessIcon);
+                    }
+                }
+                else if (this.Predicate is ISessionPredicate predicate
+                    && this.ProcessIconCacheFilePath is string filePath and not null)
+                {
+                    this.ProcessIcon = File.ReadAllText(filePath);
+                }
+            }
+        }
+        */
         /// <summary>
         /// The synchronization root.
         /// </summary>

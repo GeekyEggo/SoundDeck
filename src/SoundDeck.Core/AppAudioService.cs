@@ -218,9 +218,20 @@ namespace SoundDeck.Core
         /// <returns>The device identifier.</returns>
         private string ParseDeviceId(string deviceId)
         {
-            if (deviceId.StartsWith(MMDEVAPI_TOKEN)) deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
+            if (deviceId.StartsWith(MMDEVAPI_TOKEN))
+            {
+                deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
+            }
+
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER))
+            {
+                deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
+            }
+
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE))
+            {
+                deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
+            }
 
             return deviceId;
         }

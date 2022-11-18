@@ -32,6 +32,9 @@
             }
         }
 
+        /// <inheritdoc/>
+        public string ProcessName => null;
+
         /// <summary>
         /// Gets the process identifiers to match against.
         /// </summary>

@@ -2,12 +2,29 @@ namespace SoundDeck.Core.IO
 {
     using System;
     using System.IO;
+    using System.Text;
 
     /// <summary>
     /// Provides utility methods relating to files.
     /// </summary>
     public static class FileUtils
     {
+        /// <summary>
+        /// Writes the <paramref name="contents"/> to the specified <paramref name="contents"/>
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="contents">The contents.</param>
+        public static void WriteAllText(string path, string contents)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            File.WriteAllText(path, contents, Encoding.UTF8);
+        }
+
         /// <summary>
         /// Deletes the file for the specified path if it exists.
         /// </summary>

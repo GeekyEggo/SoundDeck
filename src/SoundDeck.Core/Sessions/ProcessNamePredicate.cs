@@ -25,9 +25,7 @@
         public ProcessNamePredicate(string processName)
             => this.ProcessName = processName;
 
-        /// <summary>
-        /// Gets the name of the process to match against.
-        /// </summary>
+        /// <inheritdoc/>
         public string ProcessName { get; }
 
         /// <inheritdoc/>

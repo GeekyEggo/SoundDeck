@@ -49,7 +49,7 @@
             {
                 if (this._mediaSession is not null)
                 {
-                    this._mediaSession.ProcessImageChanged -= this.OnProcessImageChanged;
+                    this._mediaSession.ProcessIconChanged -= this.OnProcessIconChanged;
                     this._mediaSession.SessionChanged -= this.OnSessionChanged;
                     this._mediaSession.ThumbnailChanged -= this.OnThumbnailChanged;
                     this._mediaSession.TimelineChanged -= this.OnTimelineChanged;
@@ -58,7 +58,7 @@
                 this._mediaSession = value;
                 if (this._mediaSession is not null)
                 {
-                    this._mediaSession.ProcessImageChanged += this.OnProcessImageChanged;
+                    this._mediaSession.ProcessIconChanged += this.OnProcessIconChanged;
                     this._mediaSession.SessionChanged += this.OnSessionChanged;
                     this._mediaSession.ThumbnailChanged += this.OnThumbnailChanged;
                     this._mediaSession.TimelineChanged += this.OnTimelineChanged;
@@ -179,11 +179,11 @@
         }
 
         /// <summary>
-        /// Called when <see cref="SessionWatcher{T}.ProcessImageChanged"/> occurs, and updates the image.
+        /// Called when <see cref="SessionWatcher{T}.ProcessIconChanged"/> occurs, and updates the image.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="image">The image.</param>
-        private void OnProcessImageChanged(object sender, string image)
+        private void OnProcessIconChanged(object sender, string image)
         {
             this.SetImageAsync(image).Forget(this.Logger);
             this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
@@ -195,28 +195,7 @@
         /// <param name="sender">The sender.</param>
         /// <param name="session">The new session.</param>
         private void OnSessionChanged(object sender, global::Windows.Media.Control.GlobalSystemMediaTransportControlsSession session)
-        {
-            if (session is null)
-            {
-                var feedback = new VolumeFeedback
-                {
-                    Indicator = new VolumeIndicator
-                    {
-                        IsEnabled = true,
-                        Value = 0
-                    },
-                    Icon = this.SessionWatcher?.ProcessImageAsBase64,
-                    Value = "--:--"
-                };
-
-                this.SetFeedbackAsync(feedback).Forget(this.Logger);
-            }
-            else
-            {
-                this.RefreshFeedbackAsync().Forget(this.Logger);
-                this.SetTitleAsync(global::Windows.ApplicationModel.AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName);
-            }
-        }
+            => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
 
         /// <summary>
         /// Occurs when <see cref="MediaSessionWatcher.ThumbnailChanged"/> occurs, and updates the feedback.
@@ -242,6 +221,7 @@
         {
             using (await this._syncRoot.LockAsync())
             {
+                // Update the feedback.
                 var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan;
                 var feedback = new VolumeFeedback()
                 {
@@ -251,11 +231,18 @@
                         Opacity = 1,
                         Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
                     },
-                    Icon = updateIcon ? this.SessionWatcher?.ThumbnailAsBase64 ?? this.SessionWatcher?.ProcessImageAsBase64 : null,
+                    Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
                     Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
                 };
 
                 await this.SetFeedbackAsync(feedback);
+
+                // Update the state image.
+                if (updateIcon
+                    && this.SessionWatcher?.ProcessIcon is string processIcon)
+                {
+                    this.SetImageAsync(processIcon).Forget(this.Logger);
+                }
             }
         }
     }

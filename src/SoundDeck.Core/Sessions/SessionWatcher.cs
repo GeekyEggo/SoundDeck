@@ -2,6 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using SoundDeck.Core.IO;
 
     /// <summary>
     /// Provides a base class for a session watcher, capable of wrapping and monitoring a session related to audio.
@@ -12,7 +15,7 @@
         /// <summary>
         /// The synchronization root
         /// </summary>
-        private readonly object _syncRoot = new object();
+        private static readonly object _syncRoot = new object();
 
         /// <summary>
         /// Private backing field for <see cref="EnableRaisingEvents"/>.
@@ -25,9 +28,9 @@
         private ISessionPredicate _predicate;
 
         /// <summary>
-        /// Private backing field for <see cref="ProcessImageAsBase64"/>.
+        /// Private backing field for <see cref="ProcessIcon"/>.
         /// </summary>
-        private string _processImageAsBase64;
+        private string _processIcon;
 
         /// <summary>
         /// Private backing field for <see cref="Session"/>.
@@ -35,9 +38,27 @@
         private T _session;
 
         /// <summary>
-        /// Occurs when <see cref="ProcessImageAsBase64"/> changes.
+        /// Initializes a new instance of the <see cref="SessionWatcher{T}"/> class.
         /// </summary>
-        public event EventHandler<string> ProcessImageChanged;
+        /// <param name="predicate">The <see cref="ISessionPredicate"/>.</param>
+        public SessionWatcher(ISessionPredicate predicate)
+        {
+            this._predicate = predicate;
+
+            lock (_syncRoot)
+            {
+                if (this.ProcessIconCacheFilePath is not null
+                    && File.Exists(this.ProcessIconCacheFilePath))
+                {
+                    this.ProcessIcon = File.ReadAllText(this.ProcessIconCacheFilePath, Encoding.UTF8);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Occurs when <see cref="ProcessIcon"/> changes.
+        /// </summary>
+        public event EventHandler<string> ProcessIconChanged;
 
         /// <summary>
         /// Occurs when <see cref="Session"/> changes.
@@ -52,7 +73,7 @@
             get => this._enableRaisingEvents;
             set
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
                     if (this._enableRaisingEvents != value)
                     {
@@ -71,7 +92,7 @@
             get => this._predicate;
             set
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
                     if (value?.Equals(this._predicate) == false)
                     {
@@ -85,16 +106,21 @@
         /// <summary>
         /// Gets or sets the process image, as a base64 encoded string.
         /// </summary>
-        public string ProcessImageAsBase64
+        public string ProcessIcon
         {
-            get => this._processImageAsBase64;
+            get => this._processIcon;
             protected set
             {
-                if (this._processImageAsBase64 != value
+                if (this._processIcon != value
                     && !string.IsNullOrWhiteSpace(value))
                 {
-                    this._processImageAsBase64 = value;
-                    this.ProcessImageChanged?.Invoke(this, value);
+                    this._processIcon = value;
+                    this.ProcessIconChanged?.Invoke(this, value);
+
+                    if (this.ProcessIconCacheFilePath is string filePath and not null)
+                    {
+                        FileUtils.WriteAllText(filePath, value);
+                    }
                 }
             }
         }
@@ -107,8 +133,9 @@
             get => this._session;
             protected set
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
+
                     if (!this.Equals(this._session, value))
                     {
                         var oldValue = this._session;
@@ -116,6 +143,27 @@
 
                         this.OnSessionChanged(oldValue, value);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the file path of the cached icon.
+        /// </summary>
+        private string ProcessIconCacheFilePath
+        {
+            get
+            {
+                lock (_syncRoot)
+                {
+                    if (this.Predicate is not null
+                        && this.Predicate.ProcessName is not null and not "")
+                    {
+                        var safeFileName = string.Concat(this.Predicate.ProcessName.Split(Path.GetInvalidFileNameChars()));
+                        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"SoundDeck\IconsCache\", $"{safeFileName}.txt");
+                    }
+
+                    return null;
                 }
             }
         }

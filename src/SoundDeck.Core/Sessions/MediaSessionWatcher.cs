@@ -1,6 +1,7 @@
 ﻿namespace SoundDeck.Core.Sessions
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
@@ -12,12 +13,12 @@
     /// <summary>
     /// Provides a session watcher for <see cref="GlobalSystemMediaTransportControlsSession"/>.
     /// </summary>
-    public class MediaSessionWatcher : SessionWatcher<GlobalSystemMediaTransportControlsSession>
+    public sealed class MediaSessionWatcher : SessionWatcher<GlobalSystemMediaTransportControlsSession>
     {
         /// <summary>
-        /// Private backing field for <see cref="ThumbnailAsBase64"/>.
+        /// Private backing field for <see cref="Thumbnail"/>.
         /// </summary>
-        private string _thumbnailAsBase64;
+        private string _thumbnail;
 
         /// <summary>
         /// Private backing field for <see cref="TimelineTicker"/>.
@@ -30,11 +31,10 @@
         /// <param name="manager">The <see cref="GlobalSystemMediaTransportControlsSessionManager"/>.</param>
         /// <param name="predicate">The <see cref="ISessionPredicate"/>.</param>
         public MediaSessionWatcher(GlobalSystemMediaTransportControlsSessionManager manager, ISessionPredicate predicate)
-            : base()
+            : base(predicate)
         {
             this.Manager = manager;
-            this.Predicate = predicate;
-
+            this.Session = this.GetSession();
             this.Manager.SessionsChanged += this.OnMediaSessionsChanged;
         }
 
@@ -44,21 +44,21 @@
         public event EventHandler<TimelineEventArgs> TimelineChanged;
 
         /// <summary>
-        /// Occurs when <see cref="ThumbnailAsBase64"/> changes.
+        /// Occurs when <see cref="Thumbnail"/> changes.
         /// </summary>
         public event EventHandler ThumbnailChanged;
 
         /// <summary>
         /// Gets the thumbnail associated with the media, in base64 format.
         /// </summary>
-        public string ThumbnailAsBase64
+        public string Thumbnail
         {
-            get => this._thumbnailAsBase64;
+            get => this._thumbnail;
             private set
             {
-                if (this._thumbnailAsBase64 != value)
+                if (this._thumbnail != value)
                 {
-                    this._thumbnailAsBase64 = value;
+                    this._thumbnail = value;
                     this.ThumbnailChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -143,24 +143,24 @@
         protected override void OnSessionChanged(GlobalSystemMediaTransportControlsSession oldSession, GlobalSystemMediaTransportControlsSession newSession)
         {
             // Unregister old session events.
-            if (oldSession != null)
+            if (oldSession is not null)
             {
                 oldSession.MediaPropertiesChanged -= this.OnMediaPropertiesChanged;
             }
 
             // Register new session events, when we have one.
-            if (newSession != null)
+            if (newSession is not null)
             {
                 this.TimelineTicker = new MediaSessionTimelineTicker(newSession);
 
                 newSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
                 this.OnMediaPropertiesChangedAsync(newSession).Forget();
-                this.RefreshLogo(newSession.SourceAppUserModelId).Forget();
+                this.SetProcessIconFromAsync(newSession.SourceAppUserModelId).Forget();
             }
             else
             {
+                this.Thumbnail = null;
                 this.TimelineTicker = null;
-                this.ProcessImageAsBase64 = string.Empty;
             }
 
             // Reset the track timeline info.
@@ -168,42 +168,6 @@
             this.TrackEndTime = TimeSpan.Zero;
 
             base.OnSessionChanged(oldSession, newSession);
-        }
-
-        private async Task RefreshLogo(string sourceAppUserModelId)
-        {
-            if (string.IsNullOrWhiteSpace(sourceAppUserModelId))
-            {
-                this.ProcessImageAsBase64 = string.Empty;
-            }
-            else
-            {
-                var appInfo = AppInfo.GetFromAppUserModelId(sourceAppUserModelId);
-                if (appInfo is null)
-                {
-                    this.ProcessImageAsBase64 = string.Empty;
-                }
-
-                using (var stream = await appInfo.DisplayInfo.GetLogo(new Windows.Foundation.Size(144, 144)).OpenReadAsync())
-                using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
-                using (var reader = new StreamReader(cryptoStream))
-                {
-                    this.ProcessImageAsBase64 = $"data:image/png;base64,{reader.ReadToEnd()}";
-                }
-            }
-        }
-
-        /// <summary>
-        /// Propagates the <see cref="MediaSessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>
-        private void OnTimelineChanged(object sender, TimelineEventArgs e)
-        {
-            this.TrackEndTime = e.EndTime;
-            this.TrackPosition = e.Position;
-
-            this.TimelineChanged?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -222,14 +186,14 @@
         {
             if (session is null)
             {
-                this.ThumbnailAsBase64 = string.Empty;
+                this.Thumbnail = null;
                 return;
             }
 
             var props = await session.TryGetMediaPropertiesAsync().AsTask();
             if (props.Thumbnail is null)
             {
-                this.ThumbnailAsBase64 = string.Empty;
+                this.Thumbnail = null;
                 return;
             }
 
@@ -237,7 +201,7 @@
             using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
             using (var reader = new StreamReader(cryptoStream))
             {
-                this.ThumbnailAsBase64 = $"data:image/png;base64,{reader.ReadToEnd()}";
+                this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
             }
         }
 
@@ -251,6 +215,55 @@
             if (this.Predicate is ISessionPredicate predicate)
             {
                 this.Session = sender.GetSessions().FirstOrDefault(predicate.IsMatch);
+            }
+        }
+
+        /// <summary>
+        /// Propagates the <see cref="MediaSessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>
+        private void OnTimelineChanged(object sender, TimelineEventArgs e)
+        {
+            this.TrackEndTime = e.EndTime;
+            this.TrackPosition = e.Position;
+
+            this.TimelineChanged?.Invoke(sender, e);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="SessionWatcher{T}.ProcessIcon"/> from the specified <paramref name="sourceAppUserModelId"/>.
+        /// </summary>
+        /// <param name="sourceAppUserModelId">The source application user model identifier.</param>
+        /// <returns>The task of setting the <see cref="SessionWatcher{T}.ProcessIcon"/>.</returns>
+        private async Task SetProcessIconFromAsync(string sourceAppUserModelId)
+        {
+            if (string.IsNullOrWhiteSpace(sourceAppUserModelId))
+            {
+                return;
+            }
+
+            try
+            {
+                var appInfo = AppInfo.GetFromAppUserModelId(sourceAppUserModelId);
+                if (appInfo is null)
+                {
+                    return;
+                }
+
+                using (var stream = await appInfo.DisplayInfo.GetLogo(new Windows.Foundation.Size(144, 144)).OpenReadAsync())
+                using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
+                using (var reader = new StreamReader(cryptoStream))
+                {
+                    this.ProcessIcon = $"data:image/png;base64,{reader.ReadToEnd()}";
+                }
+            }
+            catch
+            {
+                if (Process.GetProcessesByName(sourceAppUserModelId) is Process[] processes and { Length: > 0 })
+                {
+                    this.ProcessIcon = processes[0].GetIconAsBase64();
+                }
             }
         }
     }
