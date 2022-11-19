@@ -4,7 +4,6 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
-    using global::Windows.ApplicationModel;
     using Newtonsoft.Json.Linq;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -87,14 +86,8 @@
             {
                 if (!sessions.ContainsKey(session.SourceAppUserModelId))
                 {
-                    try
-                    {
-                        sessions.Add(session.SourceAppUserModelId, AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName);
-                    }
-                    catch
-                    {
-                        sessions.Add(session.SourceAppUserModelId, session.SourceAppUserModelId);
-                    }
+                    AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo);
+                    sessions.Add(session.SourceAppUserModelId, appInfo?.DisplayInfo?.DisplayName ?? session.SourceAppUserModelId);
                 }
             }
 

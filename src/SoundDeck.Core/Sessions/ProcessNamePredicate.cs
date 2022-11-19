@@ -1,11 +1,10 @@
 ﻿namespace SoundDeck.Core.Sessions
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Diagnostics;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
-    using Windows.ApplicationModel;
     using Windows.Media.Control;
 
     /// <summary>
@@ -13,11 +12,6 @@
     /// </summary>
     public class ProcessNamePredicate : ISessionPredicate
     {
-        /// <summary>
-        /// Provides a cache of invalid <see cref="AppInfo.GetFromAppUserModelId(string)"/> elements.
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, bool> INVALID_APP_USER_MODEL_IDS = new ConcurrentDictionary<string, bool>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessNamePredicate"/> class.
         /// </summary>
@@ -67,11 +61,10 @@
             try
             {
                 return session.SourceAppUserModelId.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase)
-                    || (!INVALID_APP_USER_MODEL_IDS.TryGetValue(session.SourceAppUserModelId, out var _) && AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase));
+                    || (AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo) && appInfo.DisplayInfo?.DisplayName?.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase) == true);
             }
             catch
             {
-                INVALID_APP_USER_MODEL_IDS.TryAdd(session.SourceAppUserModelId, false);
                 return false;
             }
         }

@@ -7,7 +7,6 @@
     using System.Security.Cryptography;
     using System.Threading.Tasks;
     using SoundDeck.Core.Extensions;
-    using Windows.ApplicationModel;
     using Windows.Media.Control;
 
     /// <summary>
@@ -243,14 +242,8 @@
                 return;
             }
 
-            try
+            if (AppInfoUtils.TryGet(sourceAppUserModelId, out var appInfo))
             {
-                var appInfo = AppInfo.GetFromAppUserModelId(sourceAppUserModelId);
-                if (appInfo is null)
-                {
-                    return;
-                }
-
                 using (var stream = await appInfo.DisplayInfo.GetLogo(new Windows.Foundation.Size(144, 144)).OpenReadAsync())
                 using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
                 using (var reader = new StreamReader(cryptoStream))
@@ -258,12 +251,9 @@
                     this.ProcessIcon = $"data:image/png;base64,{reader.ReadToEnd()}";
                 }
             }
-            catch
+            else if (Process.GetProcessesByName(sourceAppUserModelId) is Process[] processes and { Length: > 0 })
             {
-                if (Process.GetProcessesByName(sourceAppUserModelId) is Process[] processes and { Length: > 0 })
-                {
-                    this.ProcessIcon = processes[0].GetIconAsBase64();
-                }
+                this.ProcessIcon = processes[0].GetIconAsBase64();
             }
         }
     }
