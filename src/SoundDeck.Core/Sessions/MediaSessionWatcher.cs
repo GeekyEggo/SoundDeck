@@ -15,11 +15,6 @@
     public sealed class MediaSessionWatcher : SessionWatcher<GlobalSystemMediaTransportControlsSession>
     {
         /// <summary>
-        /// Private backing field for <see cref="Thumbnail"/>.
-        /// </summary>
-        private string _thumbnail;
-
-        /// <summary>
         /// Private backing field for <see cref="TimelineTicker"/>.
         /// </summary>
         private MediaSessionTimelineTicker _timelineTicker;
@@ -43,25 +38,19 @@
         public event EventHandler<TimelineEventArgs> TimelineChanged;
 
         /// <summary>
-        /// Occurs when <see cref="Thumbnail"/> changes.
+        /// Occurs when <see cref="Thumbnail"/> or <see cref="Title"/> changes.
         /// </summary>
-        public event EventHandler ThumbnailChanged;
+        public event EventHandler MediaPropertiesChanged;
 
         /// <summary>
         /// Gets the thumbnail associated with the media, in base64 format.
         /// </summary>
-        public string Thumbnail
-        {
-            get => this._thumbnail;
-            private set
-            {
-                if (this._thumbnail != value)
-                {
-                    this._thumbnail = value;
-                    this.ThumbnailChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
+        public string Thumbnail { get; private set; }
+
+        /// <summary>
+        /// Gets the title associated with the media.
+        /// </summary>
+        public string Title { get; private set; }
 
         /// <summary>
         /// Gets the track position.
@@ -190,18 +179,23 @@
             }
 
             var props = await session.TryGetMediaPropertiesAsync().AsTask();
-            if (props.Thumbnail is null)
+            this.Title = props?.Title;
+
+            if (props?.Thumbnail is null)
             {
                 this.Thumbnail = null;
-                return;
+            }
+            else
+            {
+                using (var stream = await props.Thumbnail.OpenReadAsync())
+                using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
+                using (var reader = new StreamReader(cryptoStream))
+                {
+                    this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
+                }
             }
 
-            using (var stream = await props.Thumbnail.OpenReadAsync())
-            using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
-            using (var reader = new StreamReader(cryptoStream))
-            {
-                this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
-            }
+            this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

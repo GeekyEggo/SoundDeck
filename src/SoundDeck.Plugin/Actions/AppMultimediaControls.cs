@@ -49,18 +49,18 @@
             {
                 if (this._mediaSession is not null)
                 {
+                    this._mediaSession.MediaPropertiesChanged -= this.OnMediaPropertiesChanged;
                     this._mediaSession.ProcessIconChanged -= this.OnProcessIconChanged;
                     this._mediaSession.SessionChanged -= this.OnSessionChanged;
-                    this._mediaSession.ThumbnailChanged -= this.OnThumbnailChanged;
                     this._mediaSession.TimelineChanged -= this.OnTimelineChanged;
                 }
 
                 this._mediaSession = value;
                 if (this._mediaSession is not null)
                 {
+                    this._mediaSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
                     this._mediaSession.ProcessIconChanged += this.OnProcessIconChanged;
                     this._mediaSession.SessionChanged += this.OnSessionChanged;
-                    this._mediaSession.ThumbnailChanged += this.OnThumbnailChanged;
                     this._mediaSession.TimelineChanged += this.OnTimelineChanged;
                 }
             }
@@ -97,7 +97,7 @@
                 this.FriendlyName = settings.ProcessLabel;
             }
 
-            await this.RefreshFeedbackAsync();
+            await this.RefreshFeedbackAsync(updateIcon: true);
         }
 
         /// <inheritdoc/>
@@ -188,6 +188,14 @@
         }
 
         /// <summary>
+        /// Occurs when <see cref="MediaSessionWatcher.MediaPropertiesChanged"/> occurs, and updates the feedback.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void OnMediaPropertiesChanged(object sender, EventArgs e)
+            => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
+
+        /// <summary>
         /// Called when <see cref="SessionWatcher{T}.ProcessIconChanged"/> occurs, and updates the image.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -207,26 +215,18 @@
             => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
 
         /// <summary>
-        /// Occurs when <see cref="MediaSessionWatcher.ThumbnailChanged"/> occurs, and updates the feedback.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void OnThumbnailChanged(object sender, EventArgs e)
-            => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
-
-        /// <summary>
         /// Occurs when <see cref="MediaSessionWatcher.TimelineChanged"/> occurs, and updates the feedback.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void OnTimelineChanged(object sender, TimelineEventArgs e)
-            => this.RefreshFeedbackAsync().Forget(this.Logger);
+            => this.RefreshFeedbackAsync(updateIcon: false).Forget(this.Logger);
 
         /// <summary>
         /// Refreshes the feedback provided to the user asynchronously.
         /// </summary>
         /// <param name="updateIcon">When <c>true</c>, the icon is updated based on the <see cref="SessionWatcher"/>.</param>
-        private async Task RefreshFeedbackAsync(bool updateIcon = false)
+        private async Task RefreshFeedbackAsync(bool updateIcon)
         {
             using (await this._syncRoot.LockAsync())
             {
@@ -242,7 +242,7 @@
                     },
                     Title = this.FriendlyName,
                     Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
-                    Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
+                    Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : this.SessionWatcher?.Title
                 };
 
                 await this.SetFeedbackAsync(feedback);
