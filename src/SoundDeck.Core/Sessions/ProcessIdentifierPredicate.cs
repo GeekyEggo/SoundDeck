@@ -15,15 +15,15 @@
         /// Initializes a new instance of the <see cref="ProcessIdentifierPredicate"/> class.
         /// </summary>
         /// <param name="processId">The process identifier to match against.</param>
-        public ProcessIdentifierPredicate(uint processId)
+        public ProcessIdentifierPredicate(int processId)
         {
             try
             {
-                var process = Process.GetProcessById((int)processId);
+                var process = Process.GetProcessById(processId);
 
                 this.SourceProciessId = processId;
                 this.ProcessIds = Process.GetProcessesByName(process.ProcessName)
-                    .Select(p => (uint)p.Id)
+                    .Select(p => p.Id)
                     .ToArray();
             }
             catch
@@ -38,12 +38,12 @@
         /// <summary>
         /// Gets the process identifiers to match against.
         /// </summary>
-        public uint[] ProcessIds { get; }
+        public int[] ProcessIds { get; }
 
         /// <summary>
         /// Gets the source prociess identifier.
         /// </summary>
-        public uint SourceProciessId { get; }
+        public int SourceProciessId { get; }
 
         /// <inheritdoc/>
         public bool Equals(ISessionPredicate x, ISessionPredicate y)
@@ -63,19 +63,11 @@
 
         /// <inheritdoc/>
         public bool IsMatch(AudioSessionControl session)
-            => this.ProcessIds.Contains(session.GetProcessID);
+            => this.ProcessIds.Contains((int)session.GetProcessID);
 
         /// <inheritdoc/>
         public bool IsMatch(GlobalSystemMediaTransportControlsSession session)
-        {
-            var process = Process.GetProcessById((int)this.SourceProciessId);
-            if (process == null)
-            {
-                return false;
-            }
-
-            return new ProcessNamePredicate(process.ProcessName)
-                .IsMatch(session);
-        }
+            => Process.GetProcessById(this.SourceProciessId) is Process process and not null
+            && new ProcessNamePredicate(process.ProcessName).IsMatch(session);
     }
 }

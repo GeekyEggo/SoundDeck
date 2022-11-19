@@ -187,6 +187,17 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
+        /// Determines whether there is a multimedia session associated with the <paramref name="processId"/>.
+        /// </summary>
+        /// <param name="processId">The process identifier.</param>
+        /// <returns><c>true</c> when there is a multimedia session associated with the <paramref name="processId"/>.</returns>
+        public async Task<bool> IsMultimediaSessionAssociatedWith(int processId)
+        {
+            var predicate = new ProcessIdentifierPredicate(processId);
+            return (await this.GetMultimediaSessionsAsync()).Any(predicate.IsMatch);
+        }
+
+        /// <summary>
         /// Gets the data flow from the specified <paramref name="deviceKey"/>.
         /// </summary>
         /// <param name="deviceKey">The audio device key.</param>
