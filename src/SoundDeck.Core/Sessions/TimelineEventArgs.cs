@@ -9,11 +9,6 @@
     public class TimelineEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets the empty <see cref="TimelineEventArgs"/>.
-        /// </summary>
-        public static new TimelineEventArgs Empty { get; } = new TimelineEventArgs(TimeSpan.Zero, TimeSpan.Zero);
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TimelineEventArgs"/> class.
         /// </summary>
         /// <param name="timeline">The timeline.</param>

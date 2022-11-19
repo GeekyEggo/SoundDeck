@@ -222,7 +222,7 @@
             using (await this._syncRoot.LockAsync())
             {
                 // Update the feedback.
-                var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan;
+                var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan and { TotalSeconds: > 0 };
                 var feedback = new VolumeFeedback()
                 {
                     Indicator = new VolumeIndicator
