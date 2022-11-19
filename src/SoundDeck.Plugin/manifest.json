@@ -21,7 +21,7 @@
       },
       "PropertyInspectorPath": "PI/appMultimediaControls.html",
       "SupportedInMultiActions": true,
-      "Tooltip": "Control the multimedia of a specific application.",
+      "Tooltip": "Control the media playback of a specific application.",
       "UUID": "com.geekyeggo.sounddeck.appmultimediacontrols",
       "VisibleInActionsList": true,
       "States": [

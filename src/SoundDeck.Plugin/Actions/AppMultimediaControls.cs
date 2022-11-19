@@ -66,6 +66,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets or sets friendly name.
+        /// </summary>
+        private string FriendlyName { get; set; }
+
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
@@ -89,6 +94,7 @@
                 }
 
                 this.SessionWatcher.Predicate = settings.ToPredicate();
+                this.FriendlyName = settings.ProcessLabel;
             }
 
             await this.RefreshFeedbackAsync();
@@ -133,10 +139,13 @@
             {
                 using (await this._syncRoot.LockAsync())
                 {
+                    var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
+                    this.FriendlyName = settings.ProcessLabel;
+
                     if (this.SessionWatcher is null)
                     {
                         var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
-                        this.SessionWatcher = new MediaSessionWatcher(manager, args.Payload.GetSettings<AppMultimediaControlsSettings>().ToPredicate());
+                        this.SessionWatcher = new MediaSessionWatcher(manager, settings.ToPredicate());
                     }
                     else
                     {
@@ -231,6 +240,7 @@
                         Opacity = 1,
                         Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
                     },
+                    Title = this.FriendlyName,
                     Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
                     Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : "--:--"
                 };
