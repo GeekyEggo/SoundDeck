@@ -231,18 +231,20 @@
             using (await this._syncRoot.LockAsync())
             {
                 // Update the feedback.
+                var hasTitle = this.SessionWatcher?.Title is not null;
                 var hasTimeline = this.SessionWatcher?.TrackEndTime is TimeSpan and { TotalSeconds: > 0 };
+
                 var feedback = new VolumeFeedback()
                 {
                     Indicator = new VolumeIndicator
                     {
-                        IsEnabled = true,
+                        IsEnabled = hasTitle,
                         Opacity = 1,
                         Value = hasTimeline ? (int)Math.Ceiling(100 / this.SessionWatcher.TrackEndTime.TotalSeconds * this.SessionWatcher.TrackPosition.TotalSeconds) : 0
                     },
                     Title = this.FriendlyName,
                     Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
-                    Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : this.SessionWatcher?.Title
+                    Value = hasTimeline ? this.SessionWatcher.TrackEndTime.Subtract(this.SessionWatcher.TrackPosition).ToString("mm':'ss") : hasTitle ? this.SessionWatcher?.Title : string.Empty
                 };
 
                 await this.SetFeedbackAsync(feedback);

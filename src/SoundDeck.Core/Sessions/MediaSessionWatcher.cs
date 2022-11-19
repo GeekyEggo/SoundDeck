@@ -149,6 +149,7 @@
             {
                 this.Thumbnail = null;
                 this.TimelineTicker = null;
+                this.Title = null;
             }
 
             // Reset the track timeline info.
@@ -175,6 +176,8 @@
             if (session is null)
             {
                 this.Thumbnail = null;
+                this.Title = null;
+
                 return;
             }
 
