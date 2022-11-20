@@ -212,7 +212,10 @@
         /// <param name="sender">The sender.</param>
         /// <param name="session">The new session.</param>
         private void OnSessionChanged(object sender, global::Windows.Media.Control.GlobalSystemMediaTransportControlsSession session)
-            => this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
+        {
+            this.FriendlyName = AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo) ? appInfo.DisplayInfo.DisplayName : session.SourceAppUserModelId;
+            this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
+        }
 
         /// <summary>
         /// Occurs when <see cref="MediaSessionWatcher.TimelineChanged"/> occurs, and updates the feedback.
