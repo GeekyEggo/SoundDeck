@@ -36,19 +36,7 @@
         /// <param name="appAudioService">The application audio service.</param>
         public AppMultimediaControls(IAudioService audioService, IAppAudioService appAudioService)
            : base(audioService, appAudioService)
-            => ForegroundProcess.Changed += this.ForegroundProcess_ChangedAsync;
-
-        private async void ForegroundProcess_ChangedAsync(object sender, EventArgs e)
         {
-            // TODO: Set title from foreground process.
-            using (_syncRoot.Lock())
-            {
-                if (this.SessionWatcher?.Predicate is ProcessIdentifierPredicate
-                    && await this.AppAudioService.IsMultimediaSessionAssociatedWith(ForegroundProcess.Id))
-                {
-                    this.SessionWatcher.Predicate = new ProcessIdentifierPredicate(ForegroundProcess.Id);
-                }
-            }
         }
 
         /// <summary>
@@ -89,8 +77,6 @@
             base.Dispose(disposing);
             using (this._syncRoot.Lock())
             {
-                ForegroundProcess.Changed -= this.ForegroundProcess_ChangedAsync;
-
                 this.SessionWatcher?.Dispose();
                 this.SessionWatcher = null;
             }
@@ -107,7 +93,7 @@
                     return;
                 }
 
-                this.SessionWatcher.Predicate = settings.ToPredicate();
+                this.SessionWatcher.SelectionCriteria = settings;
                 this.FriendlyName = settings.ProcessLabel;
             }
 
@@ -159,7 +145,7 @@
                     if (this.SessionWatcher is null)
                     {
                         var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
-                        this.SessionWatcher = new MediaSessionWatcher(manager, settings.ToPredicate());
+                        this.SessionWatcher = new MediaSessionWatcher(manager, settings);
                     }
                     else
                     {

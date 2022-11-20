@@ -60,12 +60,5 @@ namespace SoundDeck.Core
         /// </summary>
         /// <returns>The multimedia session manager.</returns>
         Task<GlobalSystemMediaTransportControlsSessionManager> GetMultimediaSessionManagerAsync();
-
-        /// <summary>
-        /// Determines whether there is a multimedia session associated with the <paramref name="processId"/>.
-        /// </summary>
-        /// <param name="processId">The process identifier.</param>
-        /// <returns><c>true</c> when there is a multimedia session associated with the <paramref name="processId"/>.</returns>
-        Task<bool> IsMultimediaSessionAssociatedWith(int processId);
     }
 }

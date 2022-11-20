@@ -20,7 +20,7 @@
         static ForegroundProcess()
         {
             Id = GetForegroundProcessId();
-            Timer = new Timer(OnTick, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(200));
+            Timer = new Timer(OnTick, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(250));
         }
 
         /// <summary>

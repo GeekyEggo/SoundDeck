@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using SoundDeck.Core.Extensions;
     using SoundDeck.Core.IO;
 
     /// <summary>
@@ -33,6 +34,11 @@
         private string _processIcon;
 
         /// <summary>
+        /// Private backing field for <see cref="SelectionCriteria"/>.
+        /// </summary>
+        private IProcessSelectionCriteria _selectionCriteria;
+
+        /// <summary>
         /// Private backing field for <see cref="Session"/>.
         /// </summary>
         private T _session;
@@ -40,10 +46,11 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionWatcher{T}"/> class.
         /// </summary>
-        /// <param name="predicate">The <see cref="ISessionPredicate"/>.</param>
-        public SessionWatcher(ISessionPredicate predicate)
+        /// <param name="selectionCriteria">The <see cref="IProcessSelectionCriteria"/>.</param>
+        public SessionWatcher(IProcessSelectionCriteria selectionCriteria)
         {
-            this._predicate = predicate;
+            this._selectionCriteria = selectionCriteria;
+            this._predicate = selectionCriteria.ToPredicate();
 
             lock (_syncRoot)
             {
@@ -51,6 +58,11 @@
                     && File.Exists(this.ProcessIconCacheFilePath))
                 {
                     this.ProcessIcon = File.ReadAllText(this.ProcessIconCacheFilePath, Encoding.UTF8);
+                }
+
+                if (selectionCriteria.ProcessSelectionType == ProcessSelectionType.Foreground)
+                {
+                    ForegroundProcess.Changed += this.ForegroundProcessChanged;
                 }
             }
         }
@@ -85,25 +97,6 @@
         }
 
         /// <summary>
-        /// Gets or sets the predicate responsible for determining the session.
-        /// </summary>
-        public ISessionPredicate Predicate
-        {
-            get => this._predicate;
-            set
-            {
-                lock (_syncRoot)
-                {
-                    if (value?.Equals(this._predicate) == false)
-                    {
-                        this._predicate = value;
-                        this.Session = this.GetSession();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the process image, as a base64 encoded string.
         /// </summary>
         public string ProcessIcon
@@ -126,6 +119,33 @@
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="IProcessSelectionCriteria"/> used to determine the <see cref="Session"/>.
+        /// </summary>
+        public IProcessSelectionCriteria SelectionCriteria
+        {
+            get => this._selectionCriteria;
+            set
+            {
+                lock (_syncRoot)
+                {
+                    if (this._selectionCriteria is not null and { ProcessSelectionType: ProcessSelectionType.Foreground }
+                        && value is null or { ProcessSelectionType: ProcessSelectionType.ByName })
+                    {
+                        ForegroundProcess.Changed -= this.ForegroundProcessChanged;
+                    }
+
+                    this._selectionCriteria = value;
+                    this.Predicate = this._selectionCriteria?.ToPredicate();
+
+                    if (this._selectionCriteria is { ProcessSelectionType: ProcessSelectionType.Foreground })
+                    {
+                        ForegroundProcess.Changed += this.ForegroundProcessChanged;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the current session.
         /// </summary>
         public T Session
@@ -142,6 +162,25 @@
                         this._session = value;
 
                         this.OnSessionChanged(oldValue, value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the predicate responsible for determining the session.
+        /// </summary>
+        private ISessionPredicate Predicate
+        {
+            get => this._predicate;
+            set
+            {
+                lock (_syncRoot)
+                {
+                    if (value?.Equals(this._predicate) == false)
+                    {
+                        this._predicate = value;
+                        this.Session = this.GetSession(this._predicate);
                     }
                 }
             }
@@ -187,13 +226,17 @@
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
-            => this.Predicate = null;
+        {
+            ForegroundProcess.Changed -= this.ForegroundProcessChanged;
+            this.SelectionCriteria = null;
+        }
 
         /// <summary>
         /// Gets the session that matches the <see cref="Predicate"/>.
         /// </summary>
+        /// <param name="predicate">The session predicate.</param>
         /// <returns>The session.</returns>
-        protected abstract T GetSession();
+        protected abstract T GetSession(ISessionPredicate predicate);
 
         /// <summary>
         /// Called when <see cref="EnableRaisingEvents"/> changes.
@@ -207,5 +250,34 @@
         /// <param name="newSession">The new session; supplied to the <see cref="SessionChanged"/> event.</param>
         protected virtual void OnSessionChanged(T oldSession, T newSession)
             => this.SessionChanged?.Invoke(this, newSession);
+
+        /// <summary>
+        /// Refreshes the current session.
+        /// </summary>
+        protected void RefreshSession()
+        {
+            lock (_syncRoot)
+            {
+                this._predicate = this.SelectionCriteria.ToPredicate();
+                this.Session = this.GetSession(this.Predicate);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ForegroundProcess.Changed"/> event, and updates the <see cref="Session"/> if one exists for the active foreground.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void ForegroundProcessChanged(object sender, EventArgs e)
+        {
+            lock (_syncRoot)
+            {
+                if (this.SelectionCriteria is { ProcessSelectionType: ProcessSelectionType.Foreground }
+                    && this.GetSession(new ProcessIdentifierPredicate(ForegroundProcess.Id)) is T session and not null)
+                {
+                    this.Session = session;
+                }
+            }
+        }
     }
 }

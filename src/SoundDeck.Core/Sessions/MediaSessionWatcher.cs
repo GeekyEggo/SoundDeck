@@ -23,13 +23,14 @@
         /// Initializes a new instance of the <see cref="MediaSessionWatcher"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="GlobalSystemMediaTransportControlsSessionManager"/>.</param>
-        /// <param name="predicate">The <see cref="ISessionPredicate"/>.</param>
-        public MediaSessionWatcher(GlobalSystemMediaTransportControlsSessionManager manager, ISessionPredicate predicate)
-            : base(predicate)
+        /// <param name="selectionCriteria">The <see cref="IProcessSelectionCriteria"/>.</param>
+        public MediaSessionWatcher(GlobalSystemMediaTransportControlsSessionManager manager, IProcessSelectionCriteria selectionCriteria)
+            : base(selectionCriteria)
         {
             this.Manager = manager;
-            this.Session = this.GetSession();
             this.Manager.SessionsChanged += this.OnMediaSessionsChanged;
+
+            this.RefreshSession();
         }
 
         /// <summary>
@@ -96,9 +97,9 @@
             || x is null && y is null;
 
         /// <inheritdoc/>
-        protected override GlobalSystemMediaTransportControlsSession GetSession()
-            => this.Predicate is not null
-            ? this.Manager.GetSessions().FirstOrDefault(this.Predicate.IsMatch)
+        protected override GlobalSystemMediaTransportControlsSession GetSession(ISessionPredicate predicate)
+            => predicate is not null
+            ? this.Manager.GetSessions().FirstOrDefault(predicate.IsMatch)
             : null;
 
         /// <inheritdoc/>
@@ -207,12 +208,7 @@
         /// <param name="sender">The sender.</param>
         /// <param name="args">The <see cref="SessionsChangedEventArgs"/> instance containing the event data.</param>
         private void OnMediaSessionsChanged(GlobalSystemMediaTransportControlsSessionManager sender, SessionsChangedEventArgs args)
-        {
-            if (this.Predicate is ISessionPredicate predicate)
-            {
-                this.Session = sender.GetSessions().FirstOrDefault(predicate.IsMatch);
-            }
-        }
+            => this.RefreshSession();
 
         /// <summary>
         /// Propagates the <see cref="MediaSessionTimelineTicker.TimelineChanged"/> to <see cref="TimelineChanged"/>.
