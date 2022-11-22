@@ -57,7 +57,7 @@
                 if (this.ProcessIconCacheFilePath is not null
                     && File.Exists(this.ProcessIconCacheFilePath))
                 {
-                    this.ProcessIcon = File.ReadAllText(this.ProcessIconCacheFilePath, Encoding.UTF8);
+                    this._processIcon = File.ReadAllText(this.ProcessIconCacheFilePath, Encoding.UTF8);
                 }
 
                 if (selectionCriteria.ProcessSelectionType == ProcessSelectionType.Foreground)
@@ -97,26 +97,9 @@
         }
 
         /// <summary>
-        /// Gets or sets the process image, as a base64 encoded string.
+        /// Gets the process image, as a base64 encoded string.
         /// </summary>
-        public string ProcessIcon
-        {
-            get => this._processIcon;
-            protected set
-            {
-                if (this._processIcon != value
-                    && !string.IsNullOrWhiteSpace(value))
-                {
-                    this._processIcon = value;
-                    this.ProcessIconChanged?.Invoke(this, value);
-
-                    if (this.ProcessIconCacheFilePath is string filePath and not null)
-                    {
-                        FileUtils.WriteAllText(filePath, value);
-                    }
-                }
-            }
-        }
+        public string ProcessIcon => this._processIcon;
 
         /// <summary>
         /// Gets or sets the <see cref="IProcessSelectionCriteria"/> used to determine the <see cref="Session"/>.
@@ -260,6 +243,32 @@
             {
                 this._predicate = this.SelectionCriteria.ToPredicate();
                 this.Session = this.GetSession(this.Predicate);
+            }
+        }
+
+        /// <summary>
+        /// Sets the <see cref="ProcessIcon"/>, and raises <see cref="ProcessIconChanged"/> if the value has changed and <paramref name="suppressRaisingEvents"/> is <c>true</c>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="suppressRaisingEvents">Whether <see cref="ProcessIconChanged"/> should be raised if the <see cref="ProcessIcon"/> changed.</param>
+        protected void SetProcessIcon(string value, bool suppressRaisingEvents = false)
+        {
+            lock (_syncRoot)
+            {
+                if (this._processIcon != value
+                    && !string.IsNullOrWhiteSpace(value))
+                {
+                    this._processIcon = value;
+                    if (!suppressRaisingEvents)
+                    {
+                        this.ProcessIconChanged?.Invoke(this, value);
+                    }
+
+                    if (this.ProcessIconCacheFilePath is string filePath and not null)
+                    {
+                        FileUtils.WriteAllText(filePath, value);
+                    }
+                }
             }
         }
 

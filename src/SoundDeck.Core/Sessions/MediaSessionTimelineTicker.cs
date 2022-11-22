@@ -61,6 +61,16 @@
         }
 
         /// <summary>
+        /// Gets the track end time.
+        /// </summary>
+        public TimeSpan EndTime { get; private set; }
+
+        /// <summary>
+        /// Gets the track position.
+        /// </summary>
+        public TimeSpan Position { get; private set; }
+
+        /// <summary>
         /// Gets the timer responsible for artificially synchronizing the timeline.
         /// </summary>
         private Timer ArtificialSynchronizationTimer { get; }
@@ -142,7 +152,7 @@
                 var diff = DateTime.UtcNow.Subtract(ticker.LastTimelineSync);
                 var position = ticker.LastTimelineProperties.Position.Add(diff);
 
-                ticker.TimelineChanged?.Invoke(ticker, new TimelineEventArgs(position, ticker.LastTimelineProperties.EndTime));
+                ticker.OnTimelineChanged(new TimelineEventArgs(position, ticker.LastTimelineProperties.EndTime));
             }
             finally
             {
@@ -187,6 +197,32 @@
         }
 
         /// <summary>
+        /// Raises the <see cref="E:TimelineChanged" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>
+        private void OnTimelineChanged(TimelineEventArgs args)
+        {
+            this.EndTime = args.EndTime;
+            this.Position = args.Position;
+
+            this.TimelineChanged?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Sets <see cref="IsActive"/> based on the state of playback, and whether a timeline is available.
+        /// </summary>
+        private void RefreshIsActive()
+        {
+            this.OnTimelineChanged(new TimelineEventArgs(this.Session.GetTimelineProperties()));
+
+            this.IsActive = this.EnableRaisingEvents
+                && this.EndTime > TimeSpan.Zero
+                && this.Session.GetPlaybackInfo().PlaybackStatus
+                    is GlobalSystemMediaTransportControlsSessionPlaybackStatus.Changing
+                    or GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+        }
+
+        /// <summary>
         /// Synchronizes the <see cref="LastTimelineProperties"/> and <see cref="LastTimelineSync"/> with the <see cref="Session"/>.
         /// </summary>
         private void SynchronizeTimeline()
@@ -194,17 +230,7 @@
             this.LastTimelineProperties = new TimelineEventArgs(this.Session.GetTimelineProperties());
             this.LastTimelineSync = DateTime.UtcNow;
 
-            this.TimelineChanged?.Invoke(this, this.LastTimelineProperties);
+            this.OnTimelineChanged(this.LastTimelineProperties);
         }
-
-        /// <summary>
-        /// Sets <see cref="IsActive"/> based on the state of playback, and whether a timeline is available.
-        /// </summary>
-        private void RefreshIsActive()
-            => this.IsActive = this.EnableRaisingEvents
-                && this.Session.GetTimelineProperties().EndTime > TimeSpan.Zero
-                && this.Session.GetPlaybackInfo().PlaybackStatus
-                    is GlobalSystemMediaTransportControlsSessionPlaybackStatus.Changing
-                    or GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
     }
 }

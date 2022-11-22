@@ -15,9 +15,9 @@
     public sealed class MediaSessionWatcher : SessionWatcher<GlobalSystemMediaTransportControlsSession>
     {
         /// <summary>
-        /// Private backing field for <see cref="TimelineTicker"/>.
+        /// Private backing field for <see cref="Timeline"/>.
         /// </summary>
-        private MediaSessionTimelineTicker _timelineTicker;
+        private MediaSessionTimelineTicker _timeline;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaSessionWatcher"/> class.
@@ -34,7 +34,7 @@
         }
 
         /// <summary>
-        /// Occurs when session timeline changes.
+        /// Occurs when <see cref="MediaSessionTimelineTicker.TimelineChanged"/> occurs; this is not raised when <see cref="Timeline"/> changes.
         /// </summary>
         public event EventHandler<TimelineEventArgs> TimelineChanged;
 
@@ -54,16 +54,6 @@
         public string Title { get; private set; }
 
         /// <summary>
-        /// Gets the track position.
-        /// </summary>
-        public TimeSpan TrackPosition { get; private set; }
-
-        /// <summary>
-        /// Gets the track end time.
-        /// </summary>
-        public TimeSpan TrackEndTime { get; private set; }
-
-        /// <summary>
         /// Gets the active media session manager.
         /// </summary>
         private GlobalSystemMediaTransportControlsSessionManager Manager { get; }
@@ -71,22 +61,22 @@
         /// <summary>
         /// Gets or sets the <see cref="MediaSessionTimelineTicker"/> associated with the <see cref="GlobalSystemMediaTransportControlsSession"/>.
         /// </summary>
-        private MediaSessionTimelineTicker TimelineTicker
+        public MediaSessionTimelineTicker Timeline
         {
-            get => this._timelineTicker;
-            set
+            get => this._timeline;
+            private set
             {
-                if (this._timelineTicker is not null)
+                if (this._timeline is not null)
                 {
-                    this._timelineTicker.Dispose();
-                    this._timelineTicker.TimelineChanged -= this.OnTimelineChanged;
+                    this._timeline.Dispose();
+                    this._timeline.TimelineChanged -= this.OnTimelineChanged;
                 }
 
-                this._timelineTicker = value;
-                if (this._timelineTicker is not null)
+                this._timeline = value;
+                if (this._timeline is not null)
                 {
-                    this._timelineTicker.EnableRaisingEvents = this.EnableRaisingEvents;
-                    this._timelineTicker.TimelineChanged += this.OnTimelineChanged;
+                    this._timeline.EnableRaisingEvents = this.EnableRaisingEvents;
+                    this._timeline.TimelineChanged += this.OnTimelineChanged;
                 }
             }
         }
@@ -108,14 +98,14 @@
             base.OnEnableRaisingEventsChanged();
 
             // Propagate event raising to the timeline ticker.
-            if (this.TimelineTicker != null
-                && this.TimelineTicker.EnableRaisingEvents != this.EnableRaisingEvents)
+            if (this.Timeline is not null
+                && this.Timeline.EnableRaisingEvents != this.EnableRaisingEvents)
             {
-                this.TimelineTicker.EnableRaisingEvents = this.EnableRaisingEvents;
+                this.Timeline.EnableRaisingEvents = this.EnableRaisingEvents;
             }
 
             // Update the event handlers on the session.
-            if (this.Session != null)
+            if (this.Session is not null)
             {
                 if (this.EnableRaisingEvents)
                 {
@@ -140,24 +130,30 @@
             // Register new session events, when we have one.
             if (newSession is not null)
             {
-                this.TimelineTicker = new MediaSessionTimelineTicker(newSession);
+                this.Timeline = new MediaSessionTimelineTicker(newSession);
 
-                newSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
-                this.OnMediaPropertiesChangedAsync(newSession).Forget();
-                this.SetProcessIconFromAsync(newSession.SourceAppUserModelId).Forget();
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await this.OnMediaPropertiesChangedAsync(newSession, suppressRaisingEvents: true);
+                        await this.SetProcessIconFromAsync(newSession.SourceAppUserModelId, suppressRaisingEvents: true);
+                    }
+                    finally
+                    {
+                        base.OnSessionChanged(oldSession, newSession);
+                        newSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
+                    }
+                }).Forget();
             }
             else
             {
                 this.Thumbnail = null;
-                this.TimelineTicker = null;
+                this.Timeline = null;
                 this.Title = null;
+
+                base.OnSessionChanged(oldSession, newSession);
             }
-
-            // Reset the track timeline info.
-            this.TrackPosition = TimeSpan.Zero;
-            this.TrackEndTime = TimeSpan.Zero;
-
-            base.OnSessionChanged(oldSession, newSession);
         }
 
         /// <summary>
@@ -172,7 +168,9 @@
         /// Handles the <see cref="GlobalSystemMediaTransportControlsSession.MediaPropertiesChanged"/> event asynchronously.
         /// </summary>
         /// <param name="session">The session.</param>
-        private async Task OnMediaPropertiesChangedAsync(GlobalSystemMediaTransportControlsSession session)
+        /// <param name="suppressRaisingEvents">When <c>true</c>, <see cref="MediaPropertiesChanged"/> is suppressed.</param>
+        /// <returns>The task of handling the changing of the media properties.</returns>
+        private async Task OnMediaPropertiesChangedAsync(GlobalSystemMediaTransportControlsSession session, bool suppressRaisingEvents = false)
         {
             if (session is null)
             {
@@ -199,7 +197,10 @@
                 }
             }
 
-            this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
+            if (!suppressRaisingEvents)
+            {
+                this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -216,19 +217,15 @@
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="TimelineEventArgs"/> instance containing the event data.</param>
         private void OnTimelineChanged(object sender, TimelineEventArgs e)
-        {
-            this.TrackEndTime = e.EndTime;
-            this.TrackPosition = e.Position;
-
-            this.TimelineChanged?.Invoke(sender, e);
-        }
+            => this.TimelineChanged?.Invoke(sender, e);
 
         /// <summary>
         /// Sets the <see cref="SessionWatcher{T}.ProcessIcon"/> from the specified <paramref name="sourceAppUserModelId"/>.
         /// </summary>
         /// <param name="sourceAppUserModelId">The source application user model identifier.</param>
+        /// <param name="suppressRaisingEvents">Whether <see cref="ProcessIconChanged"/> should be raised if the <see cref="ProcessIcon"/> changed.</param>
         /// <returns>The task of setting the <see cref="SessionWatcher{T}.ProcessIcon"/>.</returns>
-        private async Task SetProcessIconFromAsync(string sourceAppUserModelId)
+        private async Task SetProcessIconFromAsync(string sourceAppUserModelId, bool suppressRaisingEvents = false)
         {
             if (string.IsNullOrWhiteSpace(sourceAppUserModelId))
             {
@@ -241,12 +238,12 @@
                 using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
                 using (var reader = new StreamReader(cryptoStream))
                 {
-                    this.ProcessIcon = $"data:image/png;base64,{reader.ReadToEnd()}";
+                    this.SetProcessIcon($"data:image/png;base64,{reader.ReadToEnd()}", suppressRaisingEvents);
                 }
             }
             else if (Process.GetProcessesByName(sourceAppUserModelId) is Process[] processes and { Length: > 0 })
             {
-                this.ProcessIcon = processes[0].GetIconAsBase64();
+                this.SetProcessIcon(processes[0].GetIconAsBase64(), suppressRaisingEvents);
             }
         }
     }
