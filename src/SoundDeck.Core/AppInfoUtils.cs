@@ -22,7 +22,9 @@
         public static bool TryGet(string appUserModelId, out AppInfo appInfo)
         {
             appInfo = default;
-            if (INVALID_APP_USER_MODEL_IDS.TryGetValue(appUserModelId, out var _))
+
+            if (appUserModelId is null
+                || INVALID_APP_USER_MODEL_IDS.TryGetValue(appUserModelId, out var _))
             {
                 return false;
             }

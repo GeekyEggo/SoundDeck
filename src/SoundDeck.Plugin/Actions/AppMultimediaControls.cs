@@ -67,9 +67,14 @@
         }
 
         /// <summary>
-        /// Gets or sets friendly name.
+        /// Gets or sets the process label.
         /// </summary>
-        private string FriendlyName { get; set; }
+        private string ProcessLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title.
+        /// </summary>
+        private string Title { get; set; }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -88,13 +93,13 @@
             await base.OnDidReceiveSettings(args, settings);
             using (this._syncRoot.Lock())
             {
+                this.ProcessLabel = settings.ProcessLabel;
                 if (this.SessionWatcher is null)
                 {
                     return;
                 }
 
                 this.SessionWatcher.SelectionCriteria = settings;
-                this.FriendlyName = settings.ProcessLabel;
             }
 
             await this.RefreshFeedbackAsync(updateIcon: true);
@@ -140,7 +145,7 @@
                 using (await this._syncRoot.LockAsync())
                 {
                     var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
-                    this.FriendlyName = settings.ProcessLabel;
+                    this.ProcessLabel = settings.ProcessLabel;
 
                     if (this.SessionWatcher is null)
                     {
@@ -213,7 +218,9 @@
         /// <param name="session">The new session.</param>
         private void OnSessionChanged(object sender, global::Windows.Media.Control.GlobalSystemMediaTransportControlsSession session)
         {
-            this.FriendlyName = AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo) ? appInfo.DisplayInfo.DisplayName : session.SourceAppUserModelId;
+            this.Title = AppInfoUtils.TryGet(session?.SourceAppUserModelId, out var appInfo) ? appInfo.DisplayInfo.DisplayName : session?.SourceAppUserModelId;
+            this.Title ??= this.ProcessLabel;
+
             this.RefreshFeedbackAsync(updateIcon: true).Forget(this.Logger);
         }
 
@@ -247,7 +254,7 @@
                         Opacity = 1,
                         Value = hasTime ? (int)Math.Ceiling(100 / timeline.EndTime.TotalSeconds * timeline.Position.TotalSeconds) : 0
                     },
-                    Title = this.FriendlyName,
+                    Title = this.Title,
                     Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
                     Value = hasTime ? timeline.EndTime.Subtract(timeline.Position).ToString("mm':'ss") : hasTitle ? this.SessionWatcher?.Title : string.Empty
                 };

@@ -138,7 +138,6 @@
             {
                 lock (_syncRoot)
                 {
-
                     if (!this.Equals(this._session, value))
                     {
                         var oldValue = this._session;
