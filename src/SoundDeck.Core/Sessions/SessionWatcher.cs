@@ -106,6 +106,11 @@
             {
                 lock (_syncRoot)
                 {
+                    if (this._selectionCriteria?.Equals(value) == true)
+                    {
+                        return;
+                    }
+
                     if (this._selectionCriteria is not null and { ProcessSelectionType: ProcessSelectionType.Foreground }
                         && value is null or { ProcessSelectionType: ProcessSelectionType.ByName })
                     {

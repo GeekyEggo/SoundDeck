@@ -45,5 +45,22 @@
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public bool Equals(IProcessSelectionCriteria other)
+        {
+            if (this is not null && other is not null)
+            {
+                if (this.ProcessSelectionType != other.ProcessSelectionType)
+                {
+                    return false;
+                }
+
+                return this.ProcessSelectionType is ProcessSelectionType.Foreground
+                    || this.ProcessName == other.ProcessName;
+            }
+
+            return this is null && other is null;
+        }
     }
 }

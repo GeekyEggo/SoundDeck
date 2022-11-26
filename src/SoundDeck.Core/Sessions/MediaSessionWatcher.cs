@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Drawing;
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
@@ -177,9 +178,8 @@
         /// Handles the <see cref="GlobalSystemMediaTransportControlsSession.MediaPropertiesChanged"/> event asynchronously.
         /// </summary>
         /// <param name="session">The session.</param>
-        /// <param name="suppressRaisingEvents">When <c>true</c>, <see cref="MediaPropertiesChanged"/> is suppressed.</param>
         /// <returns>The task of handling the changing of the media properties.</returns>
-        private async Task OnMediaPropertiesChangedAsync(GlobalSystemMediaTransportControlsSession session, bool suppressRaisingEvents = false)
+        private async Task OnMediaPropertiesChangedAsync(GlobalSystemMediaTransportControlsSession session)
         {
             using (await this._syncRoot.LockAsync())
             {
@@ -201,14 +201,14 @@
                 else
                 {
                     using (var stream = await props.Thumbnail.OpenReadAsync())
-                    using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
-                    using (var reader = new StreamReader(cryptoStream))
+                    using (var img = Image.FromStream(stream.AsStream()))
+                    using (var cropped = img.ToSquare())
                     {
-                        this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
+                        this.Thumbnail = cropped.ToBase64();
                     }
                 }
 
-                if (!suppressRaisingEvents)
+                if (!this.SuppressRaisingEvents)
                 {
                     this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
                 }

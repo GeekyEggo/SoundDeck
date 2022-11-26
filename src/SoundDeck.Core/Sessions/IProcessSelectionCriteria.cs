@@ -1,9 +1,11 @@
 ﻿namespace SoundDeck.Core.Sessions
 {
+    using System;
+
     /// <summary>
     /// Provides information about selecting a process.
     /// </summary>
-    public interface IProcessSelectionCriteria
+    public interface IProcessSelectionCriteria : IEquatable<IProcessSelectionCriteria>
     {
         /// <summary>
         /// Gets or sets the name of the process to change.

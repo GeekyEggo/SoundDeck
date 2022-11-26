@@ -11,6 +11,7 @@
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Sessions;
+    using SoundDeck.Plugin.Models;
     using SoundDeck.Plugin.Models.Settings;
 
     /// <summary>
@@ -40,6 +41,21 @@
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is an encoder.
+        /// </summary>
+        private bool IsEncoder { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the preferred icon.
+        /// </summary>
+        private MediaSessionIconType PreferredIcon { get; set; } = MediaSessionIconType.App;
+
+        /// <summary>
+        /// Gets or sets the process label.
+        /// </summary>
+        private string ProcessLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="MediaSessionWatcher"/>, responsible for tracking the media session associated with the action.
         /// </summary>
         private MediaSessionWatcher SessionWatcher
@@ -67,11 +83,6 @@
         }
 
         /// <summary>
-        /// Gets or sets the process label.
-        /// </summary>
-        private string ProcessLabel { get; set; }
-
-        /// <summary>
         /// Gets or sets the title.
         /// </summary>
         private string Title { get; set; }
@@ -93,7 +104,9 @@
             await base.OnDidReceiveSettings(args, settings);
             using (this._syncRoot.Lock())
             {
+                this.PreferredIcon = settings.PreferredIcon;
                 this.ProcessLabel = settings.ProcessLabel;
+
                 if (this.SessionWatcher is null)
                 {
                     return;
@@ -140,26 +153,27 @@
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            if (args.Payload.Controller is Controller.Encoder)
+
+            this.IsEncoder = args.Payload.Controller is Controller.Encoder;
+            using (await this._syncRoot.LockAsync())
             {
-                using (await this._syncRoot.LockAsync())
+                var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
+
+                this.PreferredIcon = settings.PreferredIcon;
+                this.ProcessLabel = settings.ProcessLabel;
+
+                if (this.SessionWatcher is null)
                 {
-                    var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
-                    this.ProcessLabel = settings.ProcessLabel;
-
-                    if (this.SessionWatcher is null)
-                    {
-                        var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
-                        this.SessionWatcher = new MediaSessionWatcher(manager, settings);
-                    }
-                    else
-                    {
-                        this.SessionWatcher.EnableRaisingEvents = true;
-                    }
+                    var manager = await this.AppAudioService.GetMultimediaSessionManagerAsync();
+                    this.SessionWatcher = new MediaSessionWatcher(manager, settings);
                 }
-
-                await this.RefreshFeedbackAsync(updateIcon: true);
+                else
+                {
+                    this.SessionWatcher.EnableRaisingEvents = true;
+                }
             }
+
+            await this.RefreshFeedbackAsync(updateIcon: true);
         }
 
         /// <inheritdoc/>
@@ -240,6 +254,12 @@
         {
             using (await this._syncRoot.LockAsync())
             {
+                if (!this.IsEncoder)
+                {
+                    await this.SetImageAsync(this.GetPreferredIcon());
+                    return;
+                }
+
                 // Determine what information should be shown.
                 var timeline = this.SessionWatcher?.Timeline;
                 var hasTime = timeline is not null and { EndTime.TotalSeconds: > 0 };
@@ -255,7 +275,7 @@
                         Value = hasTime ? (int)Math.Ceiling(100 / timeline.EndTime.TotalSeconds * timeline.Position.TotalSeconds) : 0
                     },
                     Title = this.Title,
-                    Icon = updateIcon ? this.SessionWatcher?.Thumbnail ?? this.SessionWatcher?.ProcessIcon : null,
+                    Icon = updateIcon ? this.GetPreferredIcon() : null,
                     Value = hasTime ? timeline.EndTime.Subtract(timeline.Position).ToString("mm':'ss") : hasTitle ? this.SessionWatcher?.Title : string.Empty
                 };
 
@@ -268,6 +288,21 @@
                     this.SetImageAsync(processIcon).Forget(this.Logger);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the preferred icon based on the users <see cref="PreferredIcon"/> and the state of the <see cref="SessionWatcher"/>.
+        /// </summary>
+        /// <returns>The preferred icon.</returns>
+        private string GetPreferredIcon()
+        {
+            if (this.PreferredIcon is MediaSessionIconType.Artwork
+                && this.SessionWatcher?.Thumbnail is string thumbnail and not null)
+            {
+                return thumbnail;
+            }
+
+            return this.SessionWatcher?.ProcessIcon ?? string.Empty;
         }
     }
 }
