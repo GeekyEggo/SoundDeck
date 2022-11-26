@@ -4,6 +4,7 @@
 
 - Update "App Multimedia Controls" to support Stream Deck+ dials and touchpad!
 - Add active apps to dropdown when creating app-specific actions.
+- Add app icon / thumbnail image to media keys.
 
 ## v3.7.2
 
