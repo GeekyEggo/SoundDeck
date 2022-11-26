@@ -5,7 +5,9 @@
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Nito.AsyncEx;
     using SoundDeck.Core.Extensions;
     using Windows.Media.Control;
 
@@ -14,6 +16,11 @@
     /// </summary>
     public sealed class MediaSessionWatcher : SessionWatcher<GlobalSystemMediaTransportControlsSession>
     {
+        /// <summary>
+        /// The synchronization root.
+        /// </summary>
+        private readonly SemaphoreSlim _syncRoot = new SemaphoreSlim(1);
+
         /// <summary>
         /// Private backing field for <see cref="Timeline"/>.
         /// </summary>
@@ -130,19 +137,21 @@
             // Register new session events, when we have one.
             if (newSession is not null)
             {
+                this.SuppressRaisingEvents = true;
                 this.Timeline = new MediaSessionTimelineTicker(newSession);
+                newSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
 
                 Task.Run(async () =>
                 {
                     try
                     {
-                        await this.OnMediaPropertiesChangedAsync(newSession, suppressRaisingEvents: true);
-                        await this.SetProcessIconFromAsync(newSession.SourceAppUserModelId, suppressRaisingEvents: true);
+                        await this.OnMediaPropertiesChangedAsync(newSession);
+                        await this.SetProcessIconFromAsync(newSession.SourceAppUserModelId);
+                        base.OnSessionChanged(oldSession, newSession);
                     }
                     finally
                     {
-                        base.OnSessionChanged(oldSession, newSession);
-                        newSession.MediaPropertiesChanged += this.OnMediaPropertiesChanged;
+                        this.SuppressRaisingEvents = false;
                     }
                 }).Forget();
             }
@@ -172,34 +181,37 @@
         /// <returns>The task of handling the changing of the media properties.</returns>
         private async Task OnMediaPropertiesChangedAsync(GlobalSystemMediaTransportControlsSession session, bool suppressRaisingEvents = false)
         {
-            if (session is null)
+            using (await this._syncRoot.LockAsync())
             {
-                this.Thumbnail = null;
-                this.Title = null;
-
-                return;
-            }
-
-            var props = await session.TryGetMediaPropertiesAsync().AsTask();
-            this.Title = props?.Title;
-
-            if (props?.Thumbnail is null)
-            {
-                this.Thumbnail = null;
-            }
-            else
-            {
-                using (var stream = await props.Thumbnail.OpenReadAsync())
-                using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
-                using (var reader = new StreamReader(cryptoStream))
+                if (session is null)
                 {
-                    this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
-                }
-            }
+                    this.Thumbnail = null;
+                    this.Title = null;
 
-            if (!suppressRaisingEvents)
-            {
-                this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+
+                var props = await session.TryGetMediaPropertiesAsync().AsTask();
+                this.Title = props?.Title;
+
+                if (props?.Thumbnail is null)
+                {
+                    this.Thumbnail = null;
+                }
+                else
+                {
+                    using (var stream = await props.Thumbnail.OpenReadAsync())
+                    using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
+                    using (var reader = new StreamReader(cryptoStream))
+                    {
+                        this.Thumbnail = $"data:image/png;base64,{reader.ReadToEnd()}";
+                    }
+                }
+
+                if (!suppressRaisingEvents)
+                {
+                    this.MediaPropertiesChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -223,9 +235,8 @@
         /// Sets the <see cref="SessionWatcher{T}.ProcessIcon"/> from the specified <paramref name="sourceAppUserModelId"/>.
         /// </summary>
         /// <param name="sourceAppUserModelId">The source application user model identifier.</param>
-        /// <param name="suppressRaisingEvents">Whether <see cref="ProcessIconChanged"/> should be raised if the <see cref="ProcessIcon"/> changed.</param>
         /// <returns>The task of setting the <see cref="SessionWatcher{T}.ProcessIcon"/>.</returns>
-        private async Task SetProcessIconFromAsync(string sourceAppUserModelId, bool suppressRaisingEvents = false)
+        private async Task SetProcessIconFromAsync(string sourceAppUserModelId)
         {
             if (string.IsNullOrWhiteSpace(sourceAppUserModelId))
             {
@@ -238,12 +249,12 @@
                 using (var cryptoStream = new CryptoStream(stream.AsStream(), new ToBase64Transform(), CryptoStreamMode.Read))
                 using (var reader = new StreamReader(cryptoStream))
                 {
-                    this.SetProcessIcon($"data:image/png;base64,{reader.ReadToEnd()}", suppressRaisingEvents);
+                    this.SetProcessIcon($"data:image/png;base64,{reader.ReadToEnd()}");
                 }
             }
             else if (Process.GetProcessesByName(sourceAppUserModelId) is Process[] processes and { Length: > 0 })
             {
-                this.SetProcessIcon(processes[0].GetIconAsBase64(), suppressRaisingEvents);
+                this.SetProcessIcon(processes[0].GetIconAsBase64());
             }
         }
     }
