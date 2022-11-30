@@ -23,10 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.PI", "src\SoundDe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundDeck.Plugin", "src\SoundDeck.Plugin\SoundDeck.Plugin.csproj", "{2B75D954-6630-4FBB-BDE4-D9C078656231}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{A02A5DD9-69EA-4C77-A4DB-3032A65E7FDE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SetAppAudioDevice", "tools\SetAppAudioDevice\SetAppAudioDevice.csproj", "{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDeck", "..\SharpDeck\src\SharpDeck\SharpDeck.csproj", "{8EB54E40-917C-4EE9-96DE-225D419CF72A}"
 EndProject
 Global
@@ -47,10 +43,6 @@ Global
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B75D954-6630-4FBB-BDE4-D9C078656231}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EB54E40-917C-4EE9-96DE-225D419CF72A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,9 +50,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A0CE24DD-5F11-4D05-A94B-EA260D58E7DF} = {A02A5DD9-69EA-4C77-A4DB-3032A65E7FDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29A7862F-3307-4226-8932-37C596345BF0}
