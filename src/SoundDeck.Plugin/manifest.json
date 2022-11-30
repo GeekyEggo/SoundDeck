@@ -16,9 +16,13 @@
       "Icon": "Images/AppMultimediaControls/Action",
       "Name": "App Media Controls",
       "Controllers": [ "Encoder", "Keypad" ],
-      "Encoder": {
-        "layout": "$B1"
-      },
+        "Encoder": {
+            "layout": "$B1",
+            "TriggerDescription": {
+                "Rotate": "Previous / Next",
+                "Touch": "Play / Pause"
+            }
+        },
       "PropertyInspectorPath": "PI/appMultimediaControls.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Control the media playback of a specific application.",
