@@ -41,11 +41,6 @@
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is an encoder.
-        /// </summary>
-        private bool IsEncoder { get; set; } = false;
-
-        /// <summary>
         /// Gets or sets the preferred icon.
         /// </summary>
         private MediaSessionIconType PreferredIcon { get; set; } = MediaSessionIconType.App;
@@ -154,7 +149,6 @@
         {
             await base.OnWillAppear(args);
 
-            this.IsEncoder = args.Payload.Controller is Controller.Encoder;
             using (await this._syncRoot.LockAsync())
             {
                 var settings = args.Payload.GetSettings<AppMultimediaControlsSettings>();
@@ -285,7 +279,7 @@
                 if (updateIcon
                     && this.SessionWatcher?.ProcessIcon is string processIcon)
                 {
-                    this.SetImageAsync(processIcon).Forget(this.Logger);
+                    await this.SetImageAsync(processIcon);
                 }
             }
         }

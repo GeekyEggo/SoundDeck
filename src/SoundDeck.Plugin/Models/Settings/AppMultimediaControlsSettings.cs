@@ -16,6 +16,6 @@
         /// <summary>
         /// Gets or sets the preferred icon.
         /// </summary>
-        public MediaSessionIconType PreferredIcon { get; set; } = MediaSessionIconType.App;
+        public MediaSessionIconType PreferredIcon { get; set; } = MediaSessionIconType.Artwork;
     }
 }

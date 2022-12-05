@@ -33,6 +33,11 @@ namespace SoundDeck.Plugin.Actions
         public IAudioService AudioService { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is an encoder.
+        /// </summary>
+        protected bool IsEncoder { get; set; } = false;
+
+        /// <summary>
         /// Gets the audio devices capable of capturing audio.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
@@ -71,6 +76,13 @@ namespace SoundDeck.Plugin.Actions
             {
                 await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
             }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+        {
+            await base.OnWillAppear(args);
+            this.IsEncoder = args.Payload.Controller is Controller.Encoder;
         }
 
         /// <summary>

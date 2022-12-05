@@ -1,7 +1,6 @@
 namespace SoundDeck.Core
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using NAudio.CoreAudioApi;
@@ -11,7 +10,7 @@ namespace SoundDeck.Core
     /// <summary>
     /// Provides a singleton responsible for traversing the available <see cref="AudioDevice"/> and selecting <see cref="MMDevice"/>.
     /// </summary>
-    public sealed class AudioDevices : IReadOnlyCollection<IAudioDevice>, IMMNotificationClient
+    public sealed class AudioDevices : IMMNotificationClient
     {
         /// <summary>
         /// /// The identifier used to determine the default playback device.
@@ -71,6 +70,16 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
+        /// Occurs when the default device changed.
+        /// </summary>
+        public event EventHandler DefaultDeviceChanged;
+
+        /// <summary>
+        /// Occurs when the devices changed.
+        /// </summary>
+        public event EventHandler DevicesChanged;
+
+        /// <summary>
         /// Gets the current instance of <see cref="AudioDevices"/>.
         /// </summary>
         public static AudioDevices Current => _current.Value;
@@ -121,6 +130,15 @@ namespace SoundDeck.Core
         }
 
         /// <summary>
+        /// Called when a default device changes.
+        /// </summary>
+        /// <param name="flow">The flow.</param>
+        /// <param name="role">The role.</param>
+        /// <param name="defaultDeviceId">The default device identifier.</param>
+        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+            => this.DefaultDeviceChanged?.Invoke(this, EventArgs.Empty);
+
+        /// <summary>
         /// Handles an audio device being added.
         /// </summary>
         /// <param name="pwstrDeviceId">The device identifier.</param>
@@ -129,6 +147,7 @@ namespace SoundDeck.Core
             lock (_syncRoot)
             {
                 this.Devices.Add(new AudioDevice(this.Enumerator.GetDevice(pwstrDeviceId)));
+                this.DevicesChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -141,6 +160,7 @@ namespace SoundDeck.Core
             lock (_syncRoot)
             {
                 this.Devices.RemoveAll(device => device.Id == deviceId && !device.IsDynamic);
+                this.DevicesChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -163,16 +183,8 @@ namespace SoundDeck.Core
             }
         }
 
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>The enumerator of <see cref="AudioDevice"/>.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-            => this.GetEnumerator();
-
         #region IMMNotificationClient
-        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId) { }
-        public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
         #endregion
     }
 }
