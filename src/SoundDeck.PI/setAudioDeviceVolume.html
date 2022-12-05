@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <script>
+        function connectElgatoStreamDeckSocket(inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
+            const actionInfo = JSON.parse(inActionInfo);
+            if (actionInfo?.payload?.controller === 'Encoder') {
+                // Show the "Step" range for dials.
+                document.querySelector('sdpi-item[label="Step"]').style.display = '';
+            } else {
+                // Show the "Action" and "Value" for buttons.
+                document.querySelector('sdpi-item[label="Action"]').style.display = '';
+                document.querySelector('sdpi-select[setting="volumeAction"]').addEventListener('valuechange', ev => {
+                    document.querySelector('sdpi-item[label="Value"]').style.display = ev.srcElement.value > 2 ? '' : 'none';
+                });
+            }
+        }
+    </script>
+    <script src="./js/sdpi-components.js"></script>
+</head>
+<body>
+    <sdpi-item label="Audio Device">
+        <sdpi-select setting="audioDeviceId" datasource="getAudioDevices" placeholder="Default"></sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Action" style="display: none">
+        <sdpi-select setting="volumeAction" placeholder="Mute / Unmute" value-type="Number">
+            <option value="0">Mute / Unmute</option>
+            <option value="1">Mute</option>
+            <option value="2">Unmute</option>
+            <option value="3">Set</option>
+            <option value="4">Increase By</option>
+            <option value="5">Decrease By</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Value" style="display: none">
+        <sdpi-range setting="volumeValue" min="0" max="100" step="5" showlabels></sdpi-range>
+    </sdpi-item>
+
+    <sdpi-item label="Step" style="display: none">
+        <sdpi-range setting="volumeValue" min="0" max="25" step="1" showlabels></sdpi-range>
+    </sdpi-item>
+</body>
+</html>

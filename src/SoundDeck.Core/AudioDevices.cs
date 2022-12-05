@@ -1,6 +1,7 @@
 namespace SoundDeck.Core
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using NAudio.CoreAudioApi;
@@ -10,7 +11,7 @@ namespace SoundDeck.Core
     /// <summary>
     /// Provides a singleton responsible for traversing the available <see cref="AudioDevice"/> and selecting <see cref="MMDevice"/>.
     /// </summary>
-    public sealed class AudioDevices : IMMNotificationClient
+    public sealed class AudioDevices : IMMNotificationClient, IReadOnlyCollection<IAudioDevice>
     {
         /// <summary>
         /// /// The identifier used to determine the default playback device.
@@ -50,22 +51,28 @@ namespace SoundDeck.Core
             this.Enumerator = new MMDeviceEnumerator();
             this.Enumerator.RegisterEndpointNotificationCallback(this);
 
-            void AddDefault(DefaultAudioDevice device)
-            {
-                this.Devices.Add(device);
-                this.Enumerator.RegisterEndpointNotificationCallback(device);
-            }
-
-            // Add the default playback and recording devices.
-            AddDefault(new DefaultAudioDevice(PLAYBACK_DEFAULT, "Default", Role.Console, this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console)));
-            AddDefault(new DefaultAudioDevice(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", Role.Communications, this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications)));
-            AddDefault(new DefaultAudioDevice(RECORDING_DEFAULT, "Default", Role.Console, this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console)));
-            AddDefault(new DefaultAudioDevice(RECORDING_DEFAULT_COMMUNICATION, "Default (Communication)", Role.Communications, this.Enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications)));
-
-            // Add all other audio devices.
+            // Add all devices.
             foreach (var device in this.Enumerator.EnumerateAudioEndPoints(DataFlow.All, DeviceState.Active))
             {
                 this.Devices.Add(new AudioDevice(device));
+            }
+
+            // Add the default playback and recording devices.
+            AddDefault(PLAYBACK_DEFAULT, "Default", DataFlow.Render, Role.Console);
+            AddDefault(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", DataFlow.Render, Role.Communications);
+            AddDefault(RECORDING_DEFAULT, "Default", DataFlow.Capture, Role.Console);
+            AddDefault(RECORDING_DEFAULT_COMMUNICATION, "Default (Communication)", DataFlow.Capture, Role.Communications);
+
+            void AddDefault(string key, string friendlyName, DataFlow dataFlow, Role role)
+            {
+                using (var defaultEndpoint = this.Enumerator.GetDefaultAudioEndpoint(dataFlow, role))
+                {
+                    var sharedMMDevice = this.Devices.FirstOrDefault(item => item.Device.ID == defaultEndpoint.ID);
+                    var defaultAudioDevice = new DefaultAudioDevice(key, friendlyName, role, sharedMMDevice.Device);
+
+                    this.Devices.Add(defaultAudioDevice);
+                    this.Enumerator.RegisterEndpointNotificationCallback(defaultAudioDevice);
+                }
             }
         }
 
@@ -97,7 +104,7 @@ namespace SoundDeck.Core
         /// <summary>
         /// Gets the audio devices.
         /// </summary>
-        private List<IAudioDevice> Devices { get; } = new List<IAudioDevice>();
+        private List<AudioDevice> Devices { get; } = new List<AudioDevice>();
 
         /// <summary>
         /// Gets the <see cref="MMDevice"/> by its unique key identifier.
@@ -182,6 +189,10 @@ namespace SoundDeck.Core
                     break;
             }
         }
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator()
+            => this.GetEnumerator();
 
         #region IMMNotificationClient
         void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }

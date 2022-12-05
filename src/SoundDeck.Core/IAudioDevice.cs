@@ -14,6 +14,11 @@ namespace SoundDeck.Core
         event EventHandler IdChanged;
 
         /// <summary>
+        /// Occurs when the volume has changed.
+        /// </summary>
+        event EventHandler<IAudioDevice, AudioVolumeNotificationData> VolumeChanged;
+
+        /// <summary>
         /// Gets the friendly name of the audio device.
         /// </summary>
         string FriendlyName { get; }
@@ -34,6 +39,11 @@ namespace SoundDeck.Core
         bool IsDynamic { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is muted.
+        /// </summary>
+        bool IsMuted { get; }
+
+        /// <summary>
         /// Gets the unique key that represents the audio device.
         /// </summary>
         string Key { get; }
@@ -42,6 +52,11 @@ namespace SoundDeck.Core
         /// Gets the role that this audio device is default for.
         /// </summary>
         Role? Role { get; }
+
+        /// <summary>
+        /// Gets the volume.
+        /// </summary>
+        float Volume { get; }
 
         /// <summary>
         /// Gets the multimedia device that this instance represents.

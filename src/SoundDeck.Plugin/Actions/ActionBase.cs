@@ -72,9 +72,14 @@ namespace SoundDeck.Plugin.Actions
             await base.OnSendToPlugin(args);
 
             var payload = args.Payload.ToObject<DataSourcePayload>();
-            if (payload.Event == "getAppAssignableAudioDevices")
+            switch (payload.Event)
             {
-                await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
+                case "getAppAssignableAudioDevices":
+                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
+                    break;
+                case "getAudioDevices":
+                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices()));
+                    break;
             }
         }
 

@@ -46,6 +46,7 @@ namespace SoundDeck.Core.Devices
                     && this.Role == role)
                 {
                     this.Id = defaultDeviceId;
+                    this.Device = AudioDevices.Current.Enumerator.GetDevice(defaultDeviceId);
                 }
             }
         }
