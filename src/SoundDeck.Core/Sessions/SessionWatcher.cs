@@ -208,10 +208,7 @@
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
-        {
-            ForegroundProcess.Changed -= this.ForegroundProcessChanged;
-            this.SelectionCriteria = null;
-        }
+            => this.SelectionCriteria = null;
 
         /// <summary>
         /// Gets the session that matches the <see cref="Predicate"/>.
@@ -245,7 +242,7 @@
         {
             lock (_syncRoot)
             {
-                this._predicate = this.SelectionCriteria.ToPredicate();
+                this._predicate = this.SelectionCriteria?.ToPredicate();
                 this.Session = this.GetSession(this.Predicate);
             }
         }

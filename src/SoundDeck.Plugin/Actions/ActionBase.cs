@@ -100,10 +100,15 @@ namespace SoundDeck.Plugin.Actions
             return this.AudioService.Devices
                 .Where(filter)
                 .GroupBy(device => device.Flow)
-                .Select(g =>
+                .Select(group =>
                 {
-                    var children = g.Select(opt => new DataSourceItem(opt.Key, opt.FriendlyName)).ToArray();
-                    return new DataSourceItem(g.Key == DataFlow.Render ? "Playback" : "Recording", children);
+                    var children = group
+                        .OrderByDescending(x => x.IsDynamic)
+                        .ThenBy(x => x.FriendlyName)
+                        .Select(opt => new DataSourceItem(opt.Key, opt.FriendlyName))
+                        .ToArray();
+
+                    return new DataSourceItem(group.Key == DataFlow.Render ? "Playback" : "Recording", children);
                 }).ToArray();
         }
     }

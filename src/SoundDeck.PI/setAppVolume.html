@@ -6,7 +6,7 @@
 </head>
 <body>
     <sdpi-item label="App">
-        <sdpi-select setting="processSelectionType" id="__process" datasource="getAudioSessions" placeholder="Foreground (Active)"></sdpi-select>
+        <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
     </sdpi-item>
 
     <sdpi-item label="Name" id="__name" style="display: none;">
@@ -14,7 +14,7 @@
     </sdpi-item>
 
     <sdpi-item label="Action">
-        <sdpi-select setting="volumeAction" id="__action" placeholder="Mute / Unmute" value-type="Number">
+        <sdpi-select setting="volumeAction" placeholder="Mute / Unmute" value-type="Number">
             <option value="0">Mute / Unmute</option>
             <option value="1">Mute</option>
             <option value="2">Unmute</option>
@@ -24,17 +24,17 @@
         </sdpi-select>
     </sdpi-item>
 
-    <sdpi-item label="Value" id="__value" style="display: none">
+    <sdpi-item label="Value" style="display: none">
         <sdpi-range setting="volumeValue" min="0" max="100" step="5" showlabels></sdpi-range>
     </sdpi-item>
 
     <script>
-        document.getElementById('__process').addEventListener('valuechange', ev => {
-            document.getElementById('__name').style.display = ev.srcElement.value == 1 ? '' : 'none';
+        document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+            document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
         });
 
-        document.getElementById('__action').addEventListener('valuechange', ev => {
-            document.getElementById('__value').style.display = ev.srcElement.value > 2 ? '' : 'none';
+        document.querySelector('sdpi-select[setting="volumeAction"]').addEventListener('valuechange', ev => {
+            document.querySelector('sdpi-item[label="Value"]').style.display = ev.srcElement.value > 2 ? '' : 'none';
         });
     </script>
 </body>

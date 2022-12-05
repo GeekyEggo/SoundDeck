@@ -117,26 +117,6 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
-        {
-            var predicate = criteria.ToPredicate();
-            var sessions = await this.GetMultimediaSessionsAsync();
-
-            foreach (var session in sessions.Where(predicate.IsMatch))
-            {
-                await (action switch
-                {
-                    MultimediaAction.Play => session.TryPlayAsync(),
-                    MultimediaAction.Pause => session.TryPauseAsync(),
-                    MultimediaAction.Stop => session.TryStopAsync(),
-                    MultimediaAction.SkipPrevious => session.TrySkipPreviousAsync(),
-                    MultimediaAction.SkipNext => session.TrySkipNextAsync(),
-                    _ => session.TryTogglePlayPauseAsync()
-                });
-            }
-        }
-
-        /// <inheritdoc/>
         public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionsAsync()
         {
             var manager = await this.GetMultimediaSessionManagerAsync();

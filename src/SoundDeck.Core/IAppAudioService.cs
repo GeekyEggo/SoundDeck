@@ -36,14 +36,6 @@ namespace SoundDeck.Core
             where T : IProcessSelectionCriteria, IVolumeSettings;
 
         /// <summary>
-        /// Attempts to control a session that matches the specified <paramref name="criteria"/>.
-        /// </summary>
-        /// <param name="criteria">The process selection criteria that determines which process to update.</param>
-        /// <param name="action">The multimedia action to apply.</param>
-        /// <returns>The task of controlling the multimedia.</returns>
-        Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action);
-
-        /// <summary>
         /// Gets the all active audio sessions audio sessions.
         /// </summary>
         /// <returns>The active audio sessions.</returns>

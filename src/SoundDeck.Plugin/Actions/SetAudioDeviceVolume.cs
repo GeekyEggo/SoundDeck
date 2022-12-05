@@ -121,13 +121,14 @@
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
             await base.OnKeyDown(args);
-            await this.TryUpdateVolumeAsync(volume =>
+            using (await this._syncRoot.LockAsync())
             {
                 var settings = args.Payload.GetSettings<SetAudioDeviceVolumeSettings>();
-                volume.Set(settings);
-
-                this.ShowOkAsync().Forget(this.Logger);
-            });
+                using (var device = AudioDevices.Current.GetDeviceByKey(settings.AudioDeviceKey ?? AudioDevices.PLAYBACK_DEFAULT).GetMMDevice())
+                {
+                    device.AudioEndpointVolume.Set(settings);
+                }
+            }
         }
 
         /// <inheritdoc/>

@@ -90,6 +90,13 @@
         }
 
         /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            this.Manager.SessionsChanged -= this.OnMediaSessionsChanged;
+            base.Dispose(disposing);
+        }
+
+        /// <inheritdoc/>
         public override bool Equals(GlobalSystemMediaTransportControlsSession x, GlobalSystemMediaTransportControlsSession y)
             => x?.SourceAppUserModelId == y?.SourceAppUserModelId
             || x is null && y is null;

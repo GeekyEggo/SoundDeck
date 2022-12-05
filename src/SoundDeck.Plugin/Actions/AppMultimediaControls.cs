@@ -3,6 +3,7 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using global::Windows.Media.Control;
     using Microsoft.Extensions.Logging;
     using Nito.AsyncEx;
     using SharpDeck;
@@ -190,8 +191,24 @@
 
             try
             {
-                await this.AppAudioService.ControlAsync(settings, settings.Action);
-                await this.ShowOkAsync();
+                if (this.SessionWatcher?.Session is GlobalSystemMediaTransportControlsSession session and not null)
+                {
+                    await (settings.Action switch
+                    {
+                        MultimediaAction.Play => session.TryPlayAsync(),
+                        MultimediaAction.Pause => session.TryPauseAsync(),
+                        MultimediaAction.Stop => session.TryStopAsync(),
+                        MultimediaAction.SkipPrevious => session.TrySkipPreviousAsync(),
+                        MultimediaAction.SkipNext => session.TrySkipNextAsync(),
+                        _ => session.TryTogglePlayPauseAsync()
+                    });
+
+                    await this.ShowOkAsync();
+                }
+                else
+                {
+                    await this.ShowAlertAsync();
+                }
             }
             catch (Exception ex)
             {
