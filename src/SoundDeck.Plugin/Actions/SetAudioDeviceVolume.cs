@@ -13,7 +13,6 @@
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Volume;
     using SoundDeck.Plugin.Models.Settings;
-    using SoundDeck.Plugin.Windows;
 
     /// <summary>
     /// Provides an action that adjusts the volume of an audio device.
@@ -68,11 +67,6 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the audio device identifier.
-        /// </summary>
-        private string AudioDeviceKey { get; set; }
-
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
@@ -80,7 +74,7 @@
             {
                 AudioDevices.Current.DefaultDeviceChanged -= this.AudioDevices_Changed;
                 AudioDevices.Current.DevicesChanged -= this.AudioDevices_Changed;
-                App.Current.Dispatcher.Invoke(() => this.AudioDevice = null);
+                this.AudioDevice = null;
 
                 base.Dispose(disposing);
             }
@@ -90,79 +84,71 @@
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
-            await this.TrySetAudioDeviceAsync(args.Payload.GetSettings<SetAudioDeviceVolumeSettings>());
+            await this.TrySetAudioDeviceAsync(args.Payload.GetSettings<SetAudioDeviceVolumeSettings>()?.AudioDeviceKey);
         }
 
         /// <inheritdoc/>
         protected override async Task OnDialPress(ActionEventArgs<DialPayload> args)
         {
             await base.OnDialPress(args);
-            this.ToggleMute();
+            if (args.Payload.Pressed)
+            {
+                await this.TryUpdateVolumeAsync(volume => volume.Set(VolumeSettings.TOGGLE_MUTE));
+            }
         }
 
         /// <inheritdoc/>
         protected override async Task OnDialRotate(ActionEventArgs<DialRotatePayload> args)
         {
             await base.OnDialRotate(args);
-            using (this._syncRoot.Lock())
+            await this.TryUpdateVolumeAsync(volume =>
             {
-                if (this.AudioDevice is IAudioDevice device and not null)
+                var step = args.Payload.GetSettings<SetAudioDeviceVolumeSettings>().VolumeValue;
+                step = step > 25 ? 5 : step;
+
+                if (args.Payload.Ticks > 0)
                 {
-                    using (var mmDevice = device.GetMMDevice())
-                    {
-                        var step = args.Payload.GetSettings<SetAudioDeviceVolumeSettings>()?.VolumeValue ?? 5;
-                        if (args.Payload.Ticks > 0)
-                        {
-                            mmDevice.AudioEndpointVolume.Set(new VolumeSettings(VolumeAction.IncreaseBy, step * args.Payload.Ticks));
-                        }
-                        else if (args.Payload.Ticks < 0)
-                        {
-                            mmDevice.AudioEndpointVolume.Set(new VolumeSettings(VolumeAction.DecreaseBy, step * args.Payload.Ticks * -1));
-                        }
-                    }
+                    volume.Set(new VolumeSettings(VolumeAction.IncreaseBy, step * args.Payload.Ticks));
                 }
-            }
+                else if (args.Payload.Ticks < 0)
+                {
+                    volume.Set(new VolumeSettings(VolumeAction.DecreaseBy, step * args.Payload.Ticks * -1));
+                }
+            });
         }
 
         /// <inheritdoc/>
-        protected async override Task OnKeyDown(ActionEventArgs<KeyPayload> args)
+        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
         {
-            var settings = args.Payload.GetSettings<SetAudioDeviceVolumeSettings>();
-            try
+            await base.OnKeyDown(args);
+            await this.TryUpdateVolumeAsync(volume =>
             {
-                using (var device = AudioDevices.Current.GetDeviceByKey(settings.AudioDeviceId).GetMMDevice())
-                {
-                    device.AudioEndpointVolume.Set(settings);
-                }
+                var settings = args.Payload.GetSettings<SetAudioDeviceVolumeSettings>();
+                volume.Set(settings);
 
-                await this.ShowOkAsync();
-            }
-            catch (Exception ex)
-            {
-                this.Logger?.LogError(ex, $"Failed to set audio device volume; Device=\"{settings.AudioDeviceId}\", Action=\"{settings.VolumeAction}\", Value=\"{settings.VolumeValue}\".");
-                await this.ShowAlertAsync();
-            }
+                this.ShowOkAsync().Forget(this.Logger);
+            });
         }
 
         /// <inheritdoc/>
         protected override async Task OnTouchTap(ActionEventArgs<TouchTapPayload> args)
         {
             await base.OnTouchTap(args);
-            this.ToggleMute();
+            await this.TryUpdateVolumeAsync(volume => volume.Set(VolumeSettings.TOGGLE_MUTE));
         }
 
         /// <inheritdoc/>
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            await this.TrySetAudioDeviceAsync(args.Payload.GetSettings<SetAudioDeviceVolumeSettings>());
+            await this.TrySetAudioDeviceAsync(args.Payload.GetSettings<SetAudioDeviceVolumeSettings>()?.AudioDeviceKey);
         }
 
         /// <inheritdoc/>
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-            App.Current.Dispatcher.Invoke(() => this.AudioDevice = null);
+            this.AudioDevice = null;
         }
 
         /// <summary>
@@ -188,36 +174,34 @@
         {
             using (await this._syncRoot.LockAsync())
             {
-                if (this.AudioDevice is null)
+                if (this.AudioDevice is not null)
                 {
-                    return;
-                }
-
-                var percent = (int)Math.Round(this.AudioDevice.Volume * 100);
-                await this.SetFeedbackAsync(new VolumeFeedback
-                {
-                    Indicator = new VolumeIndicator
+                    var percent = (int)Math.Round(this.AudioDevice.Volume * 100);
+                    await this.SetFeedbackAsync(new VolumeFeedback
                     {
-                        IsEnabled = true,
-                        Opacity = 1,
-                        Value = percent
-                    },
-                    Title = this.AudioDevice.FriendlyName,
-                    Value = this.AudioDevice.IsMuted ? "Muted" : $"{percent}%"
-                });
-            }
-        }
-
-        /// <summary>
-        /// Toggles the mute state of <see cref="AudioDevice"/>.
-        /// </summary>
-        private void ToggleMute()
-        {
-            using (this._syncRoot.Lock())
-            {
-                if (this.AudioDevice is MMDevice mmDevice and not null)
+                        Indicator = new VolumeIndicator
+                        {
+                            IsEnabled = true,
+                            Opacity = 1,
+                            Value = percent
+                        },
+                        Title = this.AudioDevice.DeviceName,
+                        Value = this.AudioDevice.IsMuted ? "Muted" : $"{percent}%"
+                    });
+                }
+                else
                 {
-                    mmDevice.AudioEndpointVolume.Mute = !mmDevice.AudioEndpointVolume.Mute;
+                    await this.SetFeedbackAsync(new VolumeFeedback
+                    {
+                        Indicator = new VolumeIndicator
+                        {
+                            IsEnabled = true,
+                            Opacity = 1,
+                            Value = 0
+                        },
+                        Title = "None",
+                        Value = "-"
+                    });
                 }
             }
         }
@@ -225,8 +209,8 @@
         /// <summary>
         /// When <see cref="ActionBase{TSettings}.IsEncoder"/> is <c>true</c>, and there is a valid <see cref="SetAudioDeviceVolumeSettings.AudioDeviceId"/>, the <see cref="AudioDevice"/> is set.
         /// </summary>
-        /// <param name="settings">The settings.</param>
-        private async Task TrySetAudioDeviceAsync(SetAudioDeviceVolumeSettings settings = null)
+        /// <param name="audioDeviceKey">The audio device key.</param>
+        private async Task TrySetAudioDeviceAsync(string audioDeviceKey = default)
         {
             if (!this.IsEncoder)
             {
@@ -235,13 +219,44 @@
 
             using (await this._syncRoot.LockAsync())
             {
-                this.AudioDeviceKey = settings?.AudioDeviceId ?? this.AudioDeviceKey;
-                this.AudioDevice = !string.IsNullOrWhiteSpace(this.AudioDeviceKey)
-                    ? AudioDevices.Current.GetDeviceByKey(this.AudioDeviceKey)
+                var key = audioDeviceKey ?? this.AudioDevice?.Key ?? AudioDevices.PLAYBACK_DEFAULT;
+                this.AudioDevice = !string.IsNullOrWhiteSpace(key)
+                    ? AudioDevices.Current.GetDeviceByKey(key)
                     : null;
             }
 
             await this.RefreshFeedbackAsync();
+        }
+
+        /// <summary>
+        /// Attempts to update the volume associated with the <see cref="MMDevice"/> for the <see cref="AudioDevice"/>.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <returns>The task of updating the volume.</returns>
+        private async Task TryUpdateVolumeAsync(Action<AudioEndpointVolume> action)
+        {
+            try
+            {
+                using (await this._syncRoot.LockAsync())
+                {
+                    if (this.AudioDevice is IAudioDevice device and not null)
+                    {
+                        using (var mmDevice = device.GetMMDevice())
+                        {
+                            action(mmDevice.AudioEndpointVolume);
+                        }
+                    }
+                    else
+                    {
+                        await this.ShowAlertAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Logger?.LogError(ex, $"Failed to set audio device volume; Device=\"{this.AudioDevice.Id}\".");
+                await this.ShowAlertAsync();
+            }
         }
     }
 }

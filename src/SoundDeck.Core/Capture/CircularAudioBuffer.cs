@@ -39,7 +39,7 @@ namespace SoundDeck.Core.Capture
             this.Logger = logger;
 
             this.StartRecording();
-            this.Device.IdChanged += (_, __) => this.Restart();
+            this.Device.DeviceChanged += (_, __) => this.Restart();
         }
 
         /// <summary>

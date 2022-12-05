@@ -6,7 +6,6 @@ namespace SoundDeck.Core
     using System.Linq;
     using NAudio.CoreAudioApi;
     using NAudio.CoreAudioApi.Interfaces;
-    using SoundDeck.Core.Devices;
 
     /// <summary>
     /// Provides a singleton responsible for traversing the available <see cref="AudioDevice"/> and selecting <see cref="MMDevice"/>.
@@ -58,20 +57,19 @@ namespace SoundDeck.Core
             }
 
             // Add the default playback and recording devices.
-            AddDefault(PLAYBACK_DEFAULT, "Default", DataFlow.Render, Role.Console);
-            AddDefault(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", DataFlow.Render, Role.Communications);
-            AddDefault(RECORDING_DEFAULT, "Default", DataFlow.Capture, Role.Console);
             AddDefault(RECORDING_DEFAULT_COMMUNICATION, "Default (Communication)", DataFlow.Capture, Role.Communications);
+            AddDefault(RECORDING_DEFAULT, "Default", DataFlow.Capture, Role.Console);
+            AddDefault(PLAYBACK_DEFAULT_COMMUNICATION, "Default (Communication)", DataFlow.Render, Role.Communications);
+            AddDefault(PLAYBACK_DEFAULT, "Default", DataFlow.Render, Role.Console);
 
             void AddDefault(string key, string friendlyName, DataFlow dataFlow, Role role)
             {
                 using (var defaultEndpoint = this.Enumerator.GetDefaultAudioEndpoint(dataFlow, role))
                 {
                     var sharedMMDevice = this.Devices.FirstOrDefault(item => item.Device.ID == defaultEndpoint.ID);
-                    var defaultAudioDevice = new DefaultAudioDevice(key, friendlyName, role, sharedMMDevice.Device);
+                    var defaultAudioDevice = new AudioDevice(sharedMMDevice.Device, friendlyName, isDynamic: true, key, role);
 
-                    this.Devices.Add(defaultAudioDevice);
-                    this.Enumerator.RegisterEndpointNotificationCallback(defaultAudioDevice);
+                    this.Devices.Insert(0, defaultAudioDevice);
                 }
             }
         }
@@ -143,7 +141,18 @@ namespace SoundDeck.Core
         /// <param name="role">The role.</param>
         /// <param name="defaultDeviceId">The default device identifier.</param>
         public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
-            => this.DefaultDeviceChanged?.Invoke(this, EventArgs.Empty);
+        {
+            lock (_syncRoot)
+            {
+                var defaultDevice = this.Devices.FirstOrDefault(d => d.Id == defaultDeviceId)?.Device;
+                foreach (var audioDevice in this.Devices.Where(d => d.IsDynamic && d.Flow == flow && d.Role == role))
+                {
+                    audioDevice.Device = defaultDevice;
+                }
+
+                this.DefaultDeviceChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         /// <summary>
         /// Handles an audio device being added.

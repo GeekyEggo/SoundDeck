@@ -73,7 +73,7 @@
             "Encoder": {
                 "layout": "$B1",
                 "TriggerDescription": {
-                    "Rotate": "Adjust the volume",
+                    "Rotate": "Adjust volume",
                     "Touch": "Toggle mute"
                 }
             },

@@ -6,6 +6,11 @@
     public class VolumeSettings : IVolumeSettings
     {
         /// <summary>
+        /// A <see cref="IVolumeSettings"/> that represents a <see cref="VolumeAction.ToggleMute"/>.
+        /// </summary>
+        public static readonly IVolumeSettings TOGGLE_MUTE = new VolumeSettings(VolumeAction.ToggleMute);
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VolumeSettings"/> class.
         /// </summary>
         /// <param name="action">The action.</param>

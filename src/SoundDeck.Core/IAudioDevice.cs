@@ -9,14 +9,19 @@ namespace SoundDeck.Core
     public interface IAudioDevice
     {
         /// <summary>
-        /// Occurs when the underlying <see cref="IAudioDevice.Id"/> changes.
+        /// Occurs when the underlying device changes.
         /// </summary>
-        event EventHandler IdChanged;
+        event EventHandler DeviceChanged;
 
         /// <summary>
         /// Occurs when the volume has changed.
         /// </summary>
         event EventHandler<IAudioDevice, AudioVolumeNotificationData> VolumeChanged;
+
+        /// <summary>
+        /// Gets the name friendly name associated with underlying audio device.
+        /// </summary>
+        string DeviceName { get; }
 
         /// <summary>
         /// Gets the friendly name of the audio device.
