@@ -8,7 +8,7 @@
     using Nito.AsyncEx;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Events.Sent.Feedback;
+    using SharpDeck.Layouts;
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Volume;
@@ -178,28 +178,18 @@
                 if (this.AudioDevice is not null)
                 {
                     var percent = (int)Math.Round(this.AudioDevice.Volume * 100);
-                    await this.SetFeedbackAsync(new VolumeFeedback
+                    await this.SetFeedbackAsync(new LayoutB1
                     {
-                        Indicator = new VolumeIndicator
-                        {
-                            IsEnabled = true,
-                            Opacity = 1,
-                            Value = percent
-                        },
+                        Indicator = percent,
                         Title = this.AudioDevice.DeviceName,
                         Value = this.AudioDevice.IsMuted ? "Muted" : $"{percent}%"
                     });
                 }
                 else
                 {
-                    await this.SetFeedbackAsync(new VolumeFeedback
+                    await this.SetFeedbackAsync(new LayoutB1
                     {
-                        Indicator = new VolumeIndicator
-                        {
-                            IsEnabled = true,
-                            Opacity = 1,
-                            Value = 0
-                        },
+                        Indicator = 0,
                         Title = "None",
                         Value = "-"
                     });

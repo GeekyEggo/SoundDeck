@@ -8,7 +8,7 @@
     using Nito.AsyncEx;
     using SharpDeck;
     using SharpDeck.Events.Received;
-    using SharpDeck.Events.Sent.Feedback;
+    using SharpDeck.Layouts;
     using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
     using SoundDeck.Core.Sessions;
@@ -277,13 +277,12 @@
                 var hasTitle = this.SessionWatcher?.Title is not null;
 
                 // Set the feedback.
-                var feedback = new VolumeFeedback()
+                var feedback = new LayoutB1
                 {
-                    Indicator = new VolumeIndicator
+                    Indicator = new Bar
                     {
                         IsEnabled = hasTitle,
-                        Opacity = 1,
-                        Value = hasTime ? (int)Math.Ceiling(100 / timeline.EndTime.TotalSeconds * timeline.Position.TotalSeconds) : 0
+                        Value = hasTime ? (int)Math.Ceiling(100 / timeline.EndTime.TotalSeconds * timeline.Position.TotalSeconds) : 0,
                     },
                     Title = this.Title,
                     Icon = updateIcon ? this.GetPreferredIcon() : null,
