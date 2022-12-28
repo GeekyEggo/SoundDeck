@@ -1,6 +1,6 @@
 # Change Log
 
-## vNext
+## v3.7.2
 
 ### ⭐ Added
 
