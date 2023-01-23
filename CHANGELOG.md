@@ -1,6 +1,6 @@
 # Change Log
 
-## vNext
+## v3.7.2
 
 - Update "App Multimedia Controls" to support Stream Deck+ dials and touchpad!
 - Add active apps to dropdown when creating app-specific actions.
