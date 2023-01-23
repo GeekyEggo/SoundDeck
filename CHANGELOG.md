@@ -1,8 +1,9 @@
 # Change Log
 
-## v3.7.2
+## vNext
 
-- Update "App Multimedia Controls" to support Stream Deck+ dials and touchpad!
+- Update "App Multimedia Controls" to support Stream Deck+.
+- Update "Set Audio Device Volume" to support Stream Deck+.
 - Add active apps to dropdown when creating app-specific actions.
 - Add app icon / thumbnail image to media keys.
 
