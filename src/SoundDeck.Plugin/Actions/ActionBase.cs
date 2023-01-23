@@ -33,6 +33,11 @@ namespace SoundDeck.Plugin.Actions
         public IAudioService AudioService { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is an encoder.
+        /// </summary>
+        protected bool IsEncoder { get; set; } = false;
+
+        /// <summary>
         /// Gets the audio devices capable of capturing audio.
         /// </summary>
         /// <returns>The payload containing the audio devices.</returns>
@@ -67,10 +72,22 @@ namespace SoundDeck.Plugin.Actions
             await base.OnSendToPlugin(args);
 
             var payload = args.Payload.ToObject<DataSourcePayload>();
-            if (payload.Event == "getAppAssignableAudioDevices")
+            switch (payload.Event)
             {
-                await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
+                case "getAppAssignableAudioDevices":
+                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
+                    break;
+                case "getAudioDevices":
+                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices()));
+                    break;
             }
+        }
+
+        /// <inheritdoc/>
+        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
+        {
+            await base.OnWillAppear(args);
+            this.IsEncoder = args.Payload.Controller is Controller.Encoder;
         }
 
         /// <summary>
@@ -83,10 +100,15 @@ namespace SoundDeck.Plugin.Actions
             return this.AudioService.Devices
                 .Where(filter)
                 .GroupBy(device => device.Flow)
-                .Select(g =>
+                .Select(group =>
                 {
-                    var children = g.Select(opt => new DataSourceItem(opt.Key, opt.FriendlyName)).ToArray();
-                    return new DataSourceItem(g.Key == DataFlow.Render ? "Playback" : "Recording", children);
+                    var children = group
+                        .OrderByDescending(x => x.IsDynamic)
+                        .ThenBy(x => x.FriendlyName)
+                        .Select(opt => new DataSourceItem(opt.Key, opt.FriendlyName))
+                        .ToArray();
+
+                    return new DataSourceItem(group.Key == DataFlow.Render ? "Playback" : "Recording", children);
                 }).ToArray();
         }
     }

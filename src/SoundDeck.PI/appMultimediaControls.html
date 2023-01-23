@@ -1,33 +1,38 @@
 ﻿<!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="utf-8" />
-    <script src="./js/sdpi-components.js"></script>
-</head>
-<body>
-    <sdpi-item label="Process">
-        <sdpi-select setting="processSelectionType" id="__process" datasource="getMultimediaSessions" placeholder="Foreground"></sdpi-select>
-    </sdpi-item>
+    <head lang="en">
+        <meta charset="utf-8" />
+        <script type="text/javascript">
+            function connectElgatoStreamDeckSocket(inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
+                const { payload: { controller }} = JSON.parse(inActionInfo);
+                if (controller == 'Keypad') {
+                    document.querySelector('sdpi-item[label="Action"]').style.display = '';
+                }
+            }
+        </script>
+        <script src="./js/sdpi-components.js"></script>
+    </head>
+    <body>
+        <sdpi-item label="App">
+            <sdpi-select setting="processSelectionType" datasource="getMultimediaSessions" label-setting="processLabel" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
+        </sdpi-item>
 
-    <sdpi-item label="Name" id="__name" style="display: none;">
-        <sdpi-textfield setting="processName"></sdpi-textfield>
-    </sdpi-item>
+        <sdpi-item label="Action" style="display: none">
+            <sdpi-select setting="action" value-type="number" placeholder="Play / Pause">
+                <option value="0">Play / Pause</option>
+                <option value="1">Play</option>
+                <option value="2">Pause</option>
+                <option value="3">Stop</option>
+                <option value="4">Skip Previous</option>
+                <option value="5">Skip Next</option>
+            </sdpi-select>
+        </sdpi-item>
 
-    <sdpi-item label="Action">
-        <sdpi-select setting="action" value-type="number" placeholder="Play / Pause">
-            <option value="0">Play / Pause</option>
-            <option value="1">Play</option>
-            <option value="2">Pause</option>
-            <option value="3">Stop</option>
-            <option value="4">Skip Previous</option>
-            <option value="5">Skip Next</option>
-        </sdpi-select>
-    </sdpi-item>
-
-    <script>
-        document.getElementById('__process').addEventListener('valuechange', ev => {
-            document.getElementById('__name').style.display = ev.srcElement.value == 1 ? '' : 'none';
-        });
-    </script>
-</body>
+        <sdpi-item label="Display">
+            <sdpi-select setting="preferredIcon" placeholder="Artwork (When Available)">
+                <option value="0">App</option>
+                <option value="1">Artwork (When Available)</option>
+            </sdpi-select>
+        </sdpi-item>
+    </body>
 </html>

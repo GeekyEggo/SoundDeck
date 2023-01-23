@@ -9,6 +9,14 @@ namespace SoundDeck.Core.Interop
     public static class User32
     {
         /// <summary>
+        /// Destroys an icon and frees any memory the icon occupied.
+        /// </summary>
+        /// <param name="hIcon">A handle to the icon to be destroyed. The icon must not be in use..</param>
+        /// <returns>If the function succeeds, the return value is nonzero. If the function fails, the return value is zero</returns>
+        [DllImport("user32.dll", EntryPoint = "DestroyIcon", SetLastError = true)]
+        public static extern int DestroyIcon(IntPtr hIcon);
+
+        /// <summary>
         /// Retrieves the identifier of the thread that created the specified window and, optionally, the identifier of the process that created the window.
         /// </summary>
         /// <param name="hWnd">A handle to the window.</param>

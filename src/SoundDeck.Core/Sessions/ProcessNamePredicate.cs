@@ -3,8 +3,8 @@
     using System;
     using System.Diagnostics;
     using NAudio.CoreAudioApi;
+    using SoundDeck.Core;
     using SoundDeck.Core.Extensions;
-    using Windows.ApplicationModel;
     using Windows.Media.Control;
 
     /// <summary>
@@ -19,10 +19,24 @@
         public ProcessNamePredicate(string processName)
             => this.ProcessName = processName;
 
-        /// <summary>
-        /// Gets the name of the process to match against.
-        /// </summary>
+        /// <inheritdoc/>
         public string ProcessName { get; }
+
+        /// <inheritdoc/>
+        public bool Equals(ISessionPredicate x, ISessionPredicate y)
+        {
+            if (x is ProcessNamePredicate a
+                && y is ProcessNamePredicate b)
+            {
+                return a.ProcessName.Equals(b.ProcessName, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return x == null && y == null;
+        }
+
+        /// <inheritdoc/>
+        public int GetHashCode(ISessionPredicate obj)
+            => this.ProcessName.GetHashCode();
 
         /// <inheritdoc/>
         public bool IsMatch(AudioSessionControl session)
@@ -47,7 +61,7 @@
             try
             {
                 return session.SourceAppUserModelId.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase)
-                    || AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase);
+                    || (AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo) && appInfo.DisplayInfo?.DisplayName?.Contains(this.ProcessName, StringComparison.OrdinalIgnoreCase) == true);
             }
             catch
             {

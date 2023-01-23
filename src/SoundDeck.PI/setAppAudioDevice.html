@@ -5,11 +5,11 @@
     <script src="./js/sdpi-components.js"></script>
 </head>
 <body>
-    <sdpi-item label="Process">
-        <sdpi-select setting="processSelectionType" id="__process" datasource="getAudioSessions" placeholder="Foreground"></sdpi-select>
+    <sdpi-item label="App">
+        <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
     </sdpi-item>
 
-    <sdpi-item label="Name" id="__name" style="display: none;">
+    <sdpi-item label="Name" style="display: none;">
         <sdpi-textfield setting="processName"></sdpi-textfield>
     </sdpi-item>
 
@@ -18,8 +18,8 @@
     </sdpi-item>
 
     <script>
-        document.getElementById('__process').addEventListener('valuechange', ev => {
-            document.getElementById('__name').style.display = ev.srcElement.value == 1 ? '' : 'none';
+        document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+            document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
         });
     </script>
 </body>

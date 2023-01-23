@@ -17,6 +17,11 @@
         public ProcessSelectionType ProcessSelectionType { get; set; }
 
         /// <summary>
+        /// Gets or sets the label that accompanies the selected process.
+        /// </summary>
+        public string ProcessLabel { get; set; }
+
+        /// <summary>
         /// Sets the <see cref="ProcessName"/> and <see cref="ProcessSelectionType"/> based on the value, providing backwards compatibility.
         /// </summary>
         [JsonProperty("processSelectionType")]
@@ -39,6 +44,23 @@
                     this.ProcessName = value;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(IProcessSelectionCriteria other)
+        {
+            if (this is not null && other is not null)
+            {
+                if (this.ProcessSelectionType != other.ProcessSelectionType)
+                {
+                    return false;
+                }
+
+                return this.ProcessSelectionType is ProcessSelectionType.Foreground
+                    || this.ProcessName == other.ProcessName;
+            }
+
+            return this is null && other is null;
         }
     }
 }

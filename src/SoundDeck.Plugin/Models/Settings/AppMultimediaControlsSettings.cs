@@ -12,5 +12,10 @@
         /// Gets or sets the action to apply.
         /// </summary>
         public MultimediaAction Action { get; set; } = MultimediaAction.TogglePlayPause;
+
+        /// <summary>
+        /// Gets or sets the preferred icon.
+        /// </summary>
+        public MediaSessionIconType PreferredIcon { get; set; } = MediaSessionIconType.Artwork;
     }
 }

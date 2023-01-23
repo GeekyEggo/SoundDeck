@@ -26,7 +26,7 @@ namespace SoundDeck.Core.Capture
         /// <param name="logger">The logger.</param>
         public AudioRecorder(IAudioDevice device, ILogger<AudioRecorder> logger)
         {
-            device.IdChanged += (_, __) => this.OnCaptureDeviceChanged();
+            device.DeviceChanged += (_, __) => this.OnCaptureDeviceChanged();
 
             this.Device = device;
             this.Logger = logger;

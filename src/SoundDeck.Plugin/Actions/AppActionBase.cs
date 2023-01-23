@@ -4,7 +4,6 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
-    using global::Windows.ApplicationModel;
     using Newtonsoft.Json.Linq;
     using SharpDeck.Events.Received;
     using SoundDeck.Core;
@@ -37,11 +36,14 @@
             var payload = args.Payload.ToObject<DataSourcePayload>();
             switch (payload.Event)
             {
-                case "getMultimediaSessions":
-                    await this.SendProcessOptions(payload.Event, await this.GetMultimediaSessions());
-                    break;
                 case "getAudioSessions":
                     await this.SendProcessOptions(payload.Event, this.GetAudioSessions());
+                    break;
+                case "getAudioSessionsOnly":
+                    await this.SendProcessOptions(payload.Event, this.GetAudioSessions(), allowUserInput: false);
+                    break;
+                case "getMultimediaSessions":
+                    await this.SendProcessOptions(payload.Event, await this.GetMultimediaSessions());
                     break;
             }
         }
@@ -80,18 +82,12 @@
         private async Task<IReadOnlyList<DataSourceItem>> GetMultimediaSessions()
         {
             var sessions = new Dictionary<string, string>();
-            foreach (var session in await this.AppAudioService.GetMultimediaSessionAsync())
+            foreach (var session in await this.AppAudioService.GetMultimediaSessionsAsync())
             {
                 if (!sessions.ContainsKey(session.SourceAppUserModelId))
                 {
-                    try
-                    {
-                        sessions.Add(session.SourceAppUserModelId, AppInfo.GetFromAppUserModelId(session.SourceAppUserModelId).DisplayInfo.DisplayName);
-                    }
-                    catch
-                    {
-                        sessions.Add(session.SourceAppUserModelId, session.SourceAppUserModelId);
-                    }
+                    AppInfoUtils.TryGet(session.SourceAppUserModelId, out var appInfo);
+                    sessions.Add(session.SourceAppUserModelId, appInfo?.DisplayInfo?.DisplayName ?? session.SourceAppUserModelId);
                 }
             }
 
@@ -106,19 +102,29 @@
         /// </summary>
         /// <param name="eventName">Name of the event that requested the data source.</param>
         /// <param name="sessions">The sessions.</param>
-        private async Task SendProcessOptions(string eventName, IReadOnlyList<DataSourceItem> sessions)
+        /// <param name="allowUserInput">Determines whether "Foreground", and "By Name" should be displayed.</param>
+        private async Task SendProcessOptions(string eventName, IReadOnlyList<DataSourceItem> sessions, bool allowUserInput = true)
         {
+            var items = new List<DataSourceItem>();
+
             // Add the default items.
-            var items = new List<DataSourceItem>
+            if (allowUserInput)
             {
-                new DataSourceItem("0", "Foreground (Active)"),
-                new DataSourceItem("1", "By Name")
-            };
+                items.Add(new DataSourceItem("0", "Foreground (Active)"));
+                items.Add(new DataSourceItem("1", "By Name"));
+            }
 
             // Add the active sessions if we have any.
             if (sessions.Count > 0)
             {
-                items.Add(new DataSourceItem("Apps", sessions));
+                if (allowUserInput)
+                {
+                    items.Add(new DataSourceItem("Apps", sessions));
+                }
+                else
+                {
+                    items.AddRange(sessions);
+                }
             }
 
             // Return the items.

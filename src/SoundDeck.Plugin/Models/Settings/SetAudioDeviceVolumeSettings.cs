@@ -1,5 +1,6 @@
 ﻿namespace SoundDeck.Plugin.Models.Settings
 {
+    using Newtonsoft.Json;
     using SoundDeck.Core.Volume;
     using SoundDeck.Plugin.Actions;
 
@@ -9,9 +10,10 @@
     public class SetAudioDeviceVolumeSettings : IVolumeSettings
     {
         /// <summary>
-        /// Gets or sets the audio device identifier.
+        /// Gets or sets the audio device key used to identify the audio device.
         /// </summary>
-        public string AudioDeviceId { get; set; }
+        [JsonProperty("audioDeviceId")]
+        public string AudioDeviceKey { get; set; }
 
         /// <inheritdoc/>
         public VolumeAction VolumeAction { get; set; }

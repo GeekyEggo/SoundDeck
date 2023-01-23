@@ -117,27 +117,14 @@ namespace SoundDeck.Core
         }
 
         /// <inheritdoc/>
-        public async Task ControlAsync(IProcessSelectionCriteria criteria, MultimediaAction action)
+        public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionsAsync()
         {
-            var predicate = criteria.ToPredicate();
-            var sessions = await this.GetMultimediaSessionAsync();
-
-            foreach (var session in sessions.Where(predicate.IsMatch))
-            {
-                await (action switch
-                {
-                    MultimediaAction.Play => session.TryPlayAsync(),
-                    MultimediaAction.Pause => session.TryPauseAsync(),
-                    MultimediaAction.Stop => session.TryStopAsync(),
-                    MultimediaAction.SkipPrevious => session.TrySkipPreviousAsync(),
-                    MultimediaAction.SkipNext => session.TrySkipNextAsync(),
-                    _ => session.TryTogglePlayPauseAsync()
-                });
-            }
+            var manager = await this.GetMultimediaSessionManagerAsync();
+            return manager.GetSessions();
         }
 
         /// <inheritdoc/>
-        public async Task<IReadOnlyList<GlobalSystemMediaTransportControlsSession>> GetMultimediaSessionAsync()
+        public async Task<GlobalSystemMediaTransportControlsSessionManager> GetMultimediaSessionManagerAsync()
         {
             try
             {
@@ -152,7 +139,7 @@ namespace SoundDeck.Core
                     }
                 }
 
-                return this._manager.GetSessions();
+                return this._manager;
             }
             finally
             {
@@ -211,9 +198,20 @@ namespace SoundDeck.Core
         /// <returns>The device identifier.</returns>
         private string ParseDeviceId(string deviceId)
         {
-            if (deviceId.StartsWith(MMDEVAPI_TOKEN)) deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
-            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE)) deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
+            if (deviceId.StartsWith(MMDEVAPI_TOKEN))
+            {
+                deviceId = deviceId.Remove(0, MMDEVAPI_TOKEN.Length);
+            }
+
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_RENDER))
+            {
+                deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_RENDER.Length);
+            }
+
+            if (deviceId.EndsWith(DEVINTERFACE_AUDIO_CAPTURE))
+            {
+                deviceId = deviceId.Remove(deviceId.Length - DEVINTERFACE_AUDIO_CAPTURE.Length);
+            }
 
             return deviceId;
         }

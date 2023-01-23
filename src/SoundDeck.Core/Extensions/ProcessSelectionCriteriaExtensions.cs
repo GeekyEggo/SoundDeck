@@ -1,7 +1,6 @@
 ﻿namespace SoundDeck.Core.Extensions
 {
     using System;
-    using SoundDeck.Core.Interop;
     using SoundDeck.Core.Sessions;
 
     /// <summary>
@@ -29,10 +28,7 @@
             }
 
             // Select the foreground process predicate.
-            var hwnd = User32.GetForegroundWindow();
-            User32.GetWindowThreadProcessId(hwnd, out var processId);
-
-            return new ProcessIdentifierPredicate(processId);
+            return new ProcessIdentifierPredicate(ForegroundProcess.Id);
         }
     }
 }
