@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" />
+    <title>Clip Audio Settings</title>
+    <script src="./js/sdpi-components.js"></script>
+</head>
+<body>
+    <sdpi-item label="Capture Device">
+        <sdpi-select setting="audioDeviceId" datasource="getAudioDevices"></sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Duration">
+        <sdpi-select setting="duration" placeholder="">
+            <option value="5">5 seconds</option>
+            <option value="10">10 seconds</option>
+            <option value="15">15 seconds</option>
+            <option value="20">20 seconds</option>
+            <option value="25">25 seconds</option>
+            <option value="30">30 seconds</option>
+            <option value="45">45 seconds</option>
+            <option value="60">60 seconds</option>
+            <option value="90">90 seconds</option>
+            <option value="120">120 seconds</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Output Path">
+        <sdpi-delegate setting="outputPath" format-type="path" invoke="GetOutputPath"></sdpi-delegate>
+    </sdpi-item>
+
+    <sdpi-item label="Encoding">
+        <sdpi-checkbox setting="encodeToMP3" label="Encode to MP3"></sdpi-checkbox>
+    </sdpi-item>
+
+    <sdpi-item label="Volume">
+        <sdpi-checkbox setting="normalizeVolume" default="true" label="Normalize"></sdpi-checkbox>
+    </sdpi-item>
+</body>
+</html>

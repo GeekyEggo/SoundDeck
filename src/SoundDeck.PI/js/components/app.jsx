@@ -7,9 +7,6 @@ import SetDefaultAudioDeviceSettings from "./setDefaultAudioDeviceSettings";
 class App extends React.Component {
     render() {
         switch (this.props.uuid) {
-            case "com.geekyeggo.sounddeck.clipaudio":
-                return <CaptureAudioSettings showDuration={true} />;
-
             case "com.geekyeggo.sounddeck.playaudio":
                 return <PlayAudioSettings />;
 

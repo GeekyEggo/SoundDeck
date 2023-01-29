@@ -67,20 +67,15 @@ namespace SoundDeck.Plugin.Actions
         }
 
         /// <inheritdoc/>
-        protected override async Task OnSendToPlugin(ActionEventArgs<JObject> args)
+        protected override Task OnSendToPlugin(ActionEventArgs<JObject> args)
         {
-            await base.OnSendToPlugin(args);
-
             var payload = args.Payload.ToObject<DataSourcePayload>();
-            switch (payload.Event)
+            return payload.Event switch
             {
-                case "getAppAssignableAudioDevices":
-                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications)));
-                    break;
-                case "getAudioDevices":
-                    await this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices()));
-                    break;
-            }
+                "getAppAssignableAudioDevices" => this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices(device => device.Role != Role.Communications))),
+                "getAudioDevices" => this.SendToPropertyInspectorAsync(new DataSourceResponse(payload.Event, this.GetAudioDevices())),
+                _ => base.OnSendToPlugin(args)
+            };
         }
 
         /// <inheritdoc/>

@@ -1,11 +1,17 @@
 # Change Log
 
-## vNext
+## Beta (v3.10.0)
 
-- Update "App Multimedia Controls" to support Stream Deck+.
-- Update "Set Audio Device Volume" to support Stream Deck+.
-- Add active apps to dropdown when creating app-specific actions.
-- Add app icon / thumbnail image to media keys.
+### ⭐ Added
+
+- "App Multimedia Controls" now supports Stream Deck+.
+- "Set Audio Device Volume" now supports Stream Deck+.
+- Media keys can now display application icon / thumbnail image.
+
+### ♻️ Changed
+
+- App-specific actions now list active apps.
+- "Clip Audio" has more duration options.
 
 ## v3.7.2
 
