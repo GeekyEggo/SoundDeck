@@ -1,41 +1,42 @@
 ﻿<!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="utf-8" />
-    <script src="./js/sdpi-components.js"></script>
-</head>
-<body>
-    <sdpi-item label="App">
-        <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
-    </sdpi-item>
+    <head lang="en">
+        <meta charset="utf-8" />
+        <title>Set App Volume Settings</title>
+        <script src="./js/sdpi-components.js"></script>
+    </head>
+    <body>
+        <sdpi-item label="App">
+            <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
+        </sdpi-item>
 
-    <sdpi-item label="Name" id="__name" style="display: none;">
-        <sdpi-textfield setting="processName"></sdpi-textfield>
-    </sdpi-item>
+        <sdpi-item label="Name" style="display: none;">
+            <sdpi-textfield setting="processName"></sdpi-textfield>
+        </sdpi-item>
 
-    <sdpi-item label="Action">
-        <sdpi-select setting="volumeAction" placeholder="Mute / Unmute" value-type="Number">
-            <option value="0">Mute / Unmute</option>
-            <option value="1">Mute</option>
-            <option value="2">Unmute</option>
-            <option value="3">Set</option>
-            <option value="4">Increase By</option>
-            <option value="5">Decrease By</option>
-        </sdpi-select>
-    </sdpi-item>
+        <sdpi-item label="Action">
+            <sdpi-select setting="volumeAction" placeholder="Mute / Unmute" value-type="Number">
+                <option value="0">Mute / Unmute</option>
+                <option value="1">Mute</option>
+                <option value="2">Unmute</option>
+                <option value="3">Set</option>
+                <option value="4">Increase By</option>
+                <option value="5">Decrease By</option>
+            </sdpi-select>
+        </sdpi-item>
 
-    <sdpi-item label="Value" style="display: none">
-        <sdpi-range setting="volumeValue" min="0" max="100" step="5" showlabels></sdpi-range>
-    </sdpi-item>
+        <sdpi-item label="Value" style="display: none">
+            <sdpi-range setting="volumeValue" min="0" max="100" step="5" showlabels></sdpi-range>
+        </sdpi-item>
 
-    <script>
-        document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
-            document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
-        });
+        <script>
+            document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+            });
 
-        document.querySelector('sdpi-select[setting="volumeAction"]').addEventListener('valuechange', ev => {
-            document.querySelector('sdpi-item[label="Value"]').style.display = ev.srcElement.value > 2 ? '' : 'none';
-        });
-    </script>
-</body>
+            document.querySelector('sdpi-select[setting="volumeAction"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Value"]').style.display = ev.srcElement.value > 2 ? '' : 'none';
+            });
+        </script>
+    </body>
 </html>

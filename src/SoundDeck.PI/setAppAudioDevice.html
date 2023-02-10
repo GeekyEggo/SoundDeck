@@ -1,26 +1,27 @@
 ﻿<!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="utf-8" />
-    <script src="./js/sdpi-components.js"></script>
-</head>
-<body>
-    <sdpi-item label="App">
-        <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
-    </sdpi-item>
+    <head lang="en">
+        <meta charset="utf-8" />
+        <title>Set App Audio Device Settings</title>
+        <script src="./js/sdpi-components.js"></script>
+    </head>
+    <body>
+        <sdpi-item label="App">
+            <sdpi-select setting="processSelectionType" datasource="getAudioSessions" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
+        </sdpi-item>
 
-    <sdpi-item label="Name" style="display: none;">
-        <sdpi-textfield setting="processName"></sdpi-textfield>
-    </sdpi-item>
+        <sdpi-item label="Name" style="display: none;">
+            <sdpi-textfield setting="processName"></sdpi-textfield>
+        </sdpi-item>
 
-    <sdpi-item label="Audio Device">
-        <sdpi-select setting="audioDeviceId" datasource="getAppAssignableAudioDevices"></sdpi-select>
-    </sdpi-item>
+        <sdpi-item label="Audio Device">
+            <sdpi-select setting="audioDeviceId" datasource="getAppAssignableAudioDevices"></sdpi-select>
+        </sdpi-item>
 
-    <script>
-        document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
-            document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
-        });
-    </script>
-</body>
+        <script>
+            document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+            });
+        </script>
+    </body>
 </html>

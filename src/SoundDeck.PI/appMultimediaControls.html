@@ -2,9 +2,10 @@
 <html>
     <head lang="en">
         <meta charset="utf-8" />
+        <title>App Media Controls Settings</title>
         <script type="text/javascript">
             function connectElgatoStreamDeckSocket(inPort, inPropertyInspectorUUID, inRegisterEvent, inInfo, inActionInfo) {
-                const { payload: { controller }} = JSON.parse(inActionInfo);
+                const { payload: { controller } } = JSON.parse(inActionInfo);
                 if (controller == 'Keypad') {
                     document.querySelector('sdpi-item[label="Action"]').style.display = '';
                 }
@@ -15,6 +16,10 @@
     <body>
         <sdpi-item label="App">
             <sdpi-select setting="processSelectionType" datasource="getMultimediaSessions" label-setting="processLabel" loading="Loading..." placeholder="Foreground (Active)"></sdpi-select>
+        </sdpi-item>
+
+        <sdpi-item label="Name" style="display: none;">
+            <sdpi-textfield setting="processName"></sdpi-textfield>
         </sdpi-item>
 
         <sdpi-item label="Action" style="display: none">
@@ -34,5 +39,11 @@
                 <option value="1">Artwork (When Available)</option>
             </sdpi-select>
         </sdpi-item>
+
+        <script>
+            document.querySelector('sdpi-select[setting="processSelectionType"]').addEventListener('valuechange', ev => {
+                document.querySelector('sdpi-item[label="Name"]').style.display = ev.srcElement.value == 1 ? '' : 'none';
+            });
+        </script>
     </body>
 </html>
