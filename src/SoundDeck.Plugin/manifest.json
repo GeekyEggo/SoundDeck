@@ -46,6 +46,14 @@
         },
         {
             "Name": "Set App Volume",
+            "Controllers": [ "Encoder", "Keypad" ],
+            "Encoder": {
+                "layout": "$B1",
+                "TriggerDescription": {
+                    "Rotate": "Adjust volume",
+                    "Touch": "Toggle mute"
+                }
+            },
             "Icon": "Images/SetAppVolume/Action",
             "PropertyInspectorPath": "PI/setAppVolume.html",
             "SupportedInMultiActions": true,
