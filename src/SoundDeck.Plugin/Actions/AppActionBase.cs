@@ -1,6 +1,8 @@
 ﻿namespace SoundDeck.Plugin.Actions
 {
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -65,7 +67,14 @@
                 var process = Process.GetProcessById((int)session.GetProcessID);
                 if (!sessions.ContainsKey(process.ProcessName))
                 {
-                    sessions.Add(process.ProcessName, process.MainModule.FileVersionInfo.FileDescription);
+                    try
+                    {
+                        sessions.Add(process.ProcessName, process.MainModule.FileVersionInfo.FileDescription);
+                    }
+                    catch (Win32Exception)
+                    {
+                        sessions.Add(process.ProcessName, process.ProcessName);
+                    }
                 }
             }
 
